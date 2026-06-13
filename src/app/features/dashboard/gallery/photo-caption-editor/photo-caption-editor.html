@@ -1,0 +1,20 @@
+@if (editing()) {
+  <div class="caption-edit">
+    <input class="caption-input" [(ngModel)]="draft" (keyup.enter)="confirm()" (keyup.escape)="cancel()" />
+    <button mat-icon-button (click)="confirm()" aria-label="Salvar legenda">
+      <mat-icon>check</mat-icon>
+    </button>
+    <button mat-icon-button (click)="cancel()" aria-label="Cancelar">
+      <mat-icon>close</mat-icon>
+    </button>
+  </div>
+} @else {
+  <button class="caption-display" (click)="startEdit()">
+    @if (legenda()) {
+      <span>{{ legenda() }}</span>
+    } @else {
+      <span class="caption-placeholder">Adicionar legenda</span>
+    }
+    <mat-icon>edit</mat-icon>
+  </button>
+}

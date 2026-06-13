@@ -1,0 +1,39 @@
+.stats-panel {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(160px, 1fr));
+  gap: 16px;
+  margin-bottom: 12px;
+}
+
+.stat-card {
+  text-align: center;
+
+  mat-card-content {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 4px;
+    padding-top: 16px;
+  }
+
+  mat-icon {
+    color: var(--mat-sys-primary);
+  }
+}
+
+.stat-value {
+  font: var(--mat-sys-headline-medium);
+  font-weight: 600;
+}
+
+.stat-label {
+  font: var(--mat-sys-body-medium);
+  color: var(--mat-sys-on-surface-variant);
+}
+
+.motivational-phrase {
+  text-align: center;
+  color: var(--mat-sys-on-surface-variant);
+  font-style: italic;
+  margin: 0 0 16px;
+}

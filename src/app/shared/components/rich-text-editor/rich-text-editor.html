@@ -1,0 +1,29 @@
+<div class="rich-text-editor" [class.disabled]="disabled">
+  <div class="toolbar">
+    <button mat-icon-button type="button" matTooltip="Negrito" (click)="applyCommand('bold')">
+      <mat-icon>format_bold</mat-icon>
+    </button>
+    <button mat-icon-button type="button" matTooltip="Itálico" (click)="applyCommand('italic')">
+      <mat-icon>format_italic</mat-icon>
+    </button>
+    <button mat-icon-button type="button" matTooltip="Sublinhado" (click)="applyCommand('underline')">
+      <mat-icon>format_underlined</mat-icon>
+    </button>
+    <button mat-icon-button type="button" matTooltip="Lista" (click)="applyCommand('insertUnorderedList')">
+      <mat-icon>format_list_bulleted</mat-icon>
+    </button>
+    <button mat-icon-button type="button" matTooltip="Lista numerada" (click)="applyCommand('insertOrderedList')">
+      <mat-icon>format_list_numbered</mat-icon>
+    </button>
+    <button mat-icon-button type="button" matTooltip="Link" (click)="applyCommand('createLink')">
+      <mat-icon>link</mat-icon>
+    </button>
+  </div>
+  <div
+    #editor
+    class="editor-content"
+    contenteditable="true"
+    (input)="onInput()"
+    (blur)="onBlur()"
+  ></div>
+</div>

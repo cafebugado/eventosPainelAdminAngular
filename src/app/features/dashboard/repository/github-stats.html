@@ -1,0 +1,121 @@
+<div class="page-header">
+  <h1>Repositório</h1>
+  <button mat-flat-button color="primary" (click)="refreshAll()">
+    <mat-icon>refresh</mat-icon>
+    Atualizar
+  </button>
+</div>
+
+<mat-tab-group>
+  @for (panel of panels(); track panel.repo) {
+    <mat-tab [label]="panel.label">
+      @if (panel.loading) {
+        <div class="loading-container">
+          <mat-spinner diameter="40" />
+        </div>
+      } @else {
+        <div class="panel-content">
+          @if (panel.stats) {
+            <div class="stats-grid">
+              <mat-card class="stat-card">
+                <mat-card-content>
+                  <mat-icon>star</mat-icon>
+                  <span class="stat-value">{{ panel.stats.stars }}</span>
+                  <span class="stat-label">Estrelas</span>
+                </mat-card-content>
+              </mat-card>
+              <mat-card class="stat-card">
+                <mat-card-content>
+                  <mat-icon>call_split</mat-icon>
+                  <span class="stat-value">{{ panel.stats.forks }}</span>
+                  <span class="stat-label">Forks</span>
+                </mat-card-content>
+              </mat-card>
+              <mat-card class="stat-card">
+                <mat-card-content>
+                  <mat-icon>error_outline</mat-icon>
+                  <span class="stat-value">{{ panel.stats.open_issues }}</span>
+                  <span class="stat-label">Issues Abertas</span>
+                </mat-card-content>
+              </mat-card>
+              <mat-card class="stat-card">
+                <mat-card-content>
+                  <mat-icon>merge_type</mat-icon>
+                  <span class="stat-value">{{ panel.stats.open_prs }}</span>
+                  <span class="stat-label">PRs Abertos</span>
+                </mat-card-content>
+              </mat-card>
+              @if (panel.stats.commits_count !== undefined) {
+                <mat-card class="stat-card">
+                  <mat-card-content>
+                    <mat-icon>commit</mat-icon>
+                    <span class="stat-value">{{ panel.stats.commits_count }}</span>
+                    <span class="stat-label">Commits</span>
+                  </mat-card-content>
+                </mat-card>
+              }
+            </div>
+          }
+
+          <div class="columns">
+            <mat-card class="list-card">
+              <mat-card-header>
+                <mat-card-title>Commits Recentes</mat-card-title>
+              </mat-card-header>
+              <mat-card-content>
+                @for (commit of panel.commits; track commit.sha) {
+                  <a class="list-item" [href]="commit.html_url" target="_blank" rel="noopener">
+                    <div class="item-main">
+                      <span class="item-title">{{ commit.message }}</span>
+                      <span class="item-meta">{{ commit.author }} · {{ commit.date | date: 'dd/MM/yyyy HH:mm' }}</span>
+                    </div>
+                  </a>
+                } @empty {
+                  <p class="empty-message">Nenhum commit encontrado.</p>
+                }
+              </mat-card-content>
+            </mat-card>
+
+            <mat-card class="list-card">
+              <mat-card-header>
+                <mat-card-title>Pull Requests Recentes</mat-card-title>
+              </mat-card-header>
+              <mat-card-content>
+                @for (pr of panel.prs; track pr.number) {
+                  <a class="list-item" [href]="pr.html_url" target="_blank" rel="noopener">
+                    <div class="item-main">
+                      <span class="item-title">#{{ pr.number }} {{ pr.title }}</span>
+                      <span class="item-meta">{{ pr.user }} · {{ pr.created_at | date: 'dd/MM/yyyy' }}</span>
+                    </div>
+                    <mat-chip [class]="'pr-state pr-state--' + pr.state">{{ prStateLabel(pr.state) }}</mat-chip>
+                  </a>
+                } @empty {
+                  <p class="empty-message">Nenhum pull request encontrado.</p>
+                }
+              </mat-card-content>
+            </mat-card>
+
+            <mat-card class="list-card">
+              <mat-card-header>
+                <mat-card-title>Top Contribuidores</mat-card-title>
+              </mat-card-header>
+              <mat-card-content>
+                @for (contributor of panel.contributors; track contributor.login) {
+                  <a class="list-item" [href]="contributor.html_url" target="_blank" rel="noopener">
+                    <img [src]="contributor.avatar_url" [alt]="contributor.login" class="contributor-avatar" />
+                    <div class="item-main">
+                      <span class="item-title">{{ contributor.login }}</span>
+                      <span class="item-meta">{{ contributor.contributions }} contribuições</span>
+                    </div>
+                  </a>
+                } @empty {
+                  <p class="empty-message">Nenhum contribuidor encontrado.</p>
+                }
+              </mat-card-content>
+            </mat-card>
+          </div>
+        </div>
+      }
+    </mat-tab>
+  }
+</mat-tab-group>

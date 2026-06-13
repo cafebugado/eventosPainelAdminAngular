@@ -1,0 +1,39 @@
+<div class="mobile-nav">
+  <mat-toolbar class="mobile-nav-header">
+    <span>Café Bugado</span>
+    <span class="spacer"></span>
+    <button mat-icon-button (click)="toggleTheme()">
+      <mat-icon>{{ themeService.theme() === 'dark' ? 'light_mode' : 'dark_mode' }}</mat-icon>
+    </button>
+    <button mat-icon-button (click)="close()">
+      <mat-icon>close</mat-icon>
+    </button>
+  </mat-toolbar>
+
+  <nav class="mobile-nav-list">
+    @for (item of menuItems(); track item.route) {
+      <a
+        [routerLink]="['/admin/dashboard', item.route]"
+        routerLinkActive="active"
+        class="nav-item"
+        (click)="close()"
+      >
+        <mat-icon>{{ item.icon }}</mat-icon>
+        <span>{{ item.label }}</span>
+      </a>
+    }
+
+    <a [href]="siteUrl" target="_blank" rel="noopener" class="nav-item" (click)="close()">
+      <mat-icon>open_in_new</mat-icon>
+      <span>Ver Site</span>
+    </a>
+  </nav>
+
+  <div class="mobile-nav-footer">
+    <span class="role-label">{{ roleService.role() | roleLabel }}</span>
+    <button mat-button color="warn" (click)="handleLogout()">
+      <mat-icon>logout</mat-icon>
+      Sair
+    </button>
+  </div>
+</div>

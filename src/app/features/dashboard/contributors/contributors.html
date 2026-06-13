@@ -1,0 +1,54 @@
+<div class="page-header">
+  <h1>Contribuintes</h1>
+  <button mat-flat-button color="primary" (click)="openCreateDialog()">
+    <mat-icon>add</mat-icon>
+    Novo Contribuinte
+  </button>
+</div>
+
+@if (loading()) {
+  <div class="loading-container">
+    <mat-spinner diameter="40" />
+  </div>
+} @else {
+  <div class="contributors-grid">
+    @for (contributor of contributors(); track contributor.id) {
+      <mat-card class="contributor-card">
+        <mat-card-content>
+          @if (contributor.avatar_url) {
+            <img [src]="contributor.avatar_url" [alt]="contributor.nome ?? contributor.github_username" class="avatar" />
+          }
+          <div class="contributor-info">
+            <span class="contributor-name">{{ contributor.nome ?? contributor.github_username }}</span>
+            <span class="contributor-username">{{ '@' + contributor.github_username }}</span>
+          </div>
+          <div class="contributor-links">
+            <a [href]="'https://github.com/' + contributor.github_username" target="_blank" rel="noopener" matTooltip="GitHub">
+              <mat-icon>code</mat-icon>
+            </a>
+            @if (contributor.linkedin_url) {
+              <a [href]="contributor.linkedin_url" target="_blank" rel="noopener" matTooltip="LinkedIn">
+                <mat-icon>work</mat-icon>
+              </a>
+            }
+            @if (contributor.portfolio_url) {
+              <a [href]="contributor.portfolio_url" target="_blank" rel="noopener" matTooltip="Portfolio">
+                <mat-icon>language</mat-icon>
+              </a>
+            }
+          </div>
+        </mat-card-content>
+        <mat-card-actions align="end">
+          <button mat-icon-button (click)="openEditDialog(contributor)" aria-label="Editar">
+            <mat-icon>edit</mat-icon>
+          </button>
+          <button mat-icon-button (click)="deleteContributor(contributor)" aria-label="Excluir">
+            <mat-icon>delete</mat-icon>
+          </button>
+        </mat-card-actions>
+      </mat-card>
+    } @empty {
+      <p class="empty-message">Nenhum contribuinte cadastrado.</p>
+    }
+  </div>
+}

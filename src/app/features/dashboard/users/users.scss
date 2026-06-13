@@ -1,0 +1,35 @@
+@use '../../../shared/styles/page' as page;
+
+.page-header {
+  @include page.page-header;
+
+  h1 {
+    margin: 0;
+    font: var(--mat-sys-headline-small);
+  }
+}
+
+.loading-container {
+  @include page.loading-container;
+}
+
+.users-table {
+  width: 100%;
+}
+
+.you-chip {
+  margin-left: 8px;
+  font: var(--mat-sys-label-small);
+  min-height: 20px;
+  background: var(--mat-sys-primary-container);
+  color: var(--mat-sys-on-primary-container);
+}
+
+.role-select {
+  width: 180px;
+  margin-bottom: -1.25em;
+}
+
+.empty-message {
+  @include page.empty-message;
+}

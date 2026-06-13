@@ -1,0 +1,20 @@
+<mat-form-field appearance="outline" class="full-width">
+  <mat-label>Endereço</mat-label>
+  <input matInput [formControlName]="enderecoControlName" />
+</mat-form-field>
+
+<div class="location-row">
+  <mat-form-field appearance="outline" class="full-width">
+    <mat-label>Cidade</mat-label>
+    <input matInput [formControlName]="cidadeControlName" />
+  </mat-form-field>
+
+  <mat-form-field appearance="outline" class="full-width">
+    <mat-label>Estado</mat-label>
+    <mat-select [formControlName]="estadoControlName">
+      @for (state of states; track state.uf) {
+        <mat-option [value]="state.uf">{{ state.nome }}</mat-option>
+      }
+    </mat-select>
+  </mat-form-field>
+</div>

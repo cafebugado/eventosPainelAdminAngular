@@ -1,0 +1,65 @@
+<div class="page-header">
+  <h1>Galeria</h1>
+  <button mat-flat-button color="primary" (click)="openCreateDialog()">
+    <mat-icon>add</mat-icon>
+    Novo Álbum
+  </button>
+</div>
+
+@if (loading()) {
+  <div class="loading-container">
+    <mat-spinner diameter="40" />
+  </div>
+} @else {
+  <div class="albums-list">
+    @for (album of albums(); track album.id) {
+      <mat-card class="album-card">
+        <mat-card-header>
+          <mat-card-title>{{ albumTitle(album) }}</mat-card-title>
+          <button mat-icon-button (click)="deleteAlbum(album)" aria-label="Excluir álbum">
+            <mat-icon>delete</mat-icon>
+          </button>
+        </mat-card-header>
+        <mat-card-content>
+          <div class="photos-grid">
+            @for (foto of album.fotos; track foto.id) {
+              <div class="photo-item">
+                <img [src]="foto.url" [alt]="foto.legenda ?? ''" class="photo-image" />
+                <app-photo-caption-editor [legenda]="foto.legenda" (save)="updateCaption(foto, $event)" />
+                <button mat-icon-button class="photo-delete" (click)="deletePhoto(foto)" aria-label="Excluir foto">
+                  <mat-icon>delete</mat-icon>
+                </button>
+              </div>
+            } @empty {
+              <p class="empty-message">Nenhuma foto neste álbum.</p>
+            }
+          </div>
+
+          <div class="add-photo-row">
+            <button mat-stroked-button (click)="fileInput.click()">
+              <mat-icon>upload</mat-icon>
+              Enviar foto
+            </button>
+            <input #fileInput type="file" accept="image/*" hidden (change)="onFileSelected(album, $event)" />
+
+            <mat-form-field appearance="outline" class="url-field">
+              <mat-label>URL da foto</mat-label>
+              <input
+                matInput
+                [ngModel]="photoUrlDraft(album.id)"
+                (ngModelChange)="setPhotoUrlDraft(album.id, $event)"
+                (keyup.enter)="addPhotoByUrl(album)"
+              />
+            </mat-form-field>
+            <button mat-stroked-button (click)="addPhotoByUrl(album)">
+              <mat-icon>add</mat-icon>
+              Adicionar
+            </button>
+          </div>
+        </mat-card-content>
+      </mat-card>
+    } @empty {
+      <p class="empty-message">Nenhum álbum cadastrado.</p>
+    }
+  </div>
+}

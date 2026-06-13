@@ -1,0 +1,64 @@
+@use '../../../shared/styles/page' as page;
+
+.page-header {
+  @include page.page-header;
+
+  h1 {
+    margin: 0;
+    font: var(--mat-sys-headline-small);
+  }
+}
+
+.loading-container {
+  @include page.loading-container;
+}
+
+.contributors-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(220px, 1fr));
+  gap: 16px;
+}
+
+.contributor-card {
+  mat-card-content {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 8px;
+    text-align: center;
+  }
+}
+
+.avatar {
+  width: 64px;
+  height: 64px;
+  border-radius: 50%;
+  object-fit: cover;
+}
+
+.contributor-info {
+  display: flex;
+  flex-direction: column;
+}
+
+.contributor-name {
+  font-weight: 500;
+}
+
+.contributor-username {
+  color: var(--mat-sys-on-surface-variant);
+  font: var(--mat-sys-body-small);
+}
+
+.contributor-links {
+  display: flex;
+  gap: 8px;
+
+  a {
+    color: var(--mat-sys-on-surface-variant);
+  }
+}
+
+.empty-message {
+  @include page.empty-message;
+}

@@ -1,0 +1,91 @@
+<div class="page-header">
+  <h1>Auditoria</h1>
+</div>
+
+<div class="filters">
+  <mat-form-field appearance="outline" class="filter-field">
+    <mat-label>Usuário</mat-label>
+    <mat-select [(ngModel)]="userIdFilter" (selectionChange)="applyFilters()">
+      <mat-option value="">Todos</mat-option>
+      @for (user of users(); track user.user_id) {
+        <mat-option [value]="user.user_id">{{ userLabel()(user.user_id) }}</mat-option>
+      }
+    </mat-select>
+  </mat-form-field>
+
+  <mat-form-field appearance="outline" class="filter-field">
+    <mat-label>Ação</mat-label>
+    <mat-select [(ngModel)]="actionFilter" (selectionChange)="applyFilters()">
+      <mat-option value="">Todas</mat-option>
+      @for (action of actions; track action) {
+        <mat-option [value]="action">{{ action }}</mat-option>
+      }
+    </mat-select>
+  </mat-form-field>
+
+  <mat-form-field appearance="outline" class="filter-field">
+    <mat-label>Entidade</mat-label>
+    <mat-select [(ngModel)]="entityFilter" (selectionChange)="applyFilters()">
+      <mat-option value="">Todas</mat-option>
+      @for (entity of entities; track entity) {
+        <mat-option [value]="entity">{{ entity }}</mat-option>
+      }
+    </mat-select>
+  </mat-form-field>
+
+  <mat-form-field appearance="outline" class="filter-field">
+    <mat-label>De</mat-label>
+    <input matInput type="date" [(ngModel)]="dateFromFilter" (change)="applyFilters()" />
+  </mat-form-field>
+
+  <mat-form-field appearance="outline" class="filter-field">
+    <mat-label>Até</mat-label>
+    <input matInput type="date" [(ngModel)]="dateToFilter" (change)="applyFilters()" />
+  </mat-form-field>
+</div>
+
+@if (loading()) {
+  <div class="loading-container">
+    <mat-spinner diameter="40" />
+  </div>
+} @else {
+  <table mat-table [dataSource]="logs()" class="audit-table">
+    <ng-container matColumnDef="created_at">
+      <th mat-header-cell *matHeaderCellDef>Data</th>
+      <td mat-cell *matCellDef="let log">{{ log.created_at | date: 'dd/MM/yyyy HH:mm' }}</td>
+    </ng-container>
+
+    <ng-container matColumnDef="user">
+      <th mat-header-cell *matHeaderCellDef>Usuário</th>
+      <td mat-cell *matCellDef="let log">{{ userLabel()(log.user_id) }}</td>
+    </ng-container>
+
+    <ng-container matColumnDef="action">
+      <th mat-header-cell *matHeaderCellDef>Ação</th>
+      <td mat-cell *matCellDef="let log">{{ log.action }}</td>
+    </ng-container>
+
+    <ng-container matColumnDef="entity">
+      <th mat-header-cell *matHeaderCellDef>Entidade</th>
+      <td mat-cell *matCellDef="let log">{{ log.entity }}</td>
+    </ng-container>
+
+    <ng-container matColumnDef="acoes">
+      <th mat-header-cell *matHeaderCellDef></th>
+      <td mat-cell *matCellDef="let log">
+        <button mat-icon-button (click)="openDetail(log)" aria-label="Ver detalhes">
+          <mat-icon>visibility</mat-icon>
+        </button>
+      </td>
+    </ng-container>
+
+    <tr mat-header-row *matHeaderRowDef="columns"></tr>
+    <tr mat-row *matRowDef="let row; columns: columns"></tr>
+  </table>
+
+  @if (logs().length === 0) {
+    <p class="empty-message">Nenhum registro encontrado.</p>
+  }
+
+  <app-pagination [totalItems]="total()" [page]="page()" (pageChange)="onPageChange($event)" />
+}

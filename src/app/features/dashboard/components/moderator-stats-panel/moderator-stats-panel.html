@@ -1,0 +1,29 @@
+@if (roleService.role() === 'moderador') {
+  <div class="stats-panel">
+    <mat-card class="stat-card">
+      <mat-card-content>
+        <mat-icon>volunteer_activism</mat-icon>
+        <div class="stat-value">{{ myContributions() }}</div>
+        <div class="stat-label">Minhas Contribuições</div>
+      </mat-card-content>
+    </mat-card>
+
+    <mat-card class="stat-card">
+      <mat-card-content>
+        <mat-icon>date_range</mat-icon>
+        <div class="stat-value">{{ thisWeekCount() }}</div>
+        <div class="stat-label">Esta Semana</div>
+      </mat-card-content>
+    </mat-card>
+
+    <mat-card class="stat-card">
+      <mat-card-content>
+        <mat-icon>upcoming</mat-icon>
+        <div class="stat-value">{{ upcomingCount() }}</div>
+        <div class="stat-label">Próximos</div>
+      </mat-card-content>
+    </mat-card>
+  </div>
+
+  <p class="motivational-phrase">{{ motivationalPhrase() }}</p>
+}

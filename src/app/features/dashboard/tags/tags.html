@@ -1,0 +1,34 @@
+<div class="page-header">
+  <h1>Tags</h1>
+  <button mat-flat-button color="primary" (click)="openCreateDialog()">
+    <mat-icon>add</mat-icon>
+    Nova Tag
+  </button>
+</div>
+
+@if (loading()) {
+  <div class="loading-container">
+    <mat-spinner diameter="40" />
+  </div>
+} @else {
+  <div class="tags-grid">
+    @for (tag of tags(); track tag.id) {
+      <mat-card class="tag-card">
+        <mat-card-content>
+          <div class="tag-swatch" [style.background]="tag.cor"></div>
+          <span class="tag-name">{{ tag.nome }}</span>
+        </mat-card-content>
+        <mat-card-actions align="end">
+          <button mat-icon-button (click)="openEditDialog(tag)" aria-label="Editar">
+            <mat-icon>edit</mat-icon>
+          </button>
+          <button mat-icon-button (click)="deleteTag(tag)" aria-label="Excluir">
+            <mat-icon>delete</mat-icon>
+          </button>
+        </mat-card-actions>
+      </mat-card>
+    } @empty {
+      <p class="empty-message">Nenhuma tag cadastrada.</p>
+    }
+  </div>
+}

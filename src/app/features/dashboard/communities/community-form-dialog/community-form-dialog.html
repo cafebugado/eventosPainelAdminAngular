@@ -1,0 +1,21 @@
+<h2 mat-dialog-title>{{ isEdit ? 'Editar Comunidade' : 'Nova Comunidade' }}</h2>
+
+<mat-dialog-content>
+  <form [formGroup]="form" class="community-form">
+    <mat-form-field appearance="outline" class="full-width">
+      <mat-label>Nome</mat-label>
+      <input matInput formControlName="nome" />
+      @if (form.controls.nome.hasError('required')) {
+        <mat-error>O nome é obrigatório</mat-error>
+      }
+      @if (form.controls.nome.hasError('minlength')) {
+        <mat-error>O nome deve ter no mínimo 2 caracteres</mat-error>
+      }
+    </mat-form-field>
+  </form>
+</mat-dialog-content>
+
+<mat-dialog-actions align="end">
+  <button mat-button (click)="cancel()">Cancelar</button>
+  <button mat-flat-button color="primary" (click)="save()">Salvar</button>
+</mat-dialog-actions>

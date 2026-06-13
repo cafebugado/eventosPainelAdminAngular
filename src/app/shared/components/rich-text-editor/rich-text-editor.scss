@@ -1,0 +1,30 @@
+.rich-text-editor {
+  border: 1px solid var(--mat-sys-outline);
+  border-radius: 4px;
+  overflow: hidden;
+
+  &.disabled {
+    pointer-events: none;
+    opacity: 0.6;
+  }
+}
+
+.toolbar {
+  display: flex;
+  gap: 4px;
+  padding: 4px;
+  border-bottom: 1px solid var(--mat-sys-outline-variant);
+  background: var(--mat-sys-surface-container-low);
+}
+
+.editor-content {
+  min-height: 150px;
+  padding: 12px;
+  outline: none;
+  font: var(--mat-sys-body-medium);
+
+  &:empty::before {
+    content: 'Digite a descrição do evento...';
+    color: var(--mat-sys-on-surface-variant);
+  }
+}

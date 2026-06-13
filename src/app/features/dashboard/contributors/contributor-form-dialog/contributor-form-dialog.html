@@ -1,0 +1,62 @@
+<h2 mat-dialog-title>{{ isEdit ? 'Editar Contribuinte' : 'Novo Contribuinte' }}</h2>
+
+<mat-dialog-content>
+  <form [formGroup]="form" class="contributor-form">
+    <div class="form-row">
+      <mat-form-field appearance="outline" class="full-width">
+        <mat-label>Username do GitHub</mat-label>
+        <input matInput formControlName="github_username" />
+        @if (form.controls.github_username.hasError('required')) {
+          <mat-error>O username é obrigatório</mat-error>
+        }
+        @if (form.controls.github_username.hasError('githubUsername')) {
+          <mat-error>Username inválido</mat-error>
+        }
+      </mat-form-field>
+
+      <button mat-stroked-button type="button" (click)="searchGitHub()" [disabled]="searchingGithub()">
+        @if (searchingGithub()) {
+          <mat-spinner diameter="18" />
+        } @else {
+          <mat-icon>search</mat-icon>
+        }
+        Buscar
+      </button>
+    </div>
+
+    @if (form.controls.avatar_url.value) {
+      <img [src]="form.controls.avatar_url.value" alt="Avatar" class="avatar-preview" />
+    }
+
+    <mat-form-field appearance="outline" class="full-width">
+      <mat-label>Nome</mat-label>
+      <input matInput formControlName="nome" />
+    </mat-form-field>
+
+    <mat-form-field appearance="outline" class="full-width">
+      <mat-label>Avatar URL</mat-label>
+      <input matInput formControlName="avatar_url" />
+    </mat-form-field>
+
+    <mat-form-field appearance="outline" class="full-width">
+      <mat-label>LinkedIn</mat-label>
+      <input matInput formControlName="linkedin_url" placeholder="https://linkedin.com/in/..." />
+      @if (form.controls.linkedin_url.hasError('linkedin')) {
+        <mat-error>URL do LinkedIn inválida</mat-error>
+      }
+    </mat-form-field>
+
+    <mat-form-field appearance="outline" class="full-width">
+      <mat-label>Portfolio</mat-label>
+      <input matInput formControlName="portfolio_url" placeholder="https://..." />
+      @if (form.controls.portfolio_url.hasError('portfolio')) {
+        <mat-error>URL do portfolio inválida</mat-error>
+      }
+    </mat-form-field>
+  </form>
+</mat-dialog-content>
+
+<mat-dialog-actions align="end">
+  <button mat-button (click)="onCancel()">Cancelar</button>
+  <button mat-flat-button color="primary" (click)="onSubmit()">Salvar</button>
+</mat-dialog-actions>

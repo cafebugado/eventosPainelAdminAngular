@@ -1,0 +1,21 @@
+@mixin page-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 16px;
+  margin-bottom: 16px;
+  flex-wrap: wrap;
+}
+
+@mixin loading-container {
+  display: flex;
+  justify-content: center;
+  padding: 48px;
+}
+
+@mixin empty-message {
+  color: var(--mat-sys-on-surface-variant);
+  text-align: center;
+  padding: 24px;
+  grid-column: 1 / -1;
+}

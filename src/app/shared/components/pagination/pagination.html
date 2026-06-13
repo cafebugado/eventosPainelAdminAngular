@@ -1,0 +1,11 @@
+@if (totalPages() > 1) {
+  <div class="pagination">
+    <button mat-icon-button [disabled]="page() <= 1" (click)="previous()" aria-label="Página anterior">
+      <mat-icon>chevron_left</mat-icon>
+    </button>
+    <span class="pagination-info">Página {{ page() }} de {{ totalPages() }}</span>
+    <button mat-icon-button [disabled]="page() >= totalPages()" (click)="next()" aria-label="Próxima página">
+      <mat-icon>chevron_right</mat-icon>
+    </button>
+  </div>
+}

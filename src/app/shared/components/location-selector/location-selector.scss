@@ -1,0 +1,12 @@
+.full-width {
+  width: 100%;
+}
+
+.location-row {
+  display: flex;
+  gap: 16px;
+
+  .full-width {
+    flex: 1;
+  }
+}

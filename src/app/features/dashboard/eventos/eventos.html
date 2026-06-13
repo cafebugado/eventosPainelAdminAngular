@@ -1,0 +1,104 @@
+<div class="page-header">
+  <h1>Eventos</h1>
+  @if (roleService.permissions().canCreateEvents) {
+    <button mat-flat-button color="primary" (click)="openCreateDialog()">
+      <mat-icon>add</mat-icon>
+      Novo Evento
+    </button>
+  }
+</div>
+
+<div class="filters">
+  <mat-form-field appearance="outline" class="search-field">
+    <mat-label>Buscar</mat-label>
+    <input matInput [ngModel]="searchQuery()" (ngModelChange)="onSearchChange($event)" placeholder="Nome, descrição ou data" />
+    <mat-icon matSuffix>search</mat-icon>
+  </mat-form-field>
+
+  <mat-form-field appearance="outline" class="status-field">
+    <mat-label>Status</mat-label>
+    <mat-select [ngModel]="statusFilter()" (ngModelChange)="onStatusFilterChange($event)">
+      @for (option of statusOptions; track option.value) {
+        <mat-option [value]="option.value">{{ option.label }}</mat-option>
+      }
+    </mat-select>
+  </mat-form-field>
+</div>
+
+@if (loading()) {
+  <div class="loading-container">
+    <mat-spinner diameter="40" />
+  </div>
+} @else {
+  <div class="table-container">
+    <table mat-table [dataSource]="paginatedEvents()">
+      <ng-container matColumnDef="imagem">
+        <th mat-header-cell *matHeaderCellDef></th>
+        <td mat-cell *matCellDef="let event">
+          @if (event.imagem) {
+            <img [src]="event.imagem" [alt]="event.nome" class="event-thumb" />
+          } @else {
+            <div class="event-thumb placeholder">
+              <mat-icon>image</mat-icon>
+            </div>
+          }
+        </td>
+      </ng-container>
+
+      <ng-container matColumnDef="nome">
+        <th mat-header-cell *matHeaderCellDef>Nome</th>
+        <td mat-cell *matCellDef="let event">
+          <span class="event-name">{{ event.nome }}</span>
+          <span class="status-badge" [class]="'status-' + event.status">{{ event.status }}</span>
+        </td>
+      </ng-container>
+
+      <ng-container matColumnDef="data_evento">
+        <th mat-header-cell *matHeaderCellDef>Data do evento</th>
+        <td mat-cell *matCellDef="let event">{{ event.data_evento }}</td>
+      </ng-container>
+
+      <ng-container matColumnDef="created_at">
+        <th mat-header-cell *matHeaderCellDef>Criado em</th>
+        <td mat-cell *matCellDef="let event">{{ event.created_at | date: 'dd/MM/yyyy' }}</td>
+      </ng-container>
+
+      <ng-container matColumnDef="acoes">
+        <th mat-header-cell *matHeaderCellDef>Ações</th>
+        <td mat-cell *matCellDef="let event">
+          <div class="actions">
+            @if (event.status !== 'publicado' && roleService.permissions().canPublishEvents) {
+              <button mat-icon-button matTooltip="Publicar" (click)="publishEvent(event)">
+                <mat-icon>publish</mat-icon>
+              </button>
+            }
+            @if (event.status === 'publicado') {
+              <button mat-icon-button matTooltip="Copiar link" (click)="copyLink(event)">
+                <mat-icon>link</mat-icon>
+              </button>
+            }
+            @if (canEdit(event)) {
+              <button mat-icon-button matTooltip="Editar" (click)="openEditDialog(event)">
+                <mat-icon>edit</mat-icon>
+              </button>
+            }
+            @if (canDelete(event)) {
+              <button mat-icon-button matTooltip="Excluir" (click)="deleteEvent(event)">
+                <mat-icon>delete</mat-icon>
+              </button>
+            }
+          </div>
+        </td>
+      </ng-container>
+
+      <tr mat-header-row *matHeaderRowDef="displayedColumns"></tr>
+      <tr mat-row *matRowDef="let row; columns: displayedColumns"></tr>
+    </table>
+
+    @if (paginatedEvents().length === 0) {
+      <p class="empty-message">Nenhum evento encontrado.</p>
+    }
+  </div>
+
+  <app-pagination [totalItems]="filteredEvents().length" [page]="currentPage()" (pageChange)="onPageChange($event)" />
+}

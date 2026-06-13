@@ -1,0 +1,63 @@
+<aside class="sidebar" [class.collapsed]="sidebarService.collapsed()">
+  <div class="sidebar-header">
+    @if (!sidebarService.collapsed()) {
+      <span class="brand">Café Bugado</span>
+    }
+    <button mat-icon-button (click)="toggleCollapse()" [matTooltip]="sidebarService.collapsed() ? 'Expandir' : 'Recolher'">
+      <mat-icon>{{ sidebarService.collapsed() ? 'menu' : 'menu_open' }}</mat-icon>
+    </button>
+  </div>
+
+  <nav class="sidebar-nav">
+    @for (item of menuItems(); track item.route) {
+      <a
+        [routerLink]="['/admin/dashboard', item.route]"
+        routerLinkActive="active"
+        class="nav-item"
+        [matTooltip]="sidebarService.collapsed() ? item.label : ''"
+        matTooltipPosition="right"
+      >
+        <mat-icon>{{ item.icon }}</mat-icon>
+        @if (!sidebarService.collapsed()) {
+          <span>{{ item.label }}</span>
+        }
+      </a>
+    }
+
+    <a
+      [href]="siteUrl"
+      target="_blank"
+      rel="noopener"
+      class="nav-item"
+      [matTooltip]="sidebarService.collapsed() ? 'Ver Site' : ''"
+      matTooltipPosition="right"
+    >
+      <mat-icon>open_in_new</mat-icon>
+      @if (!sidebarService.collapsed()) {
+        <span>Ver Site</span>
+      }
+    </a>
+  </nav>
+
+  <mat-divider />
+
+  <div class="sidebar-footer">
+    <button mat-icon-button (click)="toggleTheme()" [matTooltip]="themeService.theme() === 'dark' ? 'Tema claro' : 'Tema escuro'">
+      <mat-icon>{{ themeService.theme() === 'dark' ? 'light_mode' : 'dark_mode' }}</mat-icon>
+    </button>
+
+    @if (!sidebarService.collapsed()) {
+      <div class="user-info">
+        <div class="avatar">{{ avatarInitial() }}</div>
+        <div class="user-details">
+          <span class="user-name">{{ displayName() }}</span>
+          <span class="user-role">{{ roleService.role() | roleLabel }}</span>
+        </div>
+      </div>
+    }
+
+    <button mat-icon-button (click)="handleLogout()" matTooltip="Sair" class="logout-button">
+      <mat-icon>logout</mat-icon>
+    </button>
+  </div>
+</aside>

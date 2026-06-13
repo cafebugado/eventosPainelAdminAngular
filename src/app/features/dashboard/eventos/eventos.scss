@@ -1,0 +1,92 @@
+@use '../../../shared/styles/page' as page;
+
+.page-header {
+  @include page.page-header;
+
+  h1 {
+    margin: 0;
+    font: var(--mat-sys-headline-small);
+  }
+}
+
+.filters {
+  display: flex;
+  gap: 16px;
+  margin-bottom: 16px;
+  flex-wrap: wrap;
+
+  .search-field {
+    flex: 2;
+    min-width: 200px;
+  }
+
+  .status-field {
+    flex: 1;
+    min-width: 160px;
+  }
+}
+
+.loading-container {
+  @include page.loading-container;
+}
+
+.table-container {
+  overflow-x: auto;
+
+  table {
+    width: 100%;
+  }
+}
+
+.event-thumb {
+  width: 56px;
+  height: 56px;
+  border-radius: 8px;
+  object-fit: cover;
+
+  &.placeholder {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background: var(--mat-sys-surface-container);
+    color: var(--mat-sys-on-surface-variant);
+  }
+}
+
+.event-name {
+  display: block;
+  font-weight: 500;
+}
+
+.status-badge {
+  display: inline-block;
+  font: var(--mat-sys-label-small);
+  padding: 2px 8px;
+  border-radius: 8px;
+  margin-top: 4px;
+  text-transform: capitalize;
+
+  &.status-publicado {
+    background: var(--mat-sys-tertiary-container);
+    color: var(--mat-sys-on-tertiary-container);
+  }
+
+  &.status-rascunho {
+    background: var(--mat-sys-surface-container-high);
+    color: var(--mat-sys-on-surface-variant);
+  }
+
+  &.status-arquivado {
+    background: var(--mat-sys-error-container);
+    color: var(--mat-sys-on-error-container);
+  }
+}
+
+.actions {
+  display: flex;
+  gap: 4px;
+}
+
+.empty-message {
+  @include page.empty-message;
+}

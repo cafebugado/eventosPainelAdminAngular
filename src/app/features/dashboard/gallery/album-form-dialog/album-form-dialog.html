@@ -1,0 +1,44 @@
+<h2 mat-dialog-title>{{ isEdit ? 'Editar Álbum' : 'Novo Álbum' }}</h2>
+
+<mat-dialog-content>
+  <form [formGroup]="form" class="album-form">
+    <mat-form-field appearance="outline" class="full-width">
+      <mat-label>Vincular a</mat-label>
+      <mat-select formControlName="vinculo">
+        <mat-option value="evento">Evento</mat-option>
+        <mat-option value="comunidade">Comunidade</mat-option>
+      </mat-select>
+    </mat-form-field>
+
+    @if (form.controls.vinculo.value === 'evento') {
+      <mat-form-field appearance="outline" class="full-width">
+        <mat-label>Evento</mat-label>
+        <mat-select formControlName="evento_id">
+          @for (evento of events(); track evento.id) {
+            <mat-option [value]="evento.id">{{ evento.nome }}</mat-option>
+          }
+        </mat-select>
+        @if (form.controls.evento_id.hasError('required')) {
+          <mat-error>Selecione um evento</mat-error>
+        }
+      </mat-form-field>
+    } @else {
+      <mat-form-field appearance="outline" class="full-width">
+        <mat-label>Comunidade</mat-label>
+        <mat-select formControlName="comunidade_id">
+          @for (community of communities(); track community.id) {
+            <mat-option [value]="community.id">{{ community.nome }}</mat-option>
+          }
+        </mat-select>
+        @if (form.controls.comunidade_id.hasError('required')) {
+          <mat-error>Selecione uma comunidade</mat-error>
+        }
+      </mat-form-field>
+    }
+  </form>
+</mat-dialog-content>
+
+<mat-dialog-actions align="end">
+  <button mat-button (click)="cancel()">Cancelar</button>
+  <button mat-flat-button color="primary" (click)="save()">Salvar</button>
+</mat-dialog-actions>

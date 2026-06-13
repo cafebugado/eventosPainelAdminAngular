@@ -1,0 +1,31 @@
+.meta {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  margin-bottom: 16px;
+  font: var(--mat-sys-body-medium);
+}
+
+.changes-table {
+  width: 100%;
+  border-collapse: collapse;
+  font: var(--mat-sys-body-small);
+
+  th,
+  td {
+    border: 1px solid var(--mat-sys-outline-variant);
+    padding: 8px;
+    text-align: left;
+    word-break: break-word;
+  }
+
+  th {
+    background: var(--mat-sys-surface-container-highest);
+  }
+}
+
+.empty-message {
+  color: var(--mat-sys-on-surface-variant);
+  text-align: center;
+  padding: 16px;
+}

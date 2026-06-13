@@ -1,0 +1,39 @@
+<h2 mat-dialog-title>Detalhes do Registro</h2>
+
+<mat-dialog-content>
+  <div class="meta">
+    <div><strong>Ação:</strong> {{ data.log.action }}</div>
+    <div><strong>Entidade:</strong> {{ data.log.entity }}</div>
+    @if (data.log.entity_id) {
+      <div><strong>ID:</strong> {{ data.log.entity_id }}</div>
+    }
+    <div><strong>Data:</strong> {{ data.log.created_at | date: 'dd/MM/yyyy HH:mm' }}</div>
+  </div>
+
+  @if (changeEntries.length > 0) {
+    <table class="changes-table">
+      <thead>
+        <tr>
+          <th>Campo</th>
+          <th>Antes</th>
+          <th>Depois</th>
+        </tr>
+      </thead>
+      <tbody>
+        @for (entry of changeEntries; track entry.field) {
+          <tr>
+            <td>{{ entry.field }}</td>
+            <td>{{ formatValue(entry.before) }}</td>
+            <td>{{ formatValue(entry.after) }}</td>
+          </tr>
+        }
+      </tbody>
+    </table>
+  } @else {
+    <p class="empty-message">Sem detalhes de alteração.</p>
+  }
+</mat-dialog-content>
+
+<mat-dialog-actions align="end">
+  <button mat-flat-button color="primary" (click)="close()">Fechar</button>
+</mat-dialog-actions>

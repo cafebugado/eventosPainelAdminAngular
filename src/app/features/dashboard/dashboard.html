@@ -1,0 +1,23 @@
+<div class="dashboard-layout">
+  <app-admin-sidebar class="desktop-only" />
+
+  <div class="dashboard-main">
+    <mat-toolbar class="mobile-toolbar mobile-only">
+      <button mat-icon-button (click)="toggleMobileNav()">
+        <mat-icon>menu</mat-icon>
+      </button>
+      <span>Café Bugado</span>
+    </mat-toolbar>
+
+    <mat-sidenav-container class="sidenav-container">
+      <mat-sidenav class="mobile-only" [opened]="mobileNavOpen()" (closedStart)="closeMobileNav()" mode="over">
+        <app-admin-mobile-nav (closeRequested)="closeMobileNav()" />
+      </mat-sidenav>
+      <mat-sidenav-content>
+        <main class="dashboard-content">
+          <router-outlet />
+        </main>
+      </mat-sidenav-content>
+    </mat-sidenav-container>
+  </div>
+</div>

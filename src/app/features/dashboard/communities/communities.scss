@@ -1,0 +1,41 @@
+@use '../../../shared/styles/page' as page;
+
+.page-header {
+  @include page.page-header;
+
+  h1 {
+    margin: 0;
+    font: var(--mat-sys-headline-small);
+  }
+}
+
+.loading-container {
+  @include page.loading-container;
+}
+
+.communities-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+  gap: 16px;
+}
+
+.community-card {
+  mat-card-content {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+  }
+}
+
+.community-icon {
+  color: var(--mat-sys-primary);
+}
+
+.community-name {
+  font: var(--mat-sys-body-large);
+  font-weight: 500;
+}
+
+.empty-message {
+  @include page.empty-message;
+}

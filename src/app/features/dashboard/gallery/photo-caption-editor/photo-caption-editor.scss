@@ -1,0 +1,42 @@
+.caption-edit {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+}
+
+.caption-input {
+  flex: 1;
+  border: 1px solid var(--mat-sys-outline);
+  border-radius: 4px;
+  padding: 4px 8px;
+  font: var(--mat-sys-body-small);
+  background: var(--mat-sys-surface);
+  color: var(--mat-sys-on-surface);
+}
+
+.caption-display {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 4px;
+  width: 100%;
+  border: none;
+  background: none;
+  cursor: pointer;
+  padding: 4px;
+  font: var(--mat-sys-body-small);
+  color: var(--mat-sys-on-surface);
+  text-align: left;
+
+  mat-icon {
+    font-size: 16px;
+    width: 16px;
+    height: 16px;
+    color: var(--mat-sys-on-surface-variant);
+  }
+}
+
+.caption-placeholder {
+  color: var(--mat-sys-on-surface-variant);
+  font-style: italic;
+}

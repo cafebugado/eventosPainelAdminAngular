@@ -1,0 +1,61 @@
+<div class="page-header">
+  <h1>Usuários</h1>
+</div>
+
+@if (loading()) {
+  <div class="loading-container">
+    <mat-spinner diameter="40" />
+  </div>
+} @else {
+  <table mat-table [dataSource]="users()" class="users-table">
+    <ng-container matColumnDef="nome">
+      <th mat-header-cell *matHeaderCellDef>Nome</th>
+      <td mat-cell *matCellDef="let user">
+        {{ user.nome ?? '' }} {{ user.sobrenome ?? '' }}
+        @if (isCurrentUser(user)) {
+          <mat-chip class="you-chip">Você</mat-chip>
+        }
+      </td>
+    </ng-container>
+
+    <ng-container matColumnDef="email">
+      <th mat-header-cell *matHeaderCellDef>Email</th>
+      <td mat-cell *matCellDef="let user">{{ user.email ?? '-' }}</td>
+    </ng-container>
+
+    <ng-container matColumnDef="role">
+      <th mat-header-cell *matHeaderCellDef>Permissão</th>
+      <td mat-cell *matCellDef="let user">
+        @if (isSuperAdmin && !isCurrentUser(user)) {
+          <mat-form-field appearance="outline" class="role-select">
+            <mat-select [value]="user.role" (selectionChange)="changeRole(user, $event.value)">
+              @for (role of roles; track role) {
+                <mat-option [value]="role">{{ role | roleLabel }}</mat-option>
+              }
+            </mat-select>
+          </mat-form-field>
+        } @else {
+          <span>{{ user.role | roleLabel }}</span>
+        }
+      </td>
+    </ng-container>
+
+    <ng-container matColumnDef="acoes">
+      <th mat-header-cell *matHeaderCellDef></th>
+      <td mat-cell *matCellDef="let user">
+        @if (isSuperAdmin && !isCurrentUser(user)) {
+          <button mat-icon-button (click)="removeRole(user)" aria-label="Remover acesso">
+            <mat-icon>person_remove</mat-icon>
+          </button>
+        }
+      </td>
+    </ng-container>
+
+    <tr mat-header-row *matHeaderRowDef="columns"></tr>
+    <tr mat-row *matRowDef="let row; columns: columns"></tr>
+  </table>
+
+  @if (users().length === 0) {
+    <p class="empty-message">Nenhum usuário encontrado.</p>
+  }
+}

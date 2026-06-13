@@ -1,0 +1,34 @@
+<div class="page-header">
+  <h1>Comunidades</h1>
+  <button mat-flat-button color="primary" (click)="openCreateDialog()">
+    <mat-icon>add</mat-icon>
+    Nova Comunidade
+  </button>
+</div>
+
+@if (loading()) {
+  <div class="loading-container">
+    <mat-spinner diameter="40" />
+  </div>
+} @else {
+  <div class="communities-grid">
+    @for (community of communities(); track community.id) {
+      <mat-card class="community-card">
+        <mat-card-content>
+          <mat-icon class="community-icon">groups</mat-icon>
+          <span class="community-name">{{ community.nome }}</span>
+        </mat-card-content>
+        <mat-card-actions align="end">
+          <button mat-icon-button (click)="openEditDialog(community)" aria-label="Editar">
+            <mat-icon>edit</mat-icon>
+          </button>
+          <button mat-icon-button (click)="deleteCommunity(community)" aria-label="Excluir">
+            <mat-icon>delete</mat-icon>
+          </button>
+        </mat-card-actions>
+      </mat-card>
+    } @empty {
+      <p class="empty-message">Nenhuma comunidade cadastrada.</p>
+    }
+  </div>
+}
