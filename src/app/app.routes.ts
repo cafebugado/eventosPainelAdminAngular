@@ -9,6 +9,14 @@ export const routes: Routes = [
     loadComponent: () => import('./features/login/login').then((m) => m.Login),
   },
   {
+    path: 'admin/criar-conta',
+    loadComponent: () => import('./features/register/register').then((m) => m.Register),
+  },
+  {
+    path: 'admin/recuperar-senha',
+    loadComponent: () => import('./features/forgot-password/forgot-password').then((m) => m.ForgotPassword),
+  },
+  {
     path: 'admin/dashboard',
     loadComponent: () => import('./features/dashboard/dashboard').then((m) => m.Dashboard),
     canActivate: [authGuard],

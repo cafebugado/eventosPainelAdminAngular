@@ -1,8 +1,9 @@
 import { Component, inject, signal, HostListener } from '@angular/core';
 import { FormBuilder, ReactiveFormsModule, Validators } from '@angular/forms';
-import { Router } from '@angular/router';
+import { Router, RouterModule } from '@angular/router';
 import { MatButtonModule } from '@angular/material/button';
 import { MatCardModule } from '@angular/material/card';
+import { MatCheckboxModule } from '@angular/material/checkbox';
 import { MatFormFieldModule } from '@angular/material/form-field';
 import { MatIconModule } from '@angular/material/icon';
 import { MatInputModule } from '@angular/material/input';
@@ -10,13 +11,16 @@ import { MatProgressSpinnerModule } from '@angular/material/progress-spinner';
 import { AuthService } from '../../core/services/auth.service';
 
 const EMAIL_REGEX = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+const REMEMBER_EMAIL_KEY = 'eventos_admin_remember_email';
 
 @Component({
   selector: 'app-login',
   imports: [
     ReactiveFormsModule,
+    RouterModule,
     MatButtonModule,
     MatCardModule,
+    MatCheckboxModule,
     MatFormFieldModule,
     MatIconModule,
     MatInputModule,
@@ -33,6 +37,7 @@ export class Login {
   readonly loading = signal(false);
   readonly errorMessage = signal<string | null>(null);
   readonly hidePassword = signal(true);
+  readonly rememberEmail = signal(false);
 
   readonly form = this.fb.nonNullable.group({
     email: ['', [Validators.required, Validators.pattern(EMAIL_REGEX)]],
@@ -43,6 +48,7 @@ export class Login {
     if (this.auth.isAuthenticated()) {
       this.router.navigate(['/admin/dashboard']);
     }
+    this.loadRememberedEmail();
   }
 
   @HostListener('contextmenu', ['$event'])
@@ -72,6 +78,11 @@ export class Login {
     this.auth.signIn(email, password).subscribe({
       next: () => {
         this.loading.set(false);
+        if (this.rememberEmail()) {
+          localStorage.setItem(REMEMBER_EMAIL_KEY, email);
+        } else {
+          localStorage.removeItem(REMEMBER_EMAIL_KEY);
+        }
         this.router.navigate(['/admin/dashboard']);
       },
       error: (error) => {
@@ -88,5 +99,21 @@ export class Login {
         }
       },
     });
+  }
+
+  loginWithGithub(): void {
+    // placeholder — OAuth não implementado no backend ainda
+  }
+
+  loginWithGoogle(): void {
+    // placeholder — OAuth não implementado no backend ainda
+  }
+
+  private loadRememberedEmail(): void {
+    const saved = localStorage.getItem(REMEMBER_EMAIL_KEY);
+    if (saved) {
+      this.form.controls.email.setValue(saved);
+      this.rememberEmail.set(true);
+    }
   }
 }

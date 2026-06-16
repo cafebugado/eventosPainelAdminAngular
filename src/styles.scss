@@ -97,4 +97,17 @@ body {
   .mat-mdc-card {
     --mdc-elevated-card-container-color: #ffffff;
   }
+
+  // Checkbox cor laranja
+  .mat-mdc-checkbox.mdc-checkbox--selected .mdc-checkbox__background,
+  .mat-mdc-checkbox .mdc-checkbox__native-control:enabled:checked ~ .mdc-checkbox__background,
+  .mat-mdc-checkbox .mdc-checkbox__native-control:enabled:indeterminate ~ .mdc-checkbox__background {
+    background-color: #ff6b00 !important;
+    border-color: #ff6b00 !important;
+  }
+
+  .mat-mdc-checkbox .mdc-checkbox:hover .mdc-checkbox__native-control:enabled:checked ~ .mdc-checkbox__background {
+    background-color: #e55a00 !important;
+    border-color: #e55a00 !important;
+  }
 }
