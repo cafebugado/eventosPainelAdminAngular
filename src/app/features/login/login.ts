@@ -1,4 +1,4 @@
-import { Component, inject, signal } from '@angular/core';
+import { Component, inject, signal, HostListener } from '@angular/core';
 import { FormBuilder, ReactiveFormsModule, Validators } from '@angular/forms';
 import { Router } from '@angular/router';
 import { MatButtonModule } from '@angular/material/button';
@@ -43,6 +43,16 @@ export class Login {
     if (this.auth.isAuthenticated()) {
       this.router.navigate(['/admin/dashboard']);
     }
+  }
+
+  @HostListener('contextmenu', ['$event'])
+  onContextMenu(e: MouseEvent): void {
+    e.preventDefault();
+  }
+
+  @HostListener('dragstart', ['$event'])
+  onDragStart(e: DragEvent): void {
+    e.preventDefault();
   }
 
   togglePasswordVisibility(): void {

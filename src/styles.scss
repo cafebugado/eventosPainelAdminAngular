@@ -41,3 +41,60 @@ body {
   }
 }
 /* You can add global styles to this file, and also import other style files */
+
+// Login page - light theme overrides
+.login-page {
+  // Form field label color
+  .mat-mdc-form-field .mdc-floating-label {
+    color: #6b7280 !important;
+  }
+
+  // Outlined border default
+  .mdc-text-field--outlined:not(.mdc-text-field--disabled) {
+    .mdc-notched-outline__leading,
+    .mdc-notched-outline__notch,
+    .mdc-notched-outline__trailing {
+      border-color: rgba(0, 0, 0, 0.16) !important;
+    }
+  }
+
+  // Outlined border on hover
+  .mdc-text-field--outlined:not(.mdc-text-field--disabled):not(.mdc-text-field--focused):hover {
+    .mdc-notched-outline__leading,
+    .mdc-notched-outline__notch,
+    .mdc-notched-outline__trailing {
+      border-color: rgba(255, 107, 0, 0.55) !important;
+    }
+  }
+
+  // Outlined border on focus
+  .mdc-text-field--outlined.mdc-text-field--focused:not(.mdc-text-field--disabled) {
+    .mdc-notched-outline__leading,
+    .mdc-notched-outline__notch,
+    .mdc-notched-outline__trailing {
+      border-color: #ff6b00 !important;
+      border-width: 2px !important;
+    }
+  }
+
+  // Label on focus
+  .mdc-text-field--focused .mdc-floating-label {
+    color: #ff6b00 !important;
+  }
+
+  // Input text color
+  .mat-mdc-input-element {
+    color: #1a1a2e !important;
+    caret-color: #ff6b00 !important;
+  }
+
+  // Icon suffix color
+  .mat-mdc-icon-button .mat-icon {
+    color: #6b7280 !important;
+  }
+
+  // Card background override
+  .mat-mdc-card {
+    --mdc-elevated-card-container-color: #ffffff;
+  }
+}
