@@ -1,1 +1,49 @@
 @use '../login/auth-shared' as *;
+
+.login-card {
+  max-width: 500px !important;
+}
+
+.form-row {
+  display: flex;
+  gap: 12px;
+
+  .half-width {
+    flex: 1;
+    min-width: 0;
+  }
+}
+
+.submit-spinner {
+  --mdc-circular-progress-active-indicator-color: #ffffff;
+}
+
+.email-confirmation {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  text-align: center;
+  padding: 24px 8px 8px;
+  gap: 16px;
+
+  .confirmation-icon {
+    font-size: 56px;
+    width: 56px;
+    height: 56px;
+    color: $brand-orange;
+  }
+
+  .confirmation-title {
+    font-size: 1.2rem;
+    font-weight: 700;
+    color: $text-dark;
+    margin: 0;
+  }
+
+  .confirmation-text {
+    font-size: 0.88rem;
+    color: $text-muted;
+    line-height: 1.6;
+    margin: 0;
+  }
+}

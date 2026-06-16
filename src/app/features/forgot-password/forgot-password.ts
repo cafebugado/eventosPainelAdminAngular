@@ -1,4 +1,4 @@
-import { Component, inject, HostListener } from '@angular/core';
+import { Component, inject, signal, HostListener } from '@angular/core';
 import { FormBuilder, ReactiveFormsModule, Validators } from '@angular/forms';
 import { RouterModule } from '@angular/router';
 import { MatButtonModule } from '@angular/material/button';
@@ -6,7 +6,8 @@ import { MatCardModule } from '@angular/material/card';
 import { MatFormFieldModule } from '@angular/material/form-field';
 import { MatIconModule } from '@angular/material/icon';
 import { MatInputModule } from '@angular/material/input';
-import { NotificationService } from '../../shared/services/notification.service';
+import { MatProgressSpinnerModule } from '@angular/material/progress-spinner';
+import { AuthService } from '../../core/services/auth.service';
 
 const EMAIL_REGEX = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
 
@@ -20,13 +21,18 @@ const EMAIL_REGEX = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
     MatFormFieldModule,
     MatIconModule,
     MatInputModule,
+    MatProgressSpinnerModule,
   ],
   templateUrl: './forgot-password.html',
   styleUrl: './forgot-password.scss',
 })
 export class ForgotPassword {
   private readonly fb = inject(FormBuilder);
-  private readonly notification = inject(NotificationService);
+  private readonly auth = inject(AuthService);
+
+  readonly loading = signal(false);
+  readonly errorMessage = signal<string | null>(null);
+  readonly emailSent = signal(false);
 
   readonly form = this.fb.nonNullable.group({
     email: ['', [Validators.required, Validators.pattern(EMAIL_REGEX)]],
@@ -47,6 +53,25 @@ export class ForgotPassword {
       this.form.markAllAsTouched();
       return;
     }
-    this.notification.showNotification('Recuperação de senha em breve. Fique ligado!', 'info');
+
+    const { email } = this.form.getRawValue();
+    this.loading.set(true);
+    this.errorMessage.set(null);
+
+    this.auth.requestPasswordReset(email).subscribe({
+      next: () => {
+        this.loading.set(false);
+        this.emailSent.set(true);
+      },
+      error: (error) => {
+        this.loading.set(false);
+        const detail = error?.error?.detail;
+        if (typeof detail === 'string') {
+          this.errorMessage.set(detail);
+        } else {
+          this.errorMessage.set('Não foi possível enviar o email. Tente novamente.');
+        }
+      },
+    });
   }
 }

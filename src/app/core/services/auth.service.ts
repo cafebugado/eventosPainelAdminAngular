@@ -2,7 +2,7 @@ import { HttpClient } from '@angular/common/http';
 import { Injectable, computed, inject, signal } from '@angular/core';
 import { Observable, of, tap } from 'rxjs';
 import { environment } from '../../../environments/environment';
-import { AuthSession, AuthUser, LoginRequest } from '../models/auth.model';
+import { AuthSession, AuthUser, LoginRequest, OAuthUrlResponse, RegisterRequest, RegisterResponse } from '../models/auth.model';
 
 const SESSION_STORAGE_KEY = 'eventos_admin_session';
 
@@ -41,6 +41,33 @@ export class AuthService {
 
   getCurrentUser(): AuthUser | null {
     return this.currentUser();
+  }
+
+  register(data: RegisterRequest): Observable<RegisterResponse> {
+    return this.http.post<RegisterResponse>(`${this.baseUrl}/auth/register`, data).pipe(
+      tap((response) => {
+        if (!response.confirmacao_pendente && response.access_token && response.user) {
+          this.setSession({
+            access_token: response.access_token,
+            user: response.user,
+          });
+        }
+      }),
+    );
+  }
+
+  getOAuthUrl(provider: 'github' | 'google'): Observable<OAuthUrlResponse> {
+    return this.http.get<OAuthUrlResponse>(`${this.baseUrl}/auth/oauth/${provider}`);
+  }
+
+  oauthCallback(code: string): Observable<AuthSession> {
+    return this.http.post<AuthSession>(`${this.baseUrl}/auth/oauth/callback`, { code }).pipe(
+      tap((session) => this.setSession(session)),
+    );
+  }
+
+  requestPasswordReset(email: string): Observable<void> {
+    return this.http.post<void>(`${this.baseUrl}/auth/reset-password`, { email });
   }
 
   updatePassword(newPassword: string): Observable<void> {

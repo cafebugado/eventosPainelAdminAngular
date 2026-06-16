@@ -22,3 +22,25 @@ export interface LoginRequest {
 export interface UpdatePasswordRequest {
   password: string;
 }
+
+export interface RegisterRequest {
+  nome: string;
+  sobrenome: string;
+  email: string;
+  senha: string;
+  confirma_senha: string;
+  data_nascimento: string;
+  github: string;
+  linkedin: string;
+}
+
+export interface RegisterResponse {
+  confirmacao_pendente: boolean;
+  mensagem: string;
+  access_token: string | null;
+  user: AuthUser | null;
+}
+
+export interface OAuthUrlResponse {
+  url: string;
+}

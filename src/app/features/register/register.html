@@ -21,100 +21,164 @@
       <div class="login-divider"></div>
 
       <mat-card-content class="login-content">
-        <div class="view-header">
-          <a routerLink="/admin" class="back-btn" aria-label="Voltar">
-            <mat-icon>arrow_back</mat-icon>
-          </a>
-          <h2 class="view-title">Criar conta</h2>
-        </div>
 
-        <form [formGroup]="form" (ngSubmit)="onSubmit()" class="login-form">
-
-          <mat-form-field appearance="outline" class="full-width">
-            <mat-label>Nome completo</mat-label>
-            <input matInput type="text" formControlName="name" autocomplete="name" />
-            @if (form.controls.name.hasError('required')) {
-              <mat-error>O nome é obrigatório</mat-error>
-            }
-            @if (form.controls.name.hasError('minlength')) {
-              <mat-error>O nome deve ter no mínimo 3 caracteres</mat-error>
-            }
-          </mat-form-field>
-
-          <mat-form-field appearance="outline" class="full-width">
-            <mat-label>Email</mat-label>
-            <input matInput type="email" formControlName="email" autocomplete="email" />
-            @if (form.controls.email.hasError('required')) {
-              <mat-error>O email é obrigatório</mat-error>
-            }
-            @if (form.controls.email.hasError('pattern')) {
-              <mat-error>Informe um email válido</mat-error>
-            }
-          </mat-form-field>
-
-          <mat-form-field appearance="outline" class="full-width">
-            <mat-label>Senha</mat-label>
-            <input
-              matInput
-              [type]="hidePassword() ? 'password' : 'text'"
-              formControlName="password"
-              autocomplete="new-password"
-            />
-            <button
-              mat-icon-button
-              matSuffix
-              type="button"
-              (click)="togglePasswordVisibility()"
-              [attr.aria-label]="hidePassword() ? 'Mostrar senha' : 'Ocultar senha'"
-            >
-              <mat-icon>{{ hidePassword() ? 'visibility_off' : 'visibility' }}</mat-icon>
+        @if (emailConfirmationPending()) {
+          <div class="email-confirmation">
+            <mat-icon class="confirmation-icon">mark_email_unread</mat-icon>
+            <h2 class="confirmation-title">Verifique seu email</h2>
+            <p class="confirmation-text">
+              Enviamos um link de confirmação para o seu endereço de email.
+              Acesse sua caixa de entrada e clique no link para ativar sua conta.
+            </p>
+            <button mat-flat-button routerLink="/admin" class="full-width submit-button">
+              <span class="submit-label">
+                <mat-icon class="submit-icon">login</mat-icon>
+                Já confirmei — ir para Login
+              </span>
             </button>
-            @if (form.controls.password.hasError('required')) {
-              <mat-error>A senha é obrigatória</mat-error>
-            }
-            @if (form.controls.password.hasError('minlength')) {
-              <mat-error>A senha deve ter no mínimo 6 caracteres</mat-error>
-            }
-          </mat-form-field>
+          </div>
+        } @else {
+          <div class="view-header">
+            <a routerLink="/admin" class="back-btn" aria-label="Voltar">
+              <mat-icon>arrow_back</mat-icon>
+            </a>
+            <h2 class="view-title">Criar conta</h2>
+          </div>
 
-          <mat-form-field appearance="outline" class="full-width">
-            <mat-label>Confirmar senha</mat-label>
-            <input
-              matInput
-              [type]="hideConfirmPassword() ? 'password' : 'text'"
-              formControlName="confirmPassword"
-              autocomplete="new-password"
-            />
-            <button
-              mat-icon-button
-              matSuffix
-              type="button"
-              (click)="toggleConfirmPasswordVisibility()"
-              [attr.aria-label]="hideConfirmPassword() ? 'Mostrar senha' : 'Ocultar senha'"
-            >
-              <mat-icon>{{ hideConfirmPassword() ? 'visibility_off' : 'visibility' }}</mat-icon>
+          <form [formGroup]="form" (ngSubmit)="onSubmit()" class="login-form">
+
+            <div class="form-row">
+              <mat-form-field appearance="outline" class="half-width">
+                <mat-label>Nome</mat-label>
+                <input matInput type="text" formControlName="nome" autocomplete="given-name" />
+                @if (form.controls.nome.hasError('required')) {
+                  <mat-error>O nome é obrigatório</mat-error>
+                }
+                @if (form.controls.nome.hasError('minlength')) {
+                  <mat-error>Mínimo 2 caracteres</mat-error>
+                }
+              </mat-form-field>
+
+              <mat-form-field appearance="outline" class="half-width">
+                <mat-label>Sobrenome</mat-label>
+                <input matInput type="text" formControlName="sobrenome" autocomplete="family-name" />
+                @if (form.controls.sobrenome.hasError('required')) {
+                  <mat-error>O sobrenome é obrigatório</mat-error>
+                }
+                @if (form.controls.sobrenome.hasError('minlength')) {
+                  <mat-error>Mínimo 2 caracteres</mat-error>
+                }
+              </mat-form-field>
+            </div>
+
+            <mat-form-field appearance="outline" class="full-width">
+              <mat-label>Email</mat-label>
+              <input matInput type="email" formControlName="email" autocomplete="email" />
+              @if (form.controls.email.hasError('required')) {
+                <mat-error>O email é obrigatório</mat-error>
+              }
+              @if (form.controls.email.hasError('pattern')) {
+                <mat-error>Informe um email válido</mat-error>
+              }
+            </mat-form-field>
+
+            <mat-form-field appearance="outline" class="full-width">
+              <mat-label>Data de nascimento</mat-label>
+              <input matInput type="date" formControlName="dataNascimento" />
+              @if (form.controls.dataNascimento.hasError('required')) {
+                <mat-error>A data de nascimento é obrigatória</mat-error>
+              }
+            </mat-form-field>
+
+            <mat-form-field appearance="outline" class="full-width">
+              <mat-label>GitHub (username ou URL)</mat-label>
+              <input matInput type="text" formControlName="github" autocomplete="off" placeholder="ex: seunome ou https://github.com/seunome" />
+              @if (form.controls.github.hasError('required')) {
+                <mat-error>O GitHub é obrigatório</mat-error>
+              }
+            </mat-form-field>
+
+            <mat-form-field appearance="outline" class="full-width">
+              <mat-label>LinkedIn (username ou URL)</mat-label>
+              <input matInput type="text" formControlName="linkedin" autocomplete="off" placeholder="ex: seunome ou https://linkedin.com/in/seunome" />
+              @if (form.controls.linkedin.hasError('required')) {
+                <mat-error>O LinkedIn é obrigatório</mat-error>
+              }
+            </mat-form-field>
+
+            <mat-form-field appearance="outline" class="full-width">
+              <mat-label>Senha</mat-label>
+              <input
+                matInput
+                [type]="hidePassword() ? 'password' : 'text'"
+                formControlName="password"
+                autocomplete="new-password"
+              />
+              <button
+                mat-icon-button
+                matSuffix
+                type="button"
+                (click)="togglePasswordVisibility()"
+                [attr.aria-label]="hidePassword() ? 'Mostrar senha' : 'Ocultar senha'"
+              >
+                <mat-icon>{{ hidePassword() ? 'visibility_off' : 'visibility' }}</mat-icon>
+              </button>
+              @if (form.controls.password.hasError('required')) {
+                <mat-error>A senha é obrigatória</mat-error>
+              }
+              @if (form.controls.password.hasError('minlength')) {
+                <mat-error>A senha deve ter no mínimo 6 caracteres</mat-error>
+              }
+            </mat-form-field>
+
+            <mat-form-field appearance="outline" class="full-width">
+              <mat-label>Confirmar senha</mat-label>
+              <input
+                matInput
+                [type]="hideConfirmPassword() ? 'password' : 'text'"
+                formControlName="confirmPassword"
+                autocomplete="new-password"
+              />
+              <button
+                mat-icon-button
+                matSuffix
+                type="button"
+                (click)="toggleConfirmPasswordVisibility()"
+                [attr.aria-label]="hideConfirmPassword() ? 'Mostrar senha' : 'Ocultar senha'"
+              >
+                <mat-icon>{{ hideConfirmPassword() ? 'visibility_off' : 'visibility' }}</mat-icon>
+              </button>
+              @if (form.controls.confirmPassword.hasError('required')) {
+                <mat-error>Confirme sua senha</mat-error>
+              }
+              @if (form.hasError('passwordMismatch') && form.controls.confirmPassword.touched) {
+                <mat-error>As senhas não coincidem</mat-error>
+              }
+            </mat-form-field>
+
+            @if (errorMessage()) {
+              <p class="error-message">{{ errorMessage() }}</p>
+            }
+
+            <button mat-flat-button type="submit" class="full-width submit-button" [disabled]="loading()">
+              @if (loading()) {
+                <mat-spinner diameter="20" class="submit-spinner"></mat-spinner>
+              } @else {
+                <span class="submit-label">
+                  <mat-icon class="submit-icon">person_add</mat-icon>
+                  Criar conta
+                </span>
+              }
             </button>
-            @if (form.controls.confirmPassword.hasError('required')) {
-              <mat-error>Confirme sua senha</mat-error>
-            }
-            @if (form.hasError('passwordMismatch') && form.controls.confirmPassword.touched) {
-              <mat-error>As senhas não coincidem</mat-error>
-            }
-          </mat-form-field>
 
-          <button mat-flat-button type="submit" class="full-width submit-button">
-            <span class="submit-label">
-              <mat-icon class="submit-icon">person_add</mat-icon>
-              Criar conta
-            </span>
-          </button>
+            <p class="auth-switch">
+              Já tem conta?
+              <a routerLink="/admin" class="auth-switch-link">Entrar</a>
+            </p>
 
-          <p class="auth-switch">
-            Já tem conta?
-            <a routerLink="/admin" class="auth-switch-link">Entrar</a>
-          </p>
+          </form>
+        }
 
-        </form>
       </mat-card-content>
     </mat-card>
   </div>

@@ -102,11 +102,15 @@ export class Login {
   }
 
   loginWithGithub(): void {
-    // placeholder — OAuth não implementado no backend ainda
+    this.auth.getOAuthUrl('github').subscribe({
+      next: ({ url }) => (window.location.href = url),
+    });
   }
 
   loginWithGoogle(): void {
-    // placeholder — OAuth não implementado no backend ainda
+    this.auth.getOAuthUrl('google').subscribe({
+      next: ({ url }) => (window.location.href = url),
+    });
   }
 
   private loadRememberedEmail(): void {

@@ -17,6 +17,10 @@ export const routes: Routes = [
     loadComponent: () => import('./features/forgot-password/forgot-password').then((m) => m.ForgotPassword),
   },
   {
+    path: 'admin/auth/callback',
+    loadComponent: () => import('./features/auth-callback/auth-callback').then((m) => m.AuthCallback),
+  },
+  {
     path: 'admin/dashboard',
     loadComponent: () => import('./features/dashboard/dashboard').then((m) => m.Dashboard),
     canActivate: [authGuard],

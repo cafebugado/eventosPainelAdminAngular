@@ -1,9 +1,10 @@
-export type Role = 'super_admin' | 'admin' | 'moderador';
+export type Role = 'super_admin' | 'admin' | 'moderador' | 'participante';
 
 export const ROLE_LABELS: Record<Role | 'none', string> = {
   super_admin: 'Super Admin',
   admin: 'Administrador',
   moderador: 'Moderador',
+  participante: 'Participante',
   none: 'Sem Role',
 };
 
@@ -94,9 +95,23 @@ const MODERADOR_PERMISSIONS: Permissions = {
   canSaveSettings: true,
 };
 
+const PARTICIPANTE_PERMISSIONS: Permissions = {
+  canCreateEvents: true,
+  canEditEvents: false,
+  canDeleteEvents: false,
+  canPublishEvents: false,
+  canManageTags: false,
+  canDeleteTags: false,
+  canManageContributors: false,
+  canManageUsers: false,
+  canUploadImages: true,
+  canSaveSettings: false,
+};
+
 export const PERMISSIONS: Record<Role | 'none', Permissions> = {
   super_admin: FULL_PERMISSIONS,
   admin: FULL_PERMISSIONS,
   moderador: MODERADOR_PERMISSIONS,
+  participante: PARTICIPANTE_PERMISSIONS,
   none: NO_PERMISSIONS,
 };
