@@ -48,7 +48,13 @@
 
     @if (!sidebarService.collapsed()) {
       <div class="user-info">
-        <div class="avatar">{{ avatarInitial() }}</div>
+        <div class="avatar">
+          @if (profileService.profile()?.avatar_url) {
+            <img [src]="profileService.profile()!.avatar_url!" [alt]="displayName()" class="avatar-img" />
+          } @else {
+            {{ avatarInitial() }}
+          }
+        </div>
         <div class="user-details">
           <span class="user-name">{{ displayName() }}</span>
           <span class="user-role">{{ roleService.role() | roleLabel }}</span>
