@@ -47,7 +47,16 @@ export class Login {
   constructor() {
     if (this.auth.isAuthenticated()) {
       this.router.navigate(['/admin/dashboard']);
+      return;
     }
+
+    // Fallback: captura code OAuth que chegou em /admin em vez de /admin/auth/callback
+    const code = new URLSearchParams(window.location.search).get('code');
+    if (code) {
+      this.router.navigate(['/admin/auth/callback'], { queryParams: { code } });
+      return;
+    }
+
     this.loadRememberedEmail();
   }
 
