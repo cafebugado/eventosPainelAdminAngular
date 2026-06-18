@@ -37,3 +37,18 @@
   object-fit: cover;
   align-self: center;
 }
+
+.provider-info {
+  color: var(--mat-sys-on-surface-variant);
+  margin: 0;
+}
+
+mat-card-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+
+  mat-card-title {
+    flex: 1;
+  }
+}

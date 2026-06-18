@@ -12,6 +12,7 @@ export interface AuthUser {
   id: string;
   email?: string | null;
   role: Role;
+  provider?: string | null;
 }
 
 export interface LoginRequest {
@@ -20,7 +21,8 @@ export interface LoginRequest {
 }
 
 export interface UpdatePasswordRequest {
-  password: string;
+  senha_atual: string;
+  nova_senha: string;
 }
 
 export interface RegisterRequest {

@@ -27,7 +27,9 @@ export class AuthCallback {
       return;
     }
 
-    this.auth.oauthCallback(code).subscribe({
+    const provider = this.auth.consumeOAuthProvider();
+
+    this.auth.oauthCallback(code, provider).subscribe({
       next: () => this.router.navigate(['/admin/dashboard']),
       error: () => {
         this.notification.showNotification('Falha na autenticação. Tente novamente.', 'error');

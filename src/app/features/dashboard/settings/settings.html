@@ -10,13 +10,23 @@
   <div class="settings-grid">
     <mat-card>
       <mat-card-header>
-        <mat-card-title>Perfil</mat-card-title>
+        <mat-card-title>Dados Pessoais</mat-card-title>
+        @if (!editingPersonal()) {
+          <button mat-icon-button (click)="editPersonal()" aria-label="Editar dados pessoais">
+            <mat-icon>edit</mat-icon>
+          </button>
+        }
       </mat-card-header>
       <mat-card-content>
-        <form [formGroup]="profileForm" class="settings-form">
+        <form [formGroup]="personalForm" class="settings-form">
           @if (avatarPreviewUrl) {
             <img [src]="avatarPreviewUrl" alt="Avatar" class="avatar-preview" />
           }
+
+          <mat-form-field appearance="outline" class="full-width">
+            <mat-label>Email</mat-label>
+            <input matInput [value]="currentUser()?.email ?? ''" disabled />
+          </mat-form-field>
 
           <mat-form-field appearance="outline" class="full-width">
             <mat-label>Nome</mat-label>
@@ -29,45 +39,124 @@
           </mat-form-field>
 
           <mat-form-field appearance="outline" class="full-width">
-            <mat-label>Usuário do GitHub</mat-label>
-            <input matInput formControlName="github_username" />
+            <mat-label>Data de nascimento</mat-label>
+            <input matInput type="date" formControlName="dataNascimento" />
+            @if (personalForm.controls.dataNascimento.hasError('required')) {
+              <mat-error>A data de nascimento é obrigatória</mat-error>
+            }
+            @if (personalForm.controls.dataNascimento.hasError('minAge')) {
+              <mat-error>É necessário ter no mínimo 18 anos</mat-error>
+            }
+          </mat-form-field>
+
+          <mat-form-field appearance="outline" class="full-width">
+            <mat-label>Gênero</mat-label>
+            <mat-select formControlName="genero">
+              <mat-option value="">Prefiro não informar</mat-option>
+              @for (g of generoOpcoes; track g) {
+                <mat-option [value]="g">{{ g }}</mat-option>
+              }
+            </mat-select>
+          </mat-form-field>
+
+          <mat-form-field appearance="outline" class="full-width">
+            <mat-label>WhatsApp</mat-label>
+            <input matInput formControlName="whatsapp" placeholder="(00) 00000-0000" />
           </mat-form-field>
         </form>
       </mat-card-content>
-      <mat-card-actions align="end">
-        <button mat-flat-button color="primary" (click)="saveProfile()">Salvar</button>
-      </mat-card-actions>
+      @if (editingPersonal()) {
+        <mat-card-actions align="end">
+          <button mat-stroked-button (click)="cancelPersonal()">Cancelar</button>
+          <button mat-flat-button color="primary" (click)="savePersonal()">Salvar</button>
+        </mat-card-actions>
+      }
     </mat-card>
 
     <mat-card>
       <mat-card-header>
-        <mat-card-title>Alterar Senha</mat-card-title>
+        <mat-card-title>Dados Profissionais</mat-card-title>
+        @if (!editingProfessional()) {
+          <button mat-icon-button (click)="editProfessional()" aria-label="Editar dados profissionais">
+            <mat-icon>edit</mat-icon>
+          </button>
+        }
       </mat-card-header>
       <mat-card-content>
-        <form [formGroup]="passwordForm" class="settings-form">
+        <form [formGroup]="professionalForm" class="settings-form">
           <mat-form-field appearance="outline" class="full-width">
-            <mat-label>Nova senha</mat-label>
-            <input matInput type="password" formControlName="newPassword" />
-            @if (passwordForm.controls.newPassword.hasError('required')) {
-              <mat-error>A senha é obrigatória</mat-error>
-            }
-            @if (passwordForm.controls.newPassword.hasError('minlength')) {
-              <mat-error>A senha deve ter no mínimo 6 caracteres</mat-error>
-            }
+            <mat-label>Cargo atual</mat-label>
+            <input matInput formControlName="cargo_atual" />
           </mat-form-field>
 
           <mat-form-field appearance="outline" class="full-width">
-            <mat-label>Confirmar nova senha</mat-label>
-            <input matInput type="password" formControlName="confirmPassword" />
-            @if (passwordForm.controls.confirmPassword.hasError('mismatch')) {
-              <mat-error>As senhas não coincidem</mat-error>
-            }
+            <mat-label>Empresa</mat-label>
+            <input matInput formControlName="empresa" />
+          </mat-form-field>
+
+          <mat-form-field appearance="outline" class="full-width">
+            <mat-label>Área de atuação</mat-label>
+            <input matInput formControlName="area_atuacao" />
+          </mat-form-field>
+
+          <mat-form-field appearance="outline" class="full-width">
+            <mat-label>Nível de experiência</mat-label>
+            <mat-select formControlName="nivel_experiencia">
+              <mat-option value="">Não informar</mat-option>
+              @for (n of nivelExperienciaOpcoes; track n) {
+                <mat-option [value]="n">{{ n }}</mat-option>
+              }
+            </mat-select>
+          </mat-form-field>
+
+          <mat-form-field appearance="outline" class="full-width">
+            <mat-label>Usuário do GitHub</mat-label>
+            <input matInput formControlName="github_username" />
+          </mat-form-field>
+
+          <mat-form-field appearance="outline" class="full-width">
+            <mat-label>LinkedIn</mat-label>
+            <input matInput formControlName="linkedin_url" placeholder="https://linkedin.com/in/..." />
+          </mat-form-field>
+
+          <mat-form-field appearance="outline" class="full-width">
+            <mat-label>Portfólio</mat-label>
+            <input matInput formControlName="portfolio_url" placeholder="https://" />
+          </mat-form-field>
+
+          <mat-form-field appearance="outline" class="full-width">
+            <mat-label>Bio</mat-label>
+            <textarea matInput formControlName="bio" rows="4" maxlength="500"></textarea>
           </mat-form-field>
         </form>
       </mat-card-content>
-      <mat-card-actions align="end">
-        <button mat-flat-button color="primary" (click)="updatePassword()">Atualizar Senha</button>
-      </mat-card-actions>
+      @if (editingProfessional()) {
+        <mat-card-actions align="end">
+          <button mat-stroked-button (click)="cancelProfessional()">Cancelar</button>
+          <button mat-flat-button color="primary" (click)="saveProfessional()">Salvar</button>
+        </mat-card-actions>
+      }
+    </mat-card>
+
+    <mat-card>
+      <mat-card-header>
+        <mat-card-title>Segurança</mat-card-title>
+      </mat-card-header>
+      <mat-card-content>
+        @if (isEmailProvider()) {
+          <p class="provider-info">Mantenha sua conta segura trocando sua senha periodicamente.</p>
+        } @else {
+          <p class="provider-info">
+            Sua senha é gerenciada pelo provedor de login ({{ currentUser()?.provider === 'github' ? 'GitHub' : 'Google' }}).
+            Para alterar sua senha, acesse as configurações de conta do provedor.
+          </p>
+        }
+      </mat-card-content>
+      @if (isEmailProvider()) {
+        <mat-card-actions align="end">
+          <button mat-flat-button color="primary" (click)="openChangePasswordDialog()">Trocar minha senha</button>
+        </mat-card-actions>
+      }
     </mat-card>
   </div>
 }

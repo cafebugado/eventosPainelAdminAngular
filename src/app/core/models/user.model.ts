@@ -27,12 +27,35 @@ export interface AssignRoleRequest {
   role: Role;
 }
 
+export type Genero = 'Masculino' | 'Feminino' | 'Outro' | 'Prefiro não informar';
+export type NivelExperiencia = 'Estagiário' | 'Júnior' | 'Pleno' | 'Sênior' | 'Especialista/Staff';
+
+export const GENERO_OPCOES: Genero[] = ['Masculino', 'Feminino', 'Outro', 'Prefiro não informar'];
+export const NIVEL_EXPERIENCIA_OPCOES: NivelExperiencia[] = [
+  'Estagiário',
+  'Júnior',
+  'Pleno',
+  'Sênior',
+  'Especialista/Staff',
+];
+
 export interface UserProfileRead {
   user_id: string;
   nome?: string | null;
   sobrenome?: string | null;
   github_username?: string | null;
+  linkedin_url?: string | null;
   avatar_url?: string | null;
+  data_nascimento?: string | null;
+  genero?: Genero | null;
+  whatsapp?: string | null;
+  provider?: string | null;
+  cargo_atual?: string | null;
+  empresa?: string | null;
+  area_atuacao?: string | null;
+  nivel_experiencia?: NivelExperiencia | null;
+  portfolio_url?: string | null;
+  bio?: string | null;
   updated_at: string;
 }
 
@@ -40,7 +63,17 @@ export interface UserProfileUpsert {
   nome?: string | null;
   sobrenome?: string | null;
   github_username?: string | null;
+  linkedin_url?: string | null;
   avatar_url?: string | null;
+  data_nascimento?: string | null;
+  genero?: Genero | null;
+  whatsapp?: string | null;
+  cargo_atual?: string | null;
+  empresa?: string | null;
+  area_atuacao?: string | null;
+  nivel_experiencia?: NivelExperiencia | null;
+  portfolio_url?: string | null;
+  bio?: string | null;
 }
 
 export interface Permissions {

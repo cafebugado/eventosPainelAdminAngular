@@ -88,6 +88,9 @@
               @if (form.controls.dataNascimento.hasError('required')) {
                 <mat-error>A data de nascimento é obrigatória</mat-error>
               }
+              @if (form.controls.dataNascimento.hasError('minAge')) {
+                <mat-error>É necessário ter no mínimo 18 anos</mat-error>
+              }
             </mat-form-field>
 
             <mat-form-field appearance="outline" class="full-width">

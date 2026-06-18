@@ -2,9 +2,18 @@ import { HttpClient } from '@angular/common/http';
 import { Injectable, computed, inject, signal } from '@angular/core';
 import { Observable, of, tap } from 'rxjs';
 import { environment } from '../../../environments/environment';
-import { AuthSession, AuthUser, LoginRequest, OAuthUrlResponse, RegisterRequest, RegisterResponse } from '../models/auth.model';
+import {
+  AuthSession,
+  AuthUser,
+  LoginRequest,
+  OAuthUrlResponse,
+  RegisterRequest,
+  RegisterResponse,
+  UpdatePasswordRequest,
+} from '../models/auth.model';
 
 const SESSION_STORAGE_KEY = 'eventos_admin_session';
+const OAUTH_PROVIDER_STORAGE_KEY = 'eventos_admin_oauth_provider';
 
 /**
  * Auth contra o backend (`/auth/*`). Login devolve `AuthSession` (access_token
@@ -57,21 +66,29 @@ export class AuthService {
   }
 
   getOAuthUrl(provider: 'github' | 'google'): Observable<OAuthUrlResponse> {
+    sessionStorage.setItem(OAUTH_PROVIDER_STORAGE_KEY, provider);
     return this.http.get<OAuthUrlResponse>(`${this.baseUrl}/auth/oauth/${provider}`);
   }
 
-  oauthCallback(code: string): Observable<AuthSession> {
-    return this.http.post<AuthSession>(`${this.baseUrl}/auth/oauth/callback`, { code }).pipe(
+  oauthCallback(code: string, provider: 'github' | 'google'): Observable<AuthSession> {
+    return this.http.post<AuthSession>(`${this.baseUrl}/auth/oauth/callback`, { code, provider }).pipe(
       tap((session) => this.setSession(session)),
     );
+  }
+
+  consumeOAuthProvider(): 'github' | 'google' {
+    const provider = sessionStorage.getItem(OAUTH_PROVIDER_STORAGE_KEY) as 'github' | 'google' | null;
+    sessionStorage.removeItem(OAUTH_PROVIDER_STORAGE_KEY);
+    return provider ?? 'github';
   }
 
   requestPasswordReset(email: string): Observable<void> {
     return this.http.post<void>(`${this.baseUrl}/auth/reset-password`, { email });
   }
 
-  updatePassword(newPassword: string): Observable<void> {
-    return this.http.post<void>(`${this.baseUrl}/auth/update-password`, { password: newPassword });
+  updatePassword(senhaAtual: string, novaSenha: string): Observable<void> {
+    const body: UpdatePasswordRequest = { senha_atual: senhaAtual, nova_senha: novaSenha };
+    return this.http.post<void>(`${this.baseUrl}/auth/update-password`, body);
   }
 
   private setSession(session: AuthSession): void {

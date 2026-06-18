@@ -9,6 +9,7 @@ import { MatInputModule } from '@angular/material/input';
 import { MatProgressSpinnerModule } from '@angular/material/progress-spinner';
 import { AuthService } from '../../core/services/auth.service';
 import { NotificationService } from '../../shared/services/notification.service';
+import { minAgeValidator } from '../../shared/validators/min-age.validator';
 
 const EMAIL_REGEX = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
 
@@ -50,7 +51,7 @@ export class Register {
       nome: ['', [Validators.required, Validators.minLength(2)]],
       sobrenome: ['', [Validators.required, Validators.minLength(2)]],
       email: ['', [Validators.required, Validators.pattern(EMAIL_REGEX)]],
-      dataNascimento: ['', Validators.required],
+      dataNascimento: ['', [Validators.required, minAgeValidator(18)]],
       github: ['', Validators.required],
       linkedin: ['', Validators.required],
       password: ['', [Validators.required, Validators.minLength(6)]],
