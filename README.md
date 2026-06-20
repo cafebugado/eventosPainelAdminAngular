@@ -54,6 +54,17 @@ ng e2e
 
 Angular CLI does not come with an end-to-end testing framework by default. You can choose one that suits your needs.
 
+## Observabilidade
+
+O painel admin tem 2 ferramentas open source de observabilidade:
+
+- **Sentry** — rastreamento de erros do navegador e falhas HTTP 5xx.
+- **Umami** — analytics de uso (pageviews, visitantes), sem cookies.
+
+Veja o passo a passo completo (como configurar, onde fica o código, como verificar
+que cada ferramenta está funcionando) em
+[docs/OBSERVABILIDADE.md](docs/OBSERVABILIDADE.md).
+
 ## Additional Resources
 
 For more information on using the Angular CLI, including detailed command references, visit the [Angular CLI Overview and Command Reference](https://angular.dev/tools/cli) page.
