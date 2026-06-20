@@ -1,6 +1,7 @@
 import { HttpInterceptorFn } from '@angular/common/http';
 import { inject } from '@angular/core';
 import { Router } from '@angular/router';
+import * as Sentry from '@sentry/angular';
 import { catchError, throwError } from 'rxjs';
 import { NotificationService } from '../../shared/services/notification.service';
 import { AuthService } from '../services/auth.service';
@@ -17,6 +18,11 @@ export const errorInterceptor: HttpInterceptorFn = (req, next) => {
         router.navigate(['/admin']);
         notification.showNotification('Sessão expirada. Faça login novamente.', 'error');
       } else {
+        if (error.status >= 500) {
+          Sentry.captureException(error, {
+            extra: { url: req.url, method: req.method, status: error.status },
+          });
+        }
         const message = error?.error?.detail ?? error?.message ?? 'Erro inesperado';
         notification.showNotification(
           typeof message === 'string' ? message : 'Erro inesperado',
