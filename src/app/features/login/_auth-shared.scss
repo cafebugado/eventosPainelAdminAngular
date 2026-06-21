@@ -149,7 +149,7 @@ $text-muted: #6b7280;
         animation-duration: #{10 + ($i * 2)}s;
         animation-delay: #{$i * 1.2}s;
         opacity: #{0.03 + ($i * 0.03)};
-        background: if($i % 2 == 0, rgba($brand-orange, 0.25), rgba($brand-orange-light, 0.2));
+        background: if(sass($i % 2 == 0): rgba($brand-orange, 0.25); else: rgba($brand-orange-light, 0.2));
       }
     }
   }
