@@ -21,8 +21,8 @@ interface RepoPanelState {
 }
 
 const REPOS: { repo: string; label: string }[] = [
-  { repo: 'cafe-bugado/eventos-frontend', label: 'Frontend' },
-  { repo: 'cafe-bugado/eventos-backend', label: 'Backend' },
+  { repo: 'cafebugado/eventos', label: 'Frontend' },
+  { repo: 'cafebugado/eventosBackend', label: 'Backend' },
 ];
 
 @Component({
