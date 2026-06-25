@@ -90,7 +90,11 @@ export class EventFormDialog implements OnInit {
   });
 
   ngOnInit(): void {
-    this.tagService.getTags().subscribe((tags) => this.availableTags.set(tags));
+    this.tagService
+      .getTags()
+      .subscribe((tags) =>
+        this.availableTags.set([...tags].sort((a, b) => a.nome.localeCompare(b.nome, 'pt-BR'))),
+      );
 
     this.form.controls.data_evento.valueChanges.subscribe((value) => {
       this.form.controls.dia_semana.setValue(getDayName(value));
@@ -108,9 +112,15 @@ export class EventFormDialog implements OnInit {
 
   toggleTagSelection(tagId: string): void {
     const current = this.selectedTagIds();
-    this.selectedTagIds.set(
-      current.includes(tagId) ? current.filter((id) => id !== tagId) : [...current, tagId],
-    );
+    if (current.includes(tagId)) {
+      this.selectedTagIds.set(current.filter((id) => id !== tagId));
+      return;
+    }
+    if (current.length >= 3) {
+      this.notification.showNotification('Selecione no máximo 3 tags', 'error');
+      return;
+    }
+    this.selectedTagIds.set([...current, tagId]);
   }
 
   isTagSelected(tagId: string): boolean {
@@ -165,6 +175,11 @@ export class EventFormDialog implements OnInit {
   onSubmit(): void {
     if (this.form.invalid) {
       this.form.markAllAsTouched();
+      return;
+    }
+
+    if (this.selectedTagIds().length === 0) {
+      this.notification.showNotification('Selecione ao menos 1 tag', 'error');
       return;
     }
 

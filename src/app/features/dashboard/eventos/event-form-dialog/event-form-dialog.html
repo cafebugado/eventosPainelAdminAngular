@@ -104,12 +104,14 @@
 
     <div class="field-group">
       <mat-label>Tags</mat-label>
+      <p class="tags-hint">Selecione de 1 a 3 tags</p>
       <div class="tags-selector">
         @for (tag of availableTags(); track tag.id) {
           <button
             type="button"
             class="tag-chip"
             [class.selected]="isTagSelected(tag.id)"
+            [disabled]="!isTagSelected(tag.id) && selectedTagIds().length >= 3"
             [style.borderColor]="tag.cor"
             [style.background]="isTagSelected(tag.id) ? tag.cor : 'transparent'"
             (click)="toggleTagSelection(tag.id)"
