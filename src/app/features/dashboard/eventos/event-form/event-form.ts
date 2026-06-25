@@ -43,8 +43,9 @@ export class EventForm implements OnInit {
   private readonly tagService = inject(TagService);
   private readonly notification = inject(NotificationService);
 
-  private readonly eventId = this.route.snapshot.paramMap.get('id');
-  readonly isEdit = !!this.eventId;
+  private readonly slugOrId = this.route.snapshot.paramMap.get('slug');
+  readonly isEdit = !!this.slugOrId;
+  private eventId: string | undefined;
 
   readonly loading = signal(this.isEdit);
   readonly event = signal<EventoWithTags | undefined>(undefined);
@@ -87,8 +88,8 @@ export class EventForm implements OnInit {
         this.availableTags.set([...tags].sort((a, b) => a.nome.localeCompare(b.nome, 'pt-BR'))),
       );
 
-    if (this.eventId) {
-      this.loadEvent(this.eventId);
+    if (this.slugOrId) {
+      this.loadEvent(this.slugOrId);
     }
 
     this.form.controls.data_evento.valueChanges.subscribe((value) => {
@@ -96,9 +97,10 @@ export class EventForm implements OnInit {
     });
   }
 
-  private loadEvent(eventId: string): void {
-    this.eventService.getEvent(eventId).subscribe((event) => {
-      this.tagService.getEventTags(eventId).subscribe((tags) => {
+  private loadEvent(slugOrId: string): void {
+    this.eventService.getEventBySlugOrId(slugOrId).subscribe((event) => {
+      this.eventId = event.id;
+      this.tagService.getEventTags(event.id).subscribe((tags) => {
         const eventWithTags: EventoWithTags = { ...event, tags };
         this.event.set(eventWithTags);
         this.selectedTagIds.set(tags.map((t) => t.id));

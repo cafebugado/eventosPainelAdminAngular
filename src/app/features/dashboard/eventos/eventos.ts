@@ -137,7 +137,7 @@ export class Eventos implements OnInit {
   }
 
   goToEdit(event: EventoRead): void {
-    this.router.navigate(['eventos', event.id, 'editar'], { relativeTo: this.route.parent });
+    this.router.navigate(['eventos', event.slug ?? event.id, 'editar'], { relativeTo: this.route.parent });
   }
 
   publishEvent(event: EventoRead): void {

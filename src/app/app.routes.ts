@@ -35,7 +35,7 @@ export const routes: Routes = [
         loadComponent: () => import('./features/dashboard/eventos/event-form/event-form').then((m) => m.EventForm),
       },
       {
-        path: 'eventos/:id/editar',
+        path: 'eventos/:slug/editar',
         loadComponent: () => import('./features/dashboard/eventos/event-form/event-form').then((m) => m.EventForm),
       },
       {
