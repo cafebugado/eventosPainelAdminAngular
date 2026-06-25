@@ -1,4 +1,4 @@
-import { Component, ElementRef, forwardRef, ViewChild } from '@angular/core';
+import { AfterViewInit, Component, ElementRef, forwardRef, ViewChild } from '@angular/core';
 import { ControlValueAccessor, NG_VALUE_ACCESSOR } from '@angular/forms';
 import { MatButtonModule } from '@angular/material/button';
 import { MatIconModule } from '@angular/material/icon';
@@ -17,16 +17,22 @@ import { MatTooltipModule } from '@angular/material/tooltip';
     },
   ],
 })
-export class RichTextEditor implements ControlValueAccessor {
+export class RichTextEditor implements ControlValueAccessor, AfterViewInit {
   @ViewChild('editor') editorRef!: ElementRef<HTMLDivElement>;
 
   disabled = false;
+  private pendingValue = '';
   private onChange: (value: string) => void = () => {};
   private onTouched: () => void = () => {};
 
+  ngAfterViewInit(): void {
+    this.editorRef.nativeElement.innerHTML = this.pendingValue;
+  }
+
   writeValue(value: string): void {
+    this.pendingValue = value ?? '';
     if (this.editorRef) {
-      this.editorRef.nativeElement.innerHTML = value ?? '';
+      this.editorRef.nativeElement.innerHTML = this.pendingValue;
     }
   }
 
