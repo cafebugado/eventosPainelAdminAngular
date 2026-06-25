@@ -1,19 +1,15 @@
-import { Component, OnInit, inject, signal } from '@angular/core';
+import { Component, OnInit, computed, inject, signal } from '@angular/core';
 import { FormBuilder, ReactiveFormsModule, Validators } from '@angular/forms';
+import { ActivatedRoute, Router } from '@angular/router';
 import { MatButtonModule } from '@angular/material/button';
 import { MatCheckboxModule } from '@angular/material/checkbox';
-import {
-  MAT_DIALOG_DATA,
-  MatDialogActions,
-  MatDialogContent,
-  MatDialogRef,
-  MatDialogTitle,
-} from '@angular/material/dialog';
 import { MatFormFieldModule } from '@angular/material/form-field';
 import { MatInputModule } from '@angular/material/input';
+import { MatProgressSpinnerModule } from '@angular/material/progress-spinner';
 import { MatSelectModule } from '@angular/material/select';
-import { EventoRead, EventoWithTags } from '../../../../core/models/evento.model';
+import { EventoStatus, EventoWithTags } from '../../../../core/models/evento.model';
 import { TagRead } from '../../../../core/models/tag.model';
+import { EventService } from '../../../../core/services/event.service';
 import { TagService } from '../../../../core/services/tag.service';
 import { LocationSelector } from '../../../../shared/components/location-selector/location-selector';
 import { RichTextEditor } from '../../../../shared/components/rich-text-editor/rich-text-editor';
@@ -23,45 +19,38 @@ import { validateImageFile } from '../../../../shared/utils/image-validators.uti
 import { generateSlug } from '../../../../shared/utils/slug.util';
 import { validateURL } from '../../../../shared/utils/url-validators.util';
 
-export interface EventFormDialogData {
-  event?: EventoWithTags;
-}
-
-export interface EventFormResult {
-  formData: ReturnType<EventFormDialog['buildPayload']>;
-  imageFile?: File;
-  tagIds: string[];
-}
-
 @Component({
-  selector: 'app-event-form-dialog',
+  selector: 'app-event-form',
   imports: [
     ReactiveFormsModule,
     MatButtonModule,
     MatCheckboxModule,
-    MatDialogTitle,
-    MatDialogContent,
-    MatDialogActions,
     MatFormFieldModule,
     MatInputModule,
+    MatProgressSpinnerModule,
     MatSelectModule,
     LocationSelector,
     RichTextEditor,
   ],
-  templateUrl: './event-form-dialog.html',
-  styleUrl: './event-form-dialog.scss',
+  templateUrl: './event-form.html',
+  styleUrl: './event-form.scss',
 })
-export class EventFormDialog implements OnInit {
+export class EventForm implements OnInit {
   private readonly fb = inject(FormBuilder);
-  private readonly dialogRef = inject(MatDialogRef<EventFormDialog>);
+  private readonly route = inject(ActivatedRoute);
+  private readonly router = inject(Router);
+  private readonly eventService = inject(EventService);
   private readonly tagService = inject(TagService);
   private readonly notification = inject(NotificationService);
-  readonly data = inject<EventFormDialogData>(MAT_DIALOG_DATA);
 
-  readonly isEdit = !!this.data?.event;
+  private readonly eventId = this.route.snapshot.paramMap.get('id');
+  readonly isEdit = !!this.eventId;
+
+  readonly loading = signal(this.isEdit);
+  readonly event = signal<EventoWithTags | undefined>(undefined);
   readonly availableTags = signal<TagRead[]>([]);
-  readonly selectedTagIds = signal<string[]>(this.data?.event?.tags?.map((t) => t.id) ?? []);
-  readonly imagePreview = signal<string | null>(this.data?.event?.imagem ?? null);
+  readonly selectedTagIds = signal<string[]>([]);
+  readonly imagePreview = signal<string | null>(null);
   readonly selectedImageFile = signal<File | undefined>(undefined);
   readonly imageError = signal<string | null>(null);
 
@@ -73,20 +62,22 @@ export class EventFormDialog implements OnInit {
     { value: 'arquivado', label: 'Arquivado' },
   ];
 
+  readonly pageTitle = computed(() => (this.isEdit ? 'Editar Evento' : 'Novo Evento'));
+
   readonly form = this.fb.nonNullable.group({
-    nome: [this.data?.event?.nome ?? '', Validators.required],
-    descricao: [this.data?.event?.descricao ?? ''],
-    data_evento: [formatDateToInput(this.data?.event?.data_evento), Validators.required],
-    dia_semana: [this.data?.event?.dia_semana ?? ''],
-    horario: [this.data?.event?.horario ?? '', Validators.required],
-    periodo: [this.data?.event?.periodo ?? null],
-    link: [this.data?.event?.link ?? '', [Validators.required, this.urlValidator]],
-    imagemUrl: [this.data?.event?.imagem ?? ''],
-    modalidade: [this.data?.event?.modalidade ?? 'Online'],
-    endereco: [this.data?.event?.endereco ?? ''],
-    cidade: [this.data?.event?.cidade ?? ''],
-    estado: [this.data?.event?.estado ?? ''],
-    status: [this.data?.event?.status ?? 'publicado', Validators.required],
+    nome: ['', Validators.required],
+    descricao: [''],
+    data_evento: ['', Validators.required],
+    dia_semana: [''],
+    horario: ['', Validators.required],
+    periodo: [null as (typeof this.periodos)[number] | null],
+    link: ['', [Validators.required, this.urlValidator]],
+    imagemUrl: [''],
+    modalidade: ['Online' as string],
+    endereco: [''],
+    cidade: [''],
+    estado: [''],
+    status: ['publicado' as EventoStatus, Validators.required],
   });
 
   ngOnInit(): void {
@@ -96,8 +87,43 @@ export class EventFormDialog implements OnInit {
         this.availableTags.set([...tags].sort((a, b) => a.nome.localeCompare(b.nome, 'pt-BR'))),
       );
 
+    if (this.eventId) {
+      this.loadEvent(this.eventId);
+    }
+
     this.form.controls.data_evento.valueChanges.subscribe((value) => {
       this.form.controls.dia_semana.setValue(getDayName(value));
+    });
+  }
+
+  private loadEvent(eventId: string): void {
+    this.eventService.getEvent(eventId).subscribe((event) => {
+      this.tagService.getEventTags(eventId).subscribe((tags) => {
+        const eventWithTags: EventoWithTags = { ...event, tags };
+        this.event.set(eventWithTags);
+        this.selectedTagIds.set(tags.map((t) => t.id));
+        this.imagePreview.set(event.imagem ?? null);
+        this.patchForm(eventWithTags);
+        this.loading.set(false);
+      });
+    });
+  }
+
+  private patchForm(event: EventoWithTags): void {
+    this.form.patchValue({
+      nome: event.nome,
+      descricao: event.descricao ?? '',
+      data_evento: formatDateToInput(event.data_evento),
+      dia_semana: event.dia_semana,
+      horario: event.horario,
+      periodo: event.periodo ?? null,
+      link: event.link,
+      imagemUrl: event.imagem ?? '',
+      modalidade: event.modalidade ?? 'Online',
+      endereco: event.endereco ?? '',
+      cidade: event.cidade ?? '',
+      estado: event.estado ?? '',
+      status: event.status,
     });
   }
 
@@ -144,7 +170,7 @@ export class EventFormDialog implements OnInit {
   }
 
   onCancel(): void {
-    this.dialogRef.close();
+    this.router.navigate(['/admin/dashboard/eventos']);
   }
 
   private buildPayload() {
@@ -178,12 +204,28 @@ export class EventFormDialog implements OnInit {
       return;
     }
 
-    const result: EventFormResult = {
-      formData: this.buildPayload(),
-      imageFile: this.selectedImageFile(),
-      tagIds: this.selectedTagIds(),
-    };
+    const formData = this.buildPayload();
+    const tagIds = this.selectedTagIds();
+    const imageFile = this.selectedImageFile();
 
-    this.dialogRef.close(result);
+    const save$ = this.eventId
+      ? this.eventService.updateEvent(this.eventId, formData)
+      : this.eventService.createEvent(formData);
+
+    save$.subscribe({
+      next: (saved) => {
+        this.tagService.setEventTags(saved.id, tagIds).subscribe();
+        if (imageFile) {
+          this.eventService.uploadEventImage(saved.id, imageFile).subscribe();
+        }
+
+        this.notification.showNotification(
+          this.isEdit ? 'Evento atualizado com sucesso' : 'Evento criado com sucesso',
+          'success',
+        );
+        this.eventService.getEvents().subscribe();
+        this.router.navigate(['/admin/dashboard/eventos']);
+      },
+    });
   }
 }

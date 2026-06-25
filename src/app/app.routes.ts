@@ -31,6 +31,14 @@ export const routes: Routes = [
         loadComponent: () => import('./features/dashboard/eventos/eventos').then((m) => m.Eventos),
       },
       {
+        path: 'eventos/novo',
+        loadComponent: () => import('./features/dashboard/eventos/event-form/event-form').then((m) => m.EventForm),
+      },
+      {
+        path: 'eventos/:id/editar',
+        loadComponent: () => import('./features/dashboard/eventos/event-form/event-form').then((m) => m.EventForm),
+      },
+      {
         path: 'tags',
         loadComponent: () => import('./features/dashboard/tags/tags').then((m) => m.Tags),
         canActivate: [permissionGuard],

@@ -3,6 +3,7 @@ import { DatePipe } from '@angular/common';
 import { Component, OnInit, computed, inject, signal } from '@angular/core';
 import { toSignal } from '@angular/core/rxjs-interop';
 import { FormsModule } from '@angular/forms';
+import { ActivatedRoute, Router } from '@angular/router';
 import { map } from 'rxjs';
 import { MatButtonModule } from '@angular/material/button';
 import { MatChipsModule } from '@angular/material/chips';
@@ -23,7 +24,6 @@ import { ConfirmDialog } from '../../../shared/components/confirm-dialog/confirm
 import { Pagination } from '../../../shared/components/pagination/pagination';
 import { NotificationService } from '../../../shared/services/notification.service';
 import { paginate } from '../../../shared/utils/pagination.util';
-import { EventFormDialog, EventFormDialogData, EventFormResult } from './event-form-dialog/event-form-dialog';
 
 const STATUS_OPTIONS: { value: EventoStatus | 'todos'; label: string }[] = [
   { value: 'todos', label: 'Todos' },
@@ -58,6 +58,8 @@ export class Eventos implements OnInit {
   readonly roleService = inject(RoleService);
   private readonly dialog = inject(MatDialog);
   private readonly notification = inject(NotificationService);
+  private readonly router = inject(Router);
+  private readonly route = inject(ActivatedRoute);
 
   readonly loading = this.eventService.loading;
   readonly statusOptions = STATUS_OPTIONS;
@@ -130,45 +132,12 @@ export class Eventos implements OnInit {
     return true;
   }
 
-  openCreateDialog(): void {
-    this.openFormDialog({});
+  goToCreate(): void {
+    this.router.navigate(['eventos', 'novo'], { relativeTo: this.route.parent });
   }
 
-  openEditDialog(event: EventoRead): void {
-    this.tagService.getEventTags(event.id).subscribe((tags) => {
-      const eventWithTags: EventoWithTags = { ...event, tags };
-      this.openFormDialog({ event: eventWithTags });
-    });
-  }
-
-  private openFormDialog(data: EventFormDialogData): void {
-    const ref = this.dialog.open(EventFormDialog, { data, width: '700px' });
-
-    ref.afterClosed().subscribe((result?: EventFormResult) => {
-      if (!result) return;
-
-      const save$ = data.event
-        ? this.eventService.updateEvent(data.event.id, result.formData)
-        : this.eventService.createEvent(result.formData);
-
-      save$.subscribe({
-        next: (saved) => {
-          const afterTags$ = this.tagService.setEventTags(saved.id, result.tagIds);
-          const afterImage$ = result.imageFile
-            ? this.eventService.uploadEventImage(saved.id, result.imageFile)
-            : null;
-
-          afterTags$.subscribe();
-          if (afterImage$) afterImage$.subscribe();
-
-          this.notification.showNotification(
-            data.event ? 'Evento atualizado com sucesso' : 'Evento criado com sucesso',
-            'success',
-          );
-          this.eventService.getEvents().subscribe();
-        },
-      });
-    });
+  goToEdit(event: EventoRead): void {
+    this.router.navigate(['eventos', event.id, 'editar'], { relativeTo: this.route.parent });
   }
 
   publishEvent(event: EventoRead): void {

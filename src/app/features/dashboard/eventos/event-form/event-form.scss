@@ -1,8 +1,22 @@
+@use '../../../../shared/styles/page' as page;
+
+.page-header {
+  @include page.page-header;
+
+  h1 {
+    margin: 0;
+    font: var(--mat-sys-headline-small);
+  }
+}
+
+.loading-container {
+  @include page.loading-container;
+}
+
 .event-form {
   display: flex;
   flex-direction: column;
   gap: 16px;
-  min-width: 320px;
   max-width: 600px;
 }
 
@@ -47,4 +61,11 @@
   color: var(--mat-sys-error);
   font: var(--mat-sys-body-small);
   margin: 0;
+}
+
+.form-actions {
+  display: flex;
+  justify-content: flex-end;
+  gap: 8px;
+  margin-top: 8px;
 }
