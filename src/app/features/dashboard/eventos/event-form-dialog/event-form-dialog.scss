@@ -48,35 +48,3 @@
   font: var(--mat-sys-body-small);
   margin: 0;
 }
-
-.tags-selector {
-  display: flex;
-  flex-wrap: wrap;
-  gap: 8px;
-}
-
-.tag-chip {
-  border: 2px solid;
-  border-radius: 16px;
-  padding: 4px 12px;
-  background: transparent;
-  cursor: pointer;
-  font: var(--mat-sys-body-small);
-  color: var(--mat-sys-on-surface);
-
-  &.selected {
-    color: white;
-    font-weight: 600;
-  }
-
-  &:disabled {
-    opacity: 0.4;
-    cursor: not-allowed;
-  }
-}
-
-.tags-hint {
-  font: var(--mat-sys-body-small);
-  color: var(--mat-sys-on-surface-variant);
-  margin: 0;
-}

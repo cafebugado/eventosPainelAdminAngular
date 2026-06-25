@@ -102,25 +102,17 @@
       </mat-select>
     </mat-form-field>
 
-    <div class="field-group">
+    <mat-form-field appearance="outline" class="full-width">
       <mat-label>Tags</mat-label>
-      <p class="tags-hint">Selecione de 1 a 3 tags</p>
-      <div class="tags-selector">
+      <mat-select multiple [value]="selectedTagIds()" (selectionChange)="onTagsSelectionChange($event.value)">
         @for (tag of availableTags(); track tag.id) {
-          <button
-            type="button"
-            class="tag-chip"
-            [class.selected]="isTagSelected(tag.id)"
-            [disabled]="!isTagSelected(tag.id) && selectedTagIds().length >= 3"
-            [style.borderColor]="tag.cor"
-            [style.background]="isTagSelected(tag.id) ? tag.cor : 'transparent'"
-            (click)="toggleTagSelection(tag.id)"
-          >
+          <mat-option [value]="tag.id" [disabled]="isTagOptionDisabled(tag.id)">
             {{ tag.nome }}
-          </button>
+          </mat-option>
         }
-      </div>
-    </div>
+      </mat-select>
+      <mat-hint>Selecione de 1 a 3 tags</mat-hint>
+    </mat-form-field>
   </form>
 </mat-dialog-content>
 

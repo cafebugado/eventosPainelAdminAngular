@@ -110,21 +110,16 @@ export class EventFormDialog implements OnInit {
     return this.form.controls.modalidade.value === 'Presencial';
   }
 
-  toggleTagSelection(tagId: string): void {
-    const current = this.selectedTagIds();
-    if (current.includes(tagId)) {
-      this.selectedTagIds.set(current.filter((id) => id !== tagId));
-      return;
-    }
-    if (current.length >= 3) {
+  onTagsSelectionChange(tagIds: string[]): void {
+    if (tagIds.length > 3) {
       this.notification.showNotification('Selecione no máximo 3 tags', 'error');
       return;
     }
-    this.selectedTagIds.set([...current, tagId]);
+    this.selectedTagIds.set(tagIds);
   }
 
-  isTagSelected(tagId: string): boolean {
-    return this.selectedTagIds().includes(tagId);
+  isTagOptionDisabled(tagId: string): boolean {
+    return !this.selectedTagIds().includes(tagId) && this.selectedTagIds().length >= 3;
   }
 
   onImageFileSelected(event: Event): void {
