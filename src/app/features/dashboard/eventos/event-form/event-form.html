@@ -1,13 +1,14 @@
-<div class="page-header">
-  <h1>{{ pageTitle() }}</h1>
-</div>
-
-@if (loading()) {
-  <div class="loading-container">
-    <mat-spinner diameter="40" />
+<div class="event-form-page">
+  <div class="page-header">
+    <h1>{{ pageTitle() }}</h1>
   </div>
-} @else {
-  <form [formGroup]="form" class="event-form">
+
+  @if (loading()) {
+    <div class="loading-container">
+      <mat-spinner diameter="40" />
+    </div>
+  } @else {
+    <form [formGroup]="form" class="event-form">
     <mat-form-field appearance="outline" class="full-width">
       <mat-label>Nome</mat-label>
       <input matInput formControlName="nome" />
@@ -137,4 +138,5 @@
       <button mat-flat-button color="primary" type="button" (click)="onSubmit()">Salvar</button>
     </div>
   </form>
-}
+  }
+</div>
