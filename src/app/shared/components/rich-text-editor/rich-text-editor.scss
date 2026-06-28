@@ -18,13 +18,27 @@
 }
 
 .editor-content {
+  display: block;
+  width: 100%;
   min-height: 150px;
   padding: 12px;
+  border: none;
   outline: none;
+  resize: vertical;
   font: var(--mat-sys-body-medium);
+  color: var(--mat-sys-on-surface);
+  background: transparent;
 
-  &:empty::before {
-    content: 'Digite a descrição do evento...';
+  &::placeholder {
     color: var(--mat-sys-on-surface-variant);
   }
+}
+
+.editor-hint {
+  margin: 0;
+  padding: 6px 12px;
+  font: var(--mat-sys-body-small);
+  color: var(--mat-sys-on-surface-variant);
+  border-top: 1px solid var(--mat-sys-outline-variant);
+  background: var(--mat-sys-surface-container-low);
 }

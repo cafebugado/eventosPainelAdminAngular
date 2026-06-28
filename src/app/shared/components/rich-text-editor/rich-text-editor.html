@@ -1,29 +1,29 @@
 <div class="rich-text-editor" [class.disabled]="disabled">
   <div class="toolbar">
-    <button mat-icon-button type="button" matTooltip="Negrito" (click)="applyCommand('bold')">
+    <button mat-icon-button type="button" matTooltip="Negrito" (click)="applyBold()">
       <mat-icon>format_bold</mat-icon>
     </button>
-    <button mat-icon-button type="button" matTooltip="Itálico" (click)="applyCommand('italic')">
+    <button mat-icon-button type="button" matTooltip="Itálico" (click)="applyItalic()">
       <mat-icon>format_italic</mat-icon>
     </button>
-    <button mat-icon-button type="button" matTooltip="Sublinhado" (click)="applyCommand('underline')">
-      <mat-icon>format_underlined</mat-icon>
-    </button>
-    <button mat-icon-button type="button" matTooltip="Lista" (click)="applyCommand('insertUnorderedList')">
+    <button mat-icon-button type="button" matTooltip="Lista" (click)="applyUnorderedList()">
       <mat-icon>format_list_bulleted</mat-icon>
     </button>
-    <button mat-icon-button type="button" matTooltip="Lista numerada" (click)="applyCommand('insertOrderedList')">
+    <button mat-icon-button type="button" matTooltip="Lista numerada" (click)="applyOrderedList()">
       <mat-icon>format_list_numbered</mat-icon>
     </button>
-    <button mat-icon-button type="button" matTooltip="Link" (click)="applyCommand('createLink')">
+    <button mat-icon-button type="button" matTooltip="Link" (click)="applyLink()">
       <mat-icon>link</mat-icon>
     </button>
   </div>
-  <div
+  <textarea
     #editor
     class="editor-content"
-    contenteditable="true"
+    placeholder="Digite a descrição do evento..."
     (input)="onInput()"
     (blur)="onBlur()"
-  ></div>
+  ></textarea>
+  <p class="editor-hint">
+    Markdown suportado: **negrito**, *itálico*, listas com "-" ou "1.", e links [texto](https://...)
+  </p>
 </div>
