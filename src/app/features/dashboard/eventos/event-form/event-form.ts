@@ -1,8 +1,9 @@
 import { Component, OnInit, computed, inject, signal } from '@angular/core';
-import { FormBuilder, ReactiveFormsModule, Validators } from '@angular/forms';
+import { FormBuilder, ReactiveFormsModule, ValidationErrors, Validators } from '@angular/forms';
 import { ActivatedRoute, Router } from '@angular/router';
 import { MatButtonModule } from '@angular/material/button';
 import { MatCheckboxModule } from '@angular/material/checkbox';
+import { MatDatepickerModule } from '@angular/material/datepicker';
 import { MatFormFieldModule } from '@angular/material/form-field';
 import { MatInputModule } from '@angular/material/input';
 import { MatProgressSpinnerModule } from '@angular/material/progress-spinner';
@@ -25,6 +26,7 @@ import { validateURL } from '../../../../shared/utils/url-validators.util';
     ReactiveFormsModule,
     MatButtonModule,
     MatCheckboxModule,
+    MatDatepickerModule,
     MatFormFieldModule,
     MatInputModule,
     MatProgressSpinnerModule,
@@ -64,11 +66,12 @@ export class EventForm implements OnInit {
   ];
 
   readonly pageTitle = computed(() => (this.isEdit ? 'Editar Evento' : 'Novo Evento'));
+  readonly minDate = new Date(new Date().setHours(0, 0, 0, 0));
 
   readonly form = this.fb.nonNullable.group({
     nome: ['', Validators.required],
     descricao: [''],
-    data_evento: ['', Validators.required],
+    data_evento: this.fb.control<Date | null>(null, [Validators.required, this.pastDateValidator]),
     dia_semana: [''],
     horario: ['', Validators.required],
     periodo: [null as (typeof this.periodos)[number] | null],
@@ -132,6 +135,12 @@ export class EventForm implements OnInit {
   private urlValidator(control: { value: string }) {
     if (!control.value) return null;
     return validateURL(control.value) ? null : { url: true };
+  }
+
+  private pastDateValidator(control: { value: Date | null }): ValidationErrors | null {
+    if (!control.value) return null;
+    const today = new Date(new Date().setHours(0, 0, 0, 0));
+    return control.value < today ? { pastDate: true } : null;
   }
 
   get isPresencial(): boolean {

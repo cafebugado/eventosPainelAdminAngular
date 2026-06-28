@@ -24,9 +24,21 @@
     <div class="form-row">
       <mat-form-field appearance="outline" class="full-width">
         <mat-label>Data do evento</mat-label>
-        <input matInput type="date" formControlName="data_evento" />
+        <input
+          matInput
+          readonly
+          [matDatepicker]="picker"
+          [min]="minDate"
+          formControlName="data_evento"
+          (click)="picker.open()"
+        />
+        <mat-datepicker-toggle matIconSuffix [for]="picker" />
+        <mat-datepicker #picker />
         @if (form.controls.data_evento.hasError('required')) {
           <mat-error>A data é obrigatória</mat-error>
+        }
+        @if (form.controls.data_evento.hasError('matDatepickerMin') || form.controls.data_evento.hasError('pastDate')) {
+          <mat-error>A data não pode estar no passado</mat-error>
         }
       </mat-form-field>
 
