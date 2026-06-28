@@ -15,7 +15,7 @@ import { TagService } from '../../../../core/services/tag.service';
 import { LocationSelector } from '../../../../shared/components/location-selector/location-selector';
 import { RichTextEditor } from '../../../../shared/components/rich-text-editor/rich-text-editor';
 import { NotificationService } from '../../../../shared/services/notification.service';
-import { formatDateToDisplay, formatDateToInput, getDayName } from '../../../../shared/utils/event-date.util';
+import { formatDateToDisplay, formatDateToInput, getDayName, getPeriodoFromHorario } from '../../../../shared/utils/event-date.util';
 import { validateImageFile } from '../../../../shared/utils/image-validators.util';
 import { generateSlug } from '../../../../shared/utils/slug.util';
 import { validateURL } from '../../../../shared/utils/url-validators.util';
@@ -97,6 +97,13 @@ export class EventForm implements OnInit {
 
     this.form.controls.data_evento.valueChanges.subscribe((value) => {
       this.form.controls.dia_semana.setValue(getDayName(value));
+    });
+
+    this.form.controls.horario.valueChanges.subscribe((value) => {
+      const periodo = getPeriodoFromHorario(value);
+      if (periodo) {
+        this.form.controls.periodo.setValue(periodo);
+      }
     });
   }
 

@@ -27,3 +27,13 @@ export function getDayName(value: Date | null | undefined): string {
   if (!value) return '';
   return DAY_NAMES[value.getDay()];
 }
+
+/** Deduz o período do dia (Matinal/Vespertino/Noturno) a partir do horário (HH:mm). */
+export function getPeriodoFromHorario(value: string | null | undefined): 'Matinal' | 'Vespertino' | 'Noturno' | null {
+  if (!value) return null;
+  const [hours] = value.split(':').map(Number);
+  if (Number.isNaN(hours)) return null;
+  if (hours >= 5 && hours < 12) return 'Matinal';
+  if (hours >= 12 && hours < 18) return 'Vespertino';
+  return 'Noturno';
+}
