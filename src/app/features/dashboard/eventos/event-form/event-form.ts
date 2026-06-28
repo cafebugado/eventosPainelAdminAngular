@@ -1,6 +1,7 @@
 import { Component, OnInit, computed, inject, signal } from '@angular/core';
 import { FormBuilder, ReactiveFormsModule, ValidationErrors, Validators } from '@angular/forms';
 import { ActivatedRoute, Router } from '@angular/router';
+import { forkJoin, of, switchMap } from 'rxjs';
 import { MatButtonModule } from '@angular/material/button';
 import { MatCheckboxModule } from '@angular/material/checkbox';
 import { MatDatepickerModule } from '@angular/material/datepicker';
@@ -17,6 +18,7 @@ import { RichTextEditor } from '../../../../shared/components/rich-text-editor/r
 import { NotificationService } from '../../../../shared/services/notification.service';
 import { formatDateToDisplay, formatDateToInput, getDayName, getPeriodoFromHorario } from '../../../../shared/utils/event-date.util';
 import { validateImageFile } from '../../../../shared/utils/image-validators.util';
+import { resizeImageFile } from '../../../../shared/utils/image-resize.util';
 import { generateSlug } from '../../../../shared/utils/slug.util';
 import { validateURL } from '../../../../shared/utils/url-validators.util';
 
@@ -179,12 +181,15 @@ export class EventForm implements OnInit {
     }
 
     this.imageError.set(null);
-    this.selectedImageFile.set(file);
     this.form.controls.imagemUrl.setValue('');
 
-    const reader = new FileReader();
-    reader.onload = () => this.imagePreview.set(reader.result as string);
-    reader.readAsDataURL(file);
+    resizeImageFile(file).then((resized) => {
+      this.selectedImageFile.set(resized);
+
+      const reader = new FileReader();
+      reader.onload = () => this.imagePreview.set(reader.result as string);
+      reader.readAsDataURL(resized);
+    });
   }
 
   onCancel(): void {
@@ -230,20 +235,28 @@ export class EventForm implements OnInit {
       ? this.eventService.updateEvent(this.eventId, formData)
       : this.eventService.createEvent(formData);
 
-    save$.subscribe({
-      next: (saved) => {
-        this.tagService.setEventTags(saved.id, tagIds).subscribe();
-        if (imageFile) {
-          this.eventService.uploadEventImage(saved.id, imageFile).subscribe();
-        }
-
-        this.notification.showNotification(
-          this.isEdit ? 'Evento atualizado com sucesso' : 'Evento criado com sucesso',
-          'success',
-        );
-        this.eventService.getEvents().subscribe();
-        this.router.navigate(['/admin/dashboard/eventos']);
-      },
-    });
+    save$
+      .pipe(
+        switchMap((saved) =>
+          forkJoin({
+            saved: of(saved),
+            tags: this.tagService.setEventTags(saved.id, tagIds),
+            image: imageFile ? this.eventService.uploadEventImage(saved.id, imageFile) : of(null),
+          }),
+        ),
+      )
+      .subscribe({
+        next: ({ saved, image }) => {
+          this.eventService.upsertLocal(image ?? saved);
+          this.notification.showNotification(
+            this.isEdit ? 'Evento atualizado com sucesso' : 'Evento criado com sucesso',
+            'success',
+          );
+          this.router.navigate(['/admin/dashboard/eventos']);
+        },
+        error: () => {
+          this.notification.showNotification('Erro ao salvar evento', 'error');
+        },
+      });
   }
 }

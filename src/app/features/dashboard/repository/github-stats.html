@@ -102,7 +102,7 @@
               <mat-card-content>
                 @for (contributor of panel.contributors; track contributor.login) {
                   <a class="list-item" [href]="contributor.html_url" target="_blank" rel="noopener">
-                    <img [src]="contributor.avatar_url" [alt]="contributor.login" class="contributor-avatar" />
+                    <img [src]="contributor.avatar_url" [alt]="contributor.login" class="contributor-avatar" loading="lazy" />
                     <div class="item-main">
                       <span class="item-title">{{ contributor.login }}</span>
                       <span class="item-meta">{{ contributor.contributions }} contribuições</span>

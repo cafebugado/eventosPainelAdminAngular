@@ -24,7 +24,7 @@
           <div class="photos-grid">
             @for (foto of album.fotos; track foto.id) {
               <div class="photo-item">
-                <img [src]="foto.url" [alt]="foto.legenda ?? ''" class="photo-image" />
+                <img [src]="foto.url" [alt]="foto.legenda ?? ''" class="photo-image" loading="lazy" />
                 <app-photo-caption-editor [legenda]="foto.legenda" (save)="updateCaption(foto, $event)" />
                 <button mat-icon-button class="photo-delete" (click)="deletePhoto(foto)" aria-label="Excluir foto">
                   <mat-icon>delete</mat-icon>

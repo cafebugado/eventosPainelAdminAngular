@@ -81,6 +81,20 @@ export class EventService {
     return this.http.delete<void>(`${this.baseUrl}/events/${eventId}`);
   }
 
+  upsertLocal(event: EventoRead): void {
+    this.events.update((events) => {
+      const index = events.findIndex((e) => e.id === event.id);
+      if (index === -1) return [event, ...events];
+      const copy = [...events];
+      copy[index] = event;
+      return copy;
+    });
+  }
+
+  removeLocal(eventId: string): void {
+    this.events.update((events) => events.filter((e) => e.id !== eventId));
+  }
+
   publishEvent(eventId: string): Observable<EventoRead> {
     return this.http.post<EventoRead>(`${this.baseUrl}/events/${eventId}/publish`, {});
   }

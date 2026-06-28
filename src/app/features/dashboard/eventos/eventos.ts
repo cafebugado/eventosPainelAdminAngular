@@ -4,7 +4,7 @@ import { Component, OnInit, computed, inject, signal } from '@angular/core';
 import { toSignal } from '@angular/core/rxjs-interop';
 import { FormsModule } from '@angular/forms';
 import { ActivatedRoute, Router } from '@angular/router';
-import { map } from 'rxjs';
+import { Subject, debounceTime, map } from 'rxjs';
 import { MatButtonModule } from '@angular/material/button';
 import { MatChipsModule } from '@angular/material/chips';
 import { MatDialog } from '@angular/material/dialog';
@@ -65,7 +65,9 @@ export class Eventos implements OnInit {
   readonly statusOptions = STATUS_OPTIONS;
   readonly displayedColumns = ['imagem', 'nome', 'data_evento', 'created_at', 'acoes'];
 
-  readonly searchQuery = signal('');
+  readonly rawSearchQuery = signal('');
+  private readonly searchInput$ = new Subject<string>();
+  readonly searchQuery = toSignal(this.searchInput$.pipe(debounceTime(250)), { initialValue: '' });
   readonly statusFilter = signal<EventoStatus | 'todos'>('todos');
   readonly currentPage = signal(1);
 
@@ -101,7 +103,8 @@ export class Eventos implements OnInit {
   }
 
   onSearchChange(value: string): void {
-    this.searchQuery.set(value);
+    this.rawSearchQuery.set(value);
+    this.searchInput$.next(value);
     this.currentPage.set(1);
   }
 
@@ -142,9 +145,9 @@ export class Eventos implements OnInit {
 
   publishEvent(event: EventoRead): void {
     this.eventService.publishEvent(event.id).subscribe({
-      next: () => {
+      next: (updated) => {
         this.notification.showNotification('Evento publicado com sucesso', 'success');
-        this.eventService.getEvents().subscribe();
+        this.eventService.upsertLocal(updated);
       },
     });
   }
@@ -163,7 +166,7 @@ export class Eventos implements OnInit {
       this.eventService.deleteEvent(event.id).subscribe({
         next: () => {
           this.notification.showNotification('Evento excluído com sucesso', 'success');
-          this.eventService.getEvents().subscribe();
+          this.eventService.removeLocal(event.id);
         },
       });
     });

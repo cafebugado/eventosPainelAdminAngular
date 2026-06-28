@@ -11,7 +11,7 @@
 <div class="filters">
   <mat-form-field appearance="outline" class="search-field">
     <mat-label>Buscar</mat-label>
-    <input matInput [ngModel]="searchQuery()" (ngModelChange)="onSearchChange($event)" placeholder="Nome, descrição ou data" />
+    <input matInput [ngModel]="rawSearchQuery()" (ngModelChange)="onSearchChange($event)" placeholder="Nome, descrição ou data" />
     <mat-icon matSuffix>search</mat-icon>
   </mat-form-field>
 
@@ -36,7 +36,7 @@
         <th mat-header-cell *matHeaderCellDef></th>
         <td mat-cell *matCellDef="let event">
           @if (event.imagem) {
-            <img [src]="event.imagem" [alt]="event.nome" class="event-thumb" />
+            <img [src]="event.imagem" [alt]="event.nome" class="event-thumb" loading="lazy" />
           } @else {
             <div class="event-thumb placeholder">
               <mat-icon>image</mat-icon>

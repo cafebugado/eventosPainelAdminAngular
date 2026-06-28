@@ -16,7 +16,7 @@
       <mat-card class="contributor-card">
         <mat-card-content>
           @if (contributor.avatar_url) {
-            <img [src]="contributor.avatar_url" [alt]="contributor.nome ?? contributor.github_username" class="avatar" />
+            <img [src]="contributor.avatar_url" [alt]="contributor.nome ?? contributor.github_username" class="avatar" loading="lazy" />
           }
           <div class="contributor-info">
             <span class="contributor-name">{{ contributor.nome ?? contributor.github_username }}</span>
