@@ -1,6 +1,6 @@
 import { BreakpointObserver } from '@angular/cdk/layout';
 import { DatePipe } from '@angular/common';
-import { Component, OnInit, computed, inject, signal } from '@angular/core';
+import { ChangeDetectionStrategy, Component, OnInit, computed, inject, signal } from '@angular/core';
 import { toSignal } from '@angular/core/rxjs-interop';
 import { FormsModule } from '@angular/forms';
 import { ActivatedRoute, Router } from '@angular/router';
@@ -11,7 +11,6 @@ import { MatDialog } from '@angular/material/dialog';
 import { MatFormFieldModule } from '@angular/material/form-field';
 import { MatIconModule } from '@angular/material/icon';
 import { MatInputModule } from '@angular/material/input';
-import { MatProgressSpinnerModule } from '@angular/material/progress-spinner';
 import { MatSelectModule } from '@angular/material/select';
 import { MatTableModule } from '@angular/material/table';
 import { MatTooltipModule } from '@angular/material/tooltip';
@@ -42,7 +41,6 @@ const STATUS_OPTIONS: { value: EventoStatus | 'todos'; label: string }[] = [
     MatFormFieldModule,
     MatIconModule,
     MatInputModule,
-    MatProgressSpinnerModule,
     MatSelectModule,
     MatTableModule,
     MatTooltipModule,
@@ -50,6 +48,7 @@ const STATUS_OPTIONS: { value: EventoStatus | 'todos'; label: string }[] = [
   ],
   templateUrl: './eventos.html',
   styleUrl: './eventos.scss',
+  changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class Eventos implements OnInit {
   private readonly eventService = inject(EventService);
@@ -64,6 +63,7 @@ export class Eventos implements OnInit {
   readonly loading = this.eventService.loading;
   readonly statusOptions = STATUS_OPTIONS;
   readonly displayedColumns = ['imagem', 'nome', 'data_evento', 'created_at', 'acoes'];
+  readonly skeletonRows = Array.from({ length: 6 }, (_, i) => i);
 
   readonly rawSearchQuery = signal('');
   private readonly searchInput$ = new Subject<string>();
@@ -97,9 +97,25 @@ export class Eventos implements OnInit {
 
   readonly paginatedEvents = computed(() => paginate(this.filteredEvents(), this.currentPage(), this.pageSize()));
 
+  readonly paginatedRows = computed(() => {
+    const permissions = this.roleService.permissions();
+    const role = this.roleService.role();
+    const userId = this.authService.currentUser()?.id;
+
+    return this.paginatedEvents().map((event) => ({
+      event,
+      canEdit: this.computeCanEdit(event, permissions, role, userId),
+      canDelete: this.computeCanDelete(event, permissions, role, userId),
+    }));
+  });
+
   ngOnInit(): void {
-    this.eventService.getEvents().subscribe();
-    this.tagService.getTags().subscribe();
+    if (this.eventService.events().length === 0) {
+      this.eventService.getEvents().subscribe();
+    }
+    if (this.tagService.tags().length === 0) {
+      this.tagService.getTags().subscribe();
+    }
   }
 
   onSearchChange(value: string): void {
@@ -117,20 +133,28 @@ export class Eventos implements OnInit {
     this.currentPage.set(page);
   }
 
-  canEdit(event: EventoRead): boolean {
-    const permissions = this.roleService.permissions();
+  private computeCanEdit(
+    event: EventoRead,
+    permissions: ReturnType<RoleService['permissions']>,
+    role: ReturnType<RoleService['role']>,
+    userId: string | undefined,
+  ): boolean {
     if (!permissions.canEditEvents) return false;
-    if (this.roleService.role() === 'moderador') {
-      return event.created_by === this.authService.currentUser()?.id;
+    if (role === 'moderador') {
+      return event.created_by === userId;
     }
     return true;
   }
 
-  canDelete(event: EventoRead): boolean {
-    const permissions = this.roleService.permissions();
+  private computeCanDelete(
+    event: EventoRead,
+    permissions: ReturnType<RoleService['permissions']>,
+    role: ReturnType<RoleService['role']>,
+    userId: string | undefined,
+  ): boolean {
     if (!permissions.canDeleteEvents) return false;
-    if (this.roleService.role() === 'moderador') {
-      return event.created_by === this.authService.currentUser()?.id;
+    if (role === 'moderador') {
+      return event.created_by === userId;
     }
     return true;
   }

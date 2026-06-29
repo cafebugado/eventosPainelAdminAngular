@@ -13,6 +13,12 @@ import { AuthService } from '../../core/services/auth.service';
 const EMAIL_REGEX = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
 const REMEMBER_EMAIL_KEY = 'eventos_admin_remember_email';
 
+/** Aquece o cache do browser com os chunks lazy do dashboard/eventos antes da navegação. */
+function preloadDashboardChunks(): void {
+  import('../dashboard/dashboard');
+  import('../dashboard/eventos/eventos');
+}
+
 @Component({
   selector: 'app-login',
   imports: [
@@ -92,6 +98,7 @@ export class Login {
         } else {
           localStorage.removeItem(REMEMBER_EMAIL_KEY);
         }
+        preloadDashboardChunks();
         this.router.navigate(['/admin/dashboard']);
       },
       error: (error) => {
