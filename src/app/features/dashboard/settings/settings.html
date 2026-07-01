@@ -154,7 +154,9 @@
       </mat-card-content>
       @if (isEmailProvider()) {
         <mat-card-actions align="end">
-          <button mat-flat-button color="primary" (click)="openChangePasswordDialog()">Trocar minha senha</button>
+          <button mat-flat-button class="primary-action-button" (click)="openChangePasswordDialog()">
+            Trocar minha senha
+          </button>
         </mat-card-actions>
       }
     </mat-card>
