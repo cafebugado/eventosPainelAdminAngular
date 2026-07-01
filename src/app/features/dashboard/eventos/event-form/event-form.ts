@@ -7,9 +7,11 @@ import { MatCheckboxModule } from '@angular/material/checkbox';
 import { MatDatepickerModule } from '@angular/material/datepicker';
 import { MatDialog } from '@angular/material/dialog';
 import { MatFormFieldModule } from '@angular/material/form-field';
+import { MatIconModule } from '@angular/material/icon';
 import { MatInputModule } from '@angular/material/input';
 import { MatProgressSpinnerModule } from '@angular/material/progress-spinner';
 import { MatSelectModule } from '@angular/material/select';
+import { MatTooltipModule } from '@angular/material/tooltip';
 import { AuthService } from '../../../../core/services/auth.service';
 import { EventoStatus, EventoWithTags } from '../../../../core/models/evento.model';
 import { TagRead } from '../../../../core/models/tag.model';
@@ -34,9 +36,11 @@ import { validateURL } from '../../../../shared/utils/url-validators.util';
     MatCheckboxModule,
     MatDatepickerModule,
     MatFormFieldModule,
+    MatIconModule,
     MatInputModule,
     MatProgressSpinnerModule,
     MatSelectModule,
+    MatTooltipModule,
     LocationSelector,
     RichTextEditor,
   ],
@@ -64,6 +68,7 @@ export class EventForm implements OnInit {
   readonly selectedTagIds = signal<string[]>([]);
   readonly imagePreview = signal<string | null>(null);
   readonly selectedImageFile = signal<File | undefined>(undefined);
+  readonly imageRemoved = signal(false);
   readonly imageError = signal<string | null>(null);
   readonly saving = signal(false);
 
@@ -128,6 +133,18 @@ export class EventForm implements OnInit {
         this.form.controls.periodo.setValue(periodo);
       }
     });
+
+    this.form.controls.imagemUrl.valueChanges.subscribe((value) => {
+      const imageUrl = value.trim();
+
+      if (imageUrl) {
+        this.selectedImageFile.set(undefined);
+        this.imageRemoved.set(false);
+        this.imageError.set(null);
+      }
+
+      this.imagePreview.set(imageUrl && validateURL(imageUrl) ? imageUrl : null);
+    });
   }
 
   private loadEvent(slugOrId: string): void {
@@ -138,6 +155,7 @@ export class EventForm implements OnInit {
         this.event.set(eventWithTags);
         this.selectedTagIds.set(tags.map((t) => t.id));
         this.imagePreview.set(event.imagem ?? null);
+        this.imageRemoved.set(false);
         this.patchForm(eventWithTags);
         this.loading.set(false);
       });
@@ -202,6 +220,7 @@ export class EventForm implements OnInit {
     }
 
     this.imageError.set(null);
+    this.imageRemoved.set(false);
     this.form.controls.imagemUrl.setValue('');
 
     resizeImageFile(file).then((resized) => {
@@ -211,6 +230,18 @@ export class EventForm implements OnInit {
       reader.onload = () => this.imagePreview.set(reader.result as string);
       reader.readAsDataURL(resized);
     });
+  }
+
+  onRemoveImage(fileInput?: HTMLInputElement): void {
+    this.selectedImageFile.set(undefined);
+    this.imageRemoved.set(true);
+    this.imageError.set(null);
+    this.imagePreview.set(null);
+    this.form.controls.imagemUrl.setValue('');
+
+    if (fileInput) {
+      fileInput.value = '';
+    }
   }
 
   onCancel(): void {
@@ -281,9 +312,15 @@ export class EventForm implements OnInit {
     const formData = this.buildPayload();
     const tagIds = this.selectedTagIds();
     const imageFile = this.selectedImageFile();
+    const shouldDeleteImage = this.imageRemoved() && !!this.eventId && !imageFile;
+    const eventId = this.eventId;
 
-    const save$ = this.eventId
-      ? this.eventService.updateEvent(this.eventId, formData)
+    const save$ = eventId
+      ? shouldDeleteImage
+        ? this.eventService.deleteEventImage(eventId).pipe(
+            switchMap(() => this.eventService.updateEvent(eventId, formData)),
+          )
+        : this.eventService.updateEvent(eventId, formData)
       : this.eventService.createEvent(formData);
 
     this.saving.set(true);

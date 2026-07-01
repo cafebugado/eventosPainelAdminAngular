@@ -86,12 +86,24 @@
 
     <div class="field-group">
       <mat-label>Imagem</mat-label>
+      <input type="file" accept="image/*" (change)="onImageFileSelected($event)" #fileInput hidden />
       @if (imagePreview()) {
-        <img [src]="imagePreview()" alt="Pré-visualização" class="image-preview" />
+        <div class="image-preview-wrapper">
+          <img [src]="imagePreview()" alt="Pré-visualização" class="image-preview" />
+          <button
+            mat-icon-button
+            class="remove-image-button"
+            type="button"
+            matTooltip="Remover imagem"
+            aria-label="Remover imagem"
+            (click)="onRemoveImage(fileInput)"
+          >
+            <mat-icon>delete</mat-icon>
+          </button>
+        </div>
       }
       <div class="image-actions">
-        <input type="file" accept="image/*" (change)="onImageFileSelected($event)" #fileInput hidden />
-        <button mat-stroked-button type="button" (click)="fileInput.click()">
+        <button mat-flat-button class="secondary-action-button" type="button" (click)="fileInput.click()">
           Selecionar arquivo
         </button>
       </div>
