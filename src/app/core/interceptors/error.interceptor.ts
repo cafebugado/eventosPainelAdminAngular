@@ -4,30 +4,34 @@ import { Router } from '@angular/router';
 import * as Sentry from '@sentry/angular';
 import { catchError, throwError } from 'rxjs';
 import { NotificationService } from '../../shared/services/notification.service';
+import { SKIP_ERROR_NOTIFICATION } from '../http/error-notification.context';
 import { AuthService } from '../services/auth.service';
 
 export const errorInterceptor: HttpInterceptorFn = (req, next) => {
   const notification = inject(NotificationService);
   const auth = inject(AuthService);
   const router = inject(Router);
+  const skipNotification = req.context.get(SKIP_ERROR_NOTIFICATION);
 
   return next(req).pipe(
     catchError((error) => {
-      if (error.status === 401) {
+      if (error.status === 401 && !skipNotification) {
         auth.signOut().subscribe();
         router.navigate(['/admin']);
         notification.showNotification('Sessão expirada. Faça login novamente.', 'error');
       } else {
-        if (error.status >= 500) {
+        if (error.status >= 500 && !skipNotification) {
           Sentry.captureException(error, {
             extra: { url: req.url, method: req.method, status: error.status },
           });
         }
         const message = error?.error?.detail ?? error?.message ?? 'Erro inesperado';
-        notification.showNotification(
-          typeof message === 'string' ? message : 'Erro inesperado',
-          'error',
-        );
+        if (!skipNotification) {
+          notification.showNotification(
+            typeof message === 'string' ? message : 'Erro inesperado',
+            'error',
+          );
+        }
       }
       return throwError(() => error);
     }),

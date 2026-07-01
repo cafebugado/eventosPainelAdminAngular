@@ -1,14 +1,4 @@
-<mat-form-field appearance="outline" class="full-width">
-  <mat-label>Endereço</mat-label>
-  <input matInput [formControlName]="enderecoControlName" />
-</mat-form-field>
-
-<div class="location-row">
-  <mat-form-field appearance="outline" class="full-width">
-    <mat-label>Cidade</mat-label>
-    <input matInput [formControlName]="cidadeControlName" />
-  </mat-form-field>
-
+@if (!hasSelectedState()) {
   <mat-form-field appearance="outline" class="full-width">
     <mat-label>Estado</mat-label>
     <mat-select [formControlName]="estadoControlName">
@@ -17,4 +7,44 @@
       }
     </mat-select>
   </mat-form-field>
-</div>
+} @else {
+  <mat-form-field appearance="outline" class="full-width">
+    <mat-label>Endereço</mat-label>
+    <input matInput [formControlName]="enderecoControlName" />
+  </mat-form-field>
+
+  <div class="location-row">
+    <mat-form-field appearance="outline" class="full-width">
+      <mat-label>Cidade</mat-label>
+      <input
+        matInput
+        [formControlName]="cidadeControlName"
+        [matAutocomplete]="cityAutocomplete"
+        [readonly]="loadingCities()"
+        placeholder="Digite para buscar"
+      />
+      <mat-autocomplete #cityAutocomplete="matAutocomplete">
+        @if (loadingCities()) {
+          <mat-option disabled>Carregando cidades...</mat-option>
+        } @else if (cityLoadError()) {
+          <mat-option disabled>Não foi possível carregar as cidades</mat-option>
+        } @else if (filteredCities().length === 0) {
+          <mat-option disabled>Nenhuma cidade encontrada</mat-option>
+        } @else {
+          @for (city of filteredCities(); track city.id) {
+            <mat-option [value]="city.nome">{{ city.nome }}</mat-option>
+          }
+        }
+      </mat-autocomplete>
+    </mat-form-field>
+
+    <mat-form-field appearance="outline" class="full-width">
+      <mat-label>Estado</mat-label>
+      <mat-select [formControlName]="estadoControlName">
+        @for (state of states; track state.uf) {
+          <mat-option [value]="state.uf">{{ state.nome }}</mat-option>
+        }
+      </mat-select>
+    </mat-form-field>
+  </div>
+}

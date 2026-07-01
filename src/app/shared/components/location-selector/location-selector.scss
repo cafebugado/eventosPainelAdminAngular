@@ -10,3 +10,10 @@
     flex: 1;
   }
 }
+
+@media (max-width: 640px) {
+  .location-row {
+    flex-direction: column;
+    gap: 8px;
+  }
+}
