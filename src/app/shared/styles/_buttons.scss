@@ -6,13 +6,17 @@ $brand-blue: #0ea5e9;
 $brand-blue-dark: #0369a1;
 $brand-blue-light: #38bdf8;
 
+$brand-red: #ef4444;
+$brand-red-dark: #b91c1c;
+$brand-red-light: #f87171;
+
 @mixin action-button($color, $color-dark, $color-light) {
   height: 50px !important;
   padding: 0 22px !important;
   border-radius: 10px !important;
   font-size: 0.95rem !important;
   font-weight: 600 !important;
-  letter-spacing: 0.5px !important;
+  letter-spacing: 0 !important;
   background: linear-gradient(135deg, $color-light 0%, $color 50%, $color-dark 100%) !important;
   box-shadow: 0 4px 18px rgba($color, 0.35) !important;
   transition: all 0.25s ease !important;
@@ -49,8 +53,13 @@ $brand-blue-light: #38bdf8;
   @include action-button($brand-blue, $brand-blue-dark, $brand-blue-light);
 }
 
+.cancel-action-button {
+  @include action-button($brand-red, $brand-red-dark, $brand-red-light);
+}
+
 .primary-action-button mat-icon,
-.secondary-action-button mat-icon {
+.secondary-action-button mat-icon,
+.cancel-action-button mat-icon {
   font-size: 20px !important;
   width: 20px !important;
   height: 20px !important;
@@ -58,7 +67,8 @@ $brand-blue-light: #38bdf8;
 }
 
 .dark-theme .primary-action-button,
-.dark-theme .secondary-action-button {
+.dark-theme .secondary-action-button,
+.dark-theme .cancel-action-button {
   box-shadow: none !important;
 
   &:not([disabled]):hover,
