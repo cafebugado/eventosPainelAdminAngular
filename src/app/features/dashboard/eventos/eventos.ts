@@ -20,6 +20,7 @@ import { TagService } from '../../../core/services/tag.service';
 import { Pagination } from '../../../shared/components/pagination/pagination';
 import { NotificationService } from '../../../shared/services/notification.service';
 import { paginate } from '../../../shared/utils/pagination.util';
+import { environment } from '../../../../environments/environment';
 
 const STATUS_OPTIONS: { value: EventoStatus | 'todos'; label: string }[] = [
   { value: 'todos', label: 'Todos' },
@@ -158,7 +159,7 @@ export class Eventos implements OnInit {
 
   copyLink(event: EventoRead): void {
     const slug = (event as EventoWithTags & { slug?: string }).slug ?? event.id;
-    const url = `${window.location.origin}/eventos/${slug}`;
+    const url = new URL(`/eventos/${slug}`, environment.publicEventsUrl).toString();
     navigator.clipboard.writeText(url).then(() => {
       this.notification.showNotification('Link copiado para a área de transferência', 'success');
     });
