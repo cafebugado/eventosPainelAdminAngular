@@ -73,9 +73,21 @@
 
 .form-actions {
   display: flex;
+  align-items: center;
   justify-content: flex-end;
   gap: 8px;
   margin-top: 8px;
+}
+
+.saving-feedback {
+  margin: 0 auto 0 0;
+  color: var(--mat-sys-primary);
+  font: var(--mat-sys-body-medium);
+  font-weight: 500;
+}
+
+.save-spinner {
+  --mdc-circular-progress-active-indicator-color: #ffffff;
 }
 
 @media (max-width: 640px) {
@@ -91,5 +103,14 @@
   .form-row {
     flex-direction: column;
     gap: 8px;
+  }
+
+  .form-actions {
+    align-items: stretch;
+    flex-direction: column;
+  }
+
+  .saving-feedback {
+    margin: 0;
   }
 }

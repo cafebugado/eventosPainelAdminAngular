@@ -1,7 +1,7 @@
 import { Component, OnInit, computed, inject, signal } from '@angular/core';
 import { FormBuilder, ReactiveFormsModule, ValidationErrors, Validators } from '@angular/forms';
 import { ActivatedRoute, Router } from '@angular/router';
-import { forkJoin, of, switchMap } from 'rxjs';
+import { finalize, forkJoin, of, switchMap } from 'rxjs';
 import { MatButtonModule } from '@angular/material/button';
 import { MatCheckboxModule } from '@angular/material/checkbox';
 import { MatDatepickerModule } from '@angular/material/datepicker';
@@ -65,6 +65,7 @@ export class EventForm implements OnInit {
   readonly imagePreview = signal<string | null>(null);
   readonly selectedImageFile = signal<File | undefined>(undefined);
   readonly imageError = signal<string | null>(null);
+  readonly saving = signal(false);
 
   readonly periodos = ['Matinal', 'Diurno', 'Vespertino', 'Noturno'] as const;
   readonly modalidades = ['Online', 'Presencial'] as const;
@@ -265,6 +266,8 @@ export class EventForm implements OnInit {
   }
 
   onSubmit(): void {
+    if (this.saving()) return;
+
     if (this.form.invalid) {
       this.form.markAllAsTouched();
       return;
@@ -283,6 +286,8 @@ export class EventForm implements OnInit {
       ? this.eventService.updateEvent(this.eventId, formData)
       : this.eventService.createEvent(formData);
 
+    this.saving.set(true);
+
     save$
       .pipe(
         switchMap((saved) =>
@@ -292,6 +297,7 @@ export class EventForm implements OnInit {
             image: imageFile ? this.eventService.uploadEventImage(saved.id, imageFile) : of(null),
           }),
         ),
+        finalize(() => this.saving.set(false)),
       )
       .subscribe({
         next: ({ saved, image }) => {

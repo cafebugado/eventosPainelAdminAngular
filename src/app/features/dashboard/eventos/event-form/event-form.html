@@ -139,8 +139,20 @@
     </mat-form-field>
 
     <div class="form-actions">
-      <button mat-flat-button class="cancel-action-button" type="button" (click)="onCancel()">Cancelar</button>
-      <button mat-flat-button class="secondary-action-button" type="button" (click)="onSubmit()">Salvar</button>
+      @if (saving()) {
+        <p class="saving-feedback" role="status" aria-live="polite">Salvando evento...</p>
+      }
+      <button mat-flat-button class="cancel-action-button" type="button" [disabled]="saving()" (click)="onCancel()">
+        Cancelar
+      </button>
+      <button mat-flat-button class="secondary-action-button" type="button" [disabled]="saving()" (click)="onSubmit()">
+        @if (saving()) {
+          <mat-spinner diameter="20" class="save-spinner" />
+          <span>Salvando evento...</span>
+        } @else {
+          Salvar
+        }
+      </button>
     </div>
   </form>
   }
