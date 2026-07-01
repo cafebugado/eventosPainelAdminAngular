@@ -14,6 +14,10 @@
   }
 }
 
+.delete-event-button {
+  flex-shrink: 0;
+}
+
 .loading-container {
   @include page.loading-container;
 }
@@ -72,4 +76,20 @@
   justify-content: flex-end;
   gap: 8px;
   margin-top: 8px;
+}
+
+@media (max-width: 640px) {
+  .page-header {
+    align-items: stretch;
+
+    h1,
+    .delete-event-button {
+      width: 100%;
+    }
+  }
+
+  .form-row {
+    flex-direction: column;
+    gap: 8px;
+  }
 }

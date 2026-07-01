@@ -5,14 +5,18 @@ import { forkJoin, of, switchMap } from 'rxjs';
 import { MatButtonModule } from '@angular/material/button';
 import { MatCheckboxModule } from '@angular/material/checkbox';
 import { MatDatepickerModule } from '@angular/material/datepicker';
+import { MatDialog } from '@angular/material/dialog';
 import { MatFormFieldModule } from '@angular/material/form-field';
 import { MatInputModule } from '@angular/material/input';
 import { MatProgressSpinnerModule } from '@angular/material/progress-spinner';
 import { MatSelectModule } from '@angular/material/select';
+import { AuthService } from '../../../../core/services/auth.service';
 import { EventoStatus, EventoWithTags } from '../../../../core/models/evento.model';
 import { TagRead } from '../../../../core/models/tag.model';
 import { EventService } from '../../../../core/services/event.service';
+import { RoleService } from '../../../../core/services/role.service';
 import { TagService } from '../../../../core/services/tag.service';
+import { ConfirmDialog } from '../../../../shared/components/confirm-dialog/confirm-dialog';
 import { LocationSelector } from '../../../../shared/components/location-selector/location-selector';
 import { RichTextEditor } from '../../../../shared/components/rich-text-editor/rich-text-editor';
 import { NotificationService } from '../../../../shared/services/notification.service';
@@ -43,8 +47,11 @@ export class EventForm implements OnInit {
   private readonly fb = inject(FormBuilder);
   private readonly route = inject(ActivatedRoute);
   private readonly router = inject(Router);
+  private readonly authService = inject(AuthService);
   private readonly eventService = inject(EventService);
+  private readonly roleService = inject(RoleService);
   private readonly tagService = inject(TagService);
+  private readonly dialog = inject(MatDialog);
   private readonly notification = inject(NotificationService);
 
   private readonly slugOrId = this.route.snapshot.paramMap.get('slug');
@@ -68,6 +75,19 @@ export class EventForm implements OnInit {
   ];
 
   readonly pageTitle = computed(() => (this.isEdit ? 'Editar Evento' : 'Novo Evento'));
+  readonly canDeleteEvent = computed(() => {
+    const event = this.event();
+    if (!this.isEdit || !event) return false;
+
+    const permissions = this.roleService.permissions();
+    if (!permissions.canDeleteEvents) return false;
+
+    if (this.roleService.role() === 'moderador') {
+      return event.created_by === this.authService.currentUser()?.id;
+    }
+
+    return true;
+  });
   readonly minDate = new Date(new Date().setHours(0, 0, 0, 0));
 
   readonly form = this.fb.nonNullable.group({
@@ -194,6 +214,34 @@ export class EventForm implements OnInit {
 
   onCancel(): void {
     this.router.navigate(['/admin/dashboard/eventos']);
+  }
+
+  onDelete(): void {
+    const event = this.event();
+    const eventId = this.eventId;
+    if (!event || !eventId || !this.canDeleteEvent()) return;
+
+    const ref = this.dialog.open(ConfirmDialog, {
+      data: {
+        title: 'Excluir evento',
+        message: `Tem certeza que deseja excluir o evento "${event.nome}"?`,
+      },
+    });
+
+    ref.afterClosed().subscribe((confirmed) => {
+      if (!confirmed) return;
+
+      this.eventService.deleteEvent(eventId).subscribe({
+        next: () => {
+          this.eventService.removeLocal(eventId);
+          this.notification.showNotification('Evento excluído com sucesso', 'success');
+          this.router.navigate(['/admin/dashboard/eventos']);
+        },
+        error: () => {
+          this.notification.showNotification('Erro ao excluir evento', 'error');
+        },
+      });
+    });
   }
 
   private buildPayload() {

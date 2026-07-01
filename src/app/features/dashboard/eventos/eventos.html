@@ -26,89 +26,85 @@
 </div>
 
 @if (loading()) {
-  <div class="table-container">
-    <table class="skeleton-table">
-      @for (row of skeletonRows; track row) {
-        <tr class="skeleton-row">
-          <td><div class="skeleton-thumb"></div></td>
-          <td>
-            <div class="skeleton-line skeleton-line--title"></div>
-            <div class="skeleton-line skeleton-line--badge"></div>
-          </td>
-          <td><div class="skeleton-line"></div></td>
-          <td><div class="skeleton-line"></div></td>
-          <td><div class="skeleton-line skeleton-line--actions"></div></td>
-        </tr>
-      }
-    </table>
+  <div class="events-grid">
+    @for (row of skeletonRows; track row) {
+      <mat-card class="event-card event-card--skeleton">
+        <div class="skeleton-media"></div>
+        <mat-card-content>
+          <div class="skeleton-line skeleton-line--title"></div>
+          <div class="skeleton-line skeleton-line--badge"></div>
+          <div class="skeleton-meta">
+            <div class="skeleton-line"></div>
+            <div class="skeleton-line"></div>
+          </div>
+        </mat-card-content>
+        <mat-card-actions align="end">
+          <div class="skeleton-line skeleton-line--actions"></div>
+        </mat-card-actions>
+      </mat-card>
+    }
   </div>
 } @else {
-  <div class="table-container">
-    <table mat-table [dataSource]="paginatedRows()">
-      <ng-container matColumnDef="imagem">
-        <th mat-header-cell *matHeaderCellDef></th>
-        <td mat-cell *matCellDef="let row">
+  <div class="events-grid">
+    @for (row of paginatedRows(); track row.event.id) {
+      <mat-card class="event-card">
+        <div class="event-card-media">
           @if (row.event.imagem) {
-            <img [src]="row.event.imagem" [alt]="row.event.nome" class="event-thumb" loading="lazy" />
+            <img [src]="row.event.imagem" [alt]="row.event.nome" loading="lazy" />
           } @else {
-            <div class="event-thumb placeholder">
+            <div class="event-image-placeholder">
               <mat-icon>image</mat-icon>
             </div>
           }
-        </td>
-      </ng-container>
+        </div>
 
-      <ng-container matColumnDef="nome">
-        <th mat-header-cell *matHeaderCellDef>Nome</th>
-        <td mat-cell *matCellDef="let row">
-          <span class="event-name">{{ row.event.nome }}</span>
-          <span class="status-badge" [class]="'status-' + row.event.status">{{ row.event.status }}</span>
-        </td>
-      </ng-container>
-
-      <ng-container matColumnDef="data_evento">
-        <th mat-header-cell *matHeaderCellDef>Data do evento</th>
-        <td mat-cell *matCellDef="let row">{{ row.event.data_evento }}</td>
-      </ng-container>
-
-      <ng-container matColumnDef="created_at">
-        <th mat-header-cell *matHeaderCellDef>Criado em</th>
-        <td mat-cell *matCellDef="let row">{{ row.event.created_at | date: 'dd/MM/yyyy' }}</td>
-      </ng-container>
-
-      <ng-container matColumnDef="acoes">
-        <th mat-header-cell *matHeaderCellDef>Ações</th>
-        <td mat-cell *matCellDef="let row">
-          <div class="actions">
-            @if (row.event.status !== 'publicado' && roleService.permissions().canPublishEvents) {
-              <button mat-icon-button matTooltip="Publicar" (click)="publishEvent(row.event)">
-                <mat-icon>publish</mat-icon>
-              </button>
-            }
-            @if (row.event.status === 'publicado') {
-              <button mat-icon-button matTooltip="Copiar link" (click)="copyLink(row.event)">
-                <mat-icon>link</mat-icon>
-              </button>
-            }
-            @if (row.canEdit) {
-              <button mat-icon-button matTooltip="Editar" (click)="goToEdit(row.event)">
-                <mat-icon>edit</mat-icon>
-              </button>
-            }
-            @if (row.canDelete) {
-              <button mat-icon-button matTooltip="Excluir" (click)="deleteEvent(row.event)">
-                <mat-icon>delete</mat-icon>
-              </button>
-            }
+        <mat-card-content>
+          <div class="event-card-header">
+            <h2 class="event-name">{{ row.event.nome }}</h2>
+            <span class="status-badge" [class]="'status-' + row.event.status">{{ row.event.status }}</span>
           </div>
-        </td>
-      </ng-container>
 
-      <tr mat-header-row *matHeaderRowDef="displayedColumns"></tr>
-      <tr mat-row *matRowDef="let row; columns: displayedColumns"></tr>
-    </table>
+          <div class="event-meta">
+            <div class="event-meta-item">
+              <div>
+                <span class="event-meta-label">Data do evento</span>
+                <span class="event-meta-value">{{ row.event.data_evento }}</span>
+              </div>
+            </div>
 
-    @if (paginatedRows().length === 0) {
+            <div class="event-meta-item">
+              <div>
+                <span class="event-meta-label">Criado em</span>
+                <span class="event-meta-value">{{ row.event.created_at | date: 'dd/MM/yyyy' }}</span>
+              </div>
+            </div>
+          </div>
+        </mat-card-content>
+
+        <mat-card-actions align="end" class="actions">
+          @if (row.event.status !== 'publicado' && roleService.permissions().canPublishEvents) {
+            <button mat-icon-button matTooltip="Publicar" [attr.aria-label]="'Publicar evento ' + row.event.nome" (click)="publishEvent(row.event)">
+              <mat-icon>publish</mat-icon>
+            </button>
+          }
+          @if (row.event.status === 'publicado') {
+            <button
+              mat-stroked-button
+              class="copy-link-action"
+              [attr.aria-label]="'Copiar link do evento ' + row.event.nome"
+              (click)="copyLink(row.event)"
+            >
+              Copiar link
+            </button>
+          }
+          @if (row.canEdit) {
+            <button mat-flat-button class="edit-action" [attr.aria-label]="'Editar evento ' + row.event.nome" (click)="goToEdit(row.event)">
+              Editar
+            </button>
+          }
+        </mat-card-actions>
+      </mat-card>
+    } @empty {
       <p class="empty-message">Nenhum evento encontrado.</p>
     }
   </div>

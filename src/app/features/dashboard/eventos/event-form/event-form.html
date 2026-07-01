@@ -1,6 +1,11 @@
 <div class="event-form-page">
   <div class="page-header">
     <h1>{{ pageTitle() }}</h1>
+    @if (canDeleteEvent()) {
+      <button mat-flat-button class="cancel-action-button delete-event-button" type="button" (click)="onDelete()">
+        Excluir evento
+      </button>
+    }
   </div>
 
   @if (loading()) {
