@@ -68,7 +68,7 @@
       @if (editingPersonal()) {
         <mat-card-actions align="end">
           <button mat-stroked-button (click)="cancelPersonal()">Cancelar</button>
-          <button mat-flat-button color="primary" (click)="savePersonal()">Salvar</button>
+          <button mat-flat-button class="secondary-action-button" (click)="savePersonal()">Salvar</button>
         </mat-card-actions>
       }
     </mat-card>
@@ -133,7 +133,7 @@
       @if (editingProfessional()) {
         <mat-card-actions align="end">
           <button mat-stroked-button (click)="cancelProfessional()">Cancelar</button>
-          <button mat-flat-button color="primary" (click)="saveProfessional()">Salvar</button>
+          <button mat-flat-button class="secondary-action-button" (click)="saveProfessional()">Salvar</button>
         </mat-card-actions>
       }
     </mat-card>

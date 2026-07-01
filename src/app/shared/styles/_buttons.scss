@@ -2,22 +2,26 @@ $brand-orange: #ff6b00;
 $brand-orange-dark: #e55a00;
 $brand-orange-light: #ff8c33;
 
-.primary-action-button {
+$brand-blue: #0ea5e9;
+$brand-blue-dark: #0369a1;
+$brand-blue-light: #38bdf8;
+
+@mixin action-button($color, $color-dark, $color-light) {
   height: 50px !important;
   padding: 0 22px !important;
   border-radius: 10px !important;
   font-size: 0.95rem !important;
   font-weight: 600 !important;
   letter-spacing: 0.5px !important;
-  background: linear-gradient(135deg, $brand-orange-light 0%, $brand-orange 50%, $brand-orange-dark 100%) !important;
-  box-shadow: 0 4px 18px rgba($brand-orange, 0.35) !important;
+  background: linear-gradient(135deg, $color-light 0%, $color 50%, $color-dark 100%) !important;
+  box-shadow: 0 4px 18px rgba($color, 0.35) !important;
   transition: all 0.25s ease !important;
   color: #ffffff !important;
   overflow: hidden;
   position: relative;
 
   &:not([disabled]):hover {
-    box-shadow: 0 6px 26px rgba($brand-orange, 0.55) !important;
+    box-shadow: 0 6px 26px rgba($color, 0.55) !important;
     transform: translateY(-2px);
 
     mat-icon {
@@ -27,7 +31,7 @@ $brand-orange-light: #ff8c33;
 
   &:not([disabled]):active {
     transform: translateY(0);
-    box-shadow: 0 2px 10px rgba($brand-orange, 0.3) !important;
+    box-shadow: 0 2px 10px rgba($color, 0.3) !important;
   }
 
   .mdc-button__label {
@@ -37,14 +41,24 @@ $brand-orange-light: #ff8c33;
   }
 }
 
-.primary-action-button mat-icon {
+.primary-action-button {
+  @include action-button($brand-orange, $brand-orange-dark, $brand-orange-light);
+}
+
+.secondary-action-button {
+  @include action-button($brand-blue, $brand-blue-dark, $brand-blue-light);
+}
+
+.primary-action-button mat-icon,
+.secondary-action-button mat-icon {
   font-size: 20px !important;
   width: 20px !important;
   height: 20px !important;
   transition: transform 0.25s ease;
 }
 
-.dark-theme .primary-action-button {
+.dark-theme .primary-action-button,
+.dark-theme .secondary-action-button {
   box-shadow: none !important;
 
   &:not([disabled]):hover,
