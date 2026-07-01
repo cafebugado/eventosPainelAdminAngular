@@ -1,3 +1,4 @@
+import { Location } from '@angular/common';
 import { Component, OnInit, computed, inject, signal } from '@angular/core';
 import { FormBuilder, ReactiveFormsModule, ValidationErrors, Validators } from '@angular/forms';
 import { ActivatedRoute, Router } from '@angular/router';
@@ -51,6 +52,7 @@ export class EventForm implements OnInit {
   private readonly fb = inject(FormBuilder);
   private readonly route = inject(ActivatedRoute);
   private readonly router = inject(Router);
+  private readonly location = inject(Location);
   private readonly authService = inject(AuthService);
   private readonly eventService = inject(EventService);
   private readonly roleService = inject(RoleService);
@@ -245,6 +247,15 @@ export class EventForm implements OnInit {
   }
 
   onCancel(): void {
+    this.router.navigate(['/admin/dashboard/eventos']);
+  }
+
+  goBack(): void {
+    if (window.history.length > 1) {
+      this.location.back();
+      return;
+    }
+
     this.router.navigate(['/admin/dashboard/eventos']);
   }
 

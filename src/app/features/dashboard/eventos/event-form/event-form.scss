@@ -1,6 +1,8 @@
 @use '../../../../shared/styles/page' as page;
 
 .event-form-page {
+  display: flex;
+  flex-direction: column;
   max-width: 600px;
   margin: 0 auto;
 }
@@ -12,6 +14,26 @@
     margin: 0;
     font: var(--mat-sys-headline-small);
   }
+}
+
+.page-header-title,
+.page-header-actions {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  min-width: 0;
+}
+
+.page-header-title {
+  flex: 1 1 auto;
+}
+
+.back-action-button {
+  position: fixed;
+  top: 24px;
+  right: 32px;
+  flex-shrink: 0;
+  z-index: 10;
 }
 
 .delete-event-button {
@@ -122,14 +144,35 @@
   --mdc-circular-progress-active-indicator-color: #ffffff;
 }
 
+@media (max-width: 1200px) {
+  .back-action-button {
+    position: static;
+    align-self: flex-end;
+    margin-bottom: 12px;
+  }
+}
+
 @media (max-width: 640px) {
+  .back-action-button {
+    align-self: stretch;
+    width: 100%;
+  }
+
   .page-header {
     align-items: stretch;
 
+    .page-header-title,
+    .page-header-actions,
     h1,
     .delete-event-button {
       width: 100%;
     }
+  }
+
+  .page-header-title,
+  .page-header-actions {
+    align-items: stretch;
+    flex-direction: column;
   }
 
   .form-row {

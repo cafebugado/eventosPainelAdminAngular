@@ -1,10 +1,19 @@
 <div class="event-form-page">
+  <button mat-flat-button class="primary-action-button back-action-button" type="button" (click)="goBack()">
+    <mat-icon>arrow_back</mat-icon>
+    Voltar
+  </button>
+
   <div class="page-header">
-    <h1>{{ pageTitle() }}</h1>
+    <div class="page-header-title">
+      <h1>{{ pageTitle() }}</h1>
+    </div>
     @if (canDeleteEvent()) {
-      <button mat-flat-button class="cancel-action-button delete-event-button" type="button" (click)="onDelete()">
-        Excluir evento
-      </button>
+      <div class="page-header-actions">
+        <button mat-flat-button class="cancel-action-button delete-event-button" type="button" (click)="onDelete()">
+          Excluir evento
+        </button>
+      </div>
     }
   </div>
 
