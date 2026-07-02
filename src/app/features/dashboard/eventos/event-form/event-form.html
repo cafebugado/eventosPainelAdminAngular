@@ -112,7 +112,7 @@
         </div>
       }
       <div class="image-actions">
-        <button mat-flat-button class="secondary-action-button" type="button" (click)="fileInput.click()">
+        <button mat-flat-button class="primary-action-button" type="button" (click)="fileInput.click()">
           Selecionar arquivo
         </button>
       </div>
@@ -163,15 +163,22 @@
       @if (saving()) {
         <p class="saving-feedback" role="status" aria-live="polite">Salvando evento...</p>
       }
-      <button mat-flat-button class="cancel-action-button" type="button" [disabled]="saving()" (click)="onCancel()">
+      <button mat-flat-button class="cancel-action-button" type="button" [disabled]="formActionsDisabled()" (click)="onCancel()">
         Cancelar
       </button>
-      <button mat-flat-button class="secondary-action-button" type="button" [disabled]="saving()" (click)="onSubmit()">
+      <button
+        mat-flat-button
+        [class.secondary-action-button]="isEdit"
+        [class.success-action-button]="!isEdit"
+        type="button"
+        [disabled]="formActionsDisabled()"
+        (click)="onSubmit()"
+      >
         @if (saving()) {
           <mat-spinner diameter="20" class="save-spinner" />
           <span>Salvando evento...</span>
         } @else {
-          Salvar
+          {{ isEdit ? 'Salvar' : 'Cadastrar evento' }}
         }
       </button>
     </div>

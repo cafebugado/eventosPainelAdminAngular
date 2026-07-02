@@ -10,6 +10,10 @@ $brand-red: #ef4444;
 $brand-red-dark: #b91c1c;
 $brand-red-light: #f87171;
 
+$brand-green: #22c55e;
+$brand-green-dark: #15803d;
+$brand-green-light: #4ade80;
+
 @mixin action-button($color, $color-dark, $color-light) {
   height: 50px !important;
   padding: 0 22px !important;
@@ -57,9 +61,14 @@ $brand-red-light: #f87171;
   @include action-button($brand-red, $brand-red-dark, $brand-red-light);
 }
 
+.success-action-button {
+  @include action-button($brand-green, $brand-green-dark, $brand-green-light);
+}
+
 .primary-action-button mat-icon,
 .secondary-action-button mat-icon,
-.cancel-action-button mat-icon {
+.cancel-action-button mat-icon,
+.success-action-button mat-icon {
   font-size: 20px !important;
   width: 20px !important;
   height: 20px !important;
@@ -68,7 +77,8 @@ $brand-red-light: #f87171;
 
 .dark-theme .primary-action-button,
 .dark-theme .secondary-action-button,
-.dark-theme .cancel-action-button {
+.dark-theme .cancel-action-button,
+.dark-theme .success-action-button {
   box-shadow: none !important;
 
   &:not([disabled]):hover,

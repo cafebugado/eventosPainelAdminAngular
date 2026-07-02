@@ -131,6 +131,17 @@
   justify-content: flex-end;
   gap: 8px;
   margin-top: 8px;
+
+  .cancel-action-button[disabled],
+  .secondary-action-button[disabled],
+  .success-action-button[disabled] {
+    background: var(--mat-sys-surface-container-highest) !important;
+    box-shadow: none !important;
+    color: var(--mat-sys-on-surface-variant) !important;
+    cursor: not-allowed;
+    opacity: 0.58;
+    transform: none;
+  }
 }
 
 .saving-feedback {

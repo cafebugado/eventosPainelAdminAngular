@@ -63,6 +63,7 @@ export class EventForm implements OnInit {
   private readonly slugOrId = this.route.snapshot.paramMap.get('slug');
   readonly isEdit = !!this.slugOrId;
   private eventId: string | undefined;
+  private initialEditState = '';
 
   readonly loading = signal(this.isEdit);
   readonly event = signal<EventoWithTags | undefined>(undefined);
@@ -73,6 +74,8 @@ export class EventForm implements OnInit {
   readonly imageRemoved = signal(false);
   readonly imageError = signal<string | null>(null);
   readonly saving = signal(false);
+  readonly hasCreateInformation = signal(false);
+  readonly hasEditChanges = signal(false);
 
   readonly periodos = ['Matinal', 'Diurno', 'Vespertino', 'Noturno'] as const;
   readonly modalidades = ['Online', 'Presencial'] as const;
@@ -83,6 +86,9 @@ export class EventForm implements OnInit {
   ];
 
   readonly pageTitle = computed(() => (this.isEdit ? 'Editar Evento' : 'Novo Evento'));
+  readonly formActionsDisabled = computed(
+    () => this.saving() || (this.isEdit ? !this.hasEditChanges() : !this.hasCreateInformation()),
+  );
   readonly canDeleteEvent = computed(() => {
     const event = this.event();
     if (!this.isEdit || !event) return false;
@@ -125,6 +131,8 @@ export class EventForm implements OnInit {
       this.loadEvent(this.slugOrId);
     }
 
+    this.form.valueChanges.subscribe(() => this.updateFormActionsState());
+
     this.form.controls.data_evento.valueChanges.subscribe((value) => {
       this.form.controls.dia_semana.setValue(getDayName(value));
     });
@@ -146,6 +154,7 @@ export class EventForm implements OnInit {
       }
 
       this.imagePreview.set(imageUrl && validateURL(imageUrl) ? imageUrl : null);
+      this.updateFormActionsState();
     });
   }
 
@@ -159,6 +168,8 @@ export class EventForm implements OnInit {
         this.imagePreview.set(event.imagem ?? null);
         this.imageRemoved.set(false);
         this.patchForm(eventWithTags);
+        this.initialEditState = this.getComparableFormState();
+        this.updateFormActionsState();
         this.loading.set(false);
       });
     });
@@ -182,6 +193,71 @@ export class EventForm implements OnInit {
     });
   }
 
+  private updateCreateInformationState(): void {
+    const value = this.form.getRawValue();
+    this.hasCreateInformation.set(
+      !!(
+        value.nome.trim() ||
+        value.descricao.trim() ||
+        value.data_evento ||
+        value.horario.trim() ||
+        value.periodo ||
+        value.link.trim() ||
+        value.imagemUrl.trim() ||
+        value.modalidade !== 'Online' ||
+        value.status !== 'publicado' ||
+        value.endereco.trim() ||
+        value.cidade.trim() ||
+        value.estado.trim() ||
+        this.selectedTagIds().length ||
+        this.selectedImageFile()
+      ),
+    );
+  }
+
+  private updateEditChangesState(): void {
+    this.hasEditChanges.set(!!this.initialEditState && this.getComparableFormState() !== this.initialEditState);
+  }
+
+  private updateFormActionsState(): void {
+    if (this.isEdit) {
+      this.updateEditChangesState();
+      return;
+    }
+
+    this.updateCreateInformationState();
+  }
+
+  private getComparableFormState(): string {
+    const value = this.form.getRawValue();
+
+    return JSON.stringify({
+      nome: value.nome.trim(),
+      descricao: value.descricao.trim(),
+      data_evento: this.getDateKey(value.data_evento),
+      horario: value.horario.trim(),
+      periodo: value.periodo ?? '',
+      link: value.link.trim(),
+      imagemUrl: value.imagemUrl.trim(),
+      modalidade: value.modalidade,
+      endereco: value.endereco.trim(),
+      cidade: value.cidade.trim(),
+      estado: value.estado.trim(),
+      status: value.status,
+      tagIds: [...this.selectedTagIds()].sort(),
+      hasSelectedImageFile: !!this.selectedImageFile(),
+    });
+  }
+
+  private getDateKey(value: Date | null): string {
+    if (!value) return '';
+
+    const year = value.getFullYear();
+    const month = `${value.getMonth() + 1}`.padStart(2, '0');
+    const day = `${value.getDate()}`.padStart(2, '0');
+    return `${year}-${month}-${day}`;
+  }
+
   private urlValidator(control: { value: string }) {
     if (!control.value) return null;
     return validateURL(control.value) ? null : { url: true };
@@ -203,6 +279,7 @@ export class EventForm implements OnInit {
       return;
     }
     this.selectedTagIds.set(tagIds);
+    this.updateFormActionsState();
   }
 
   isTagOptionDisabled(tagId: string): boolean {
@@ -227,6 +304,7 @@ export class EventForm implements OnInit {
 
     resizeImageFile(file).then((resized) => {
       this.selectedImageFile.set(resized);
+      this.updateFormActionsState();
 
       const reader = new FileReader();
       reader.onload = () => this.imagePreview.set(reader.result as string);
@@ -244,6 +322,8 @@ export class EventForm implements OnInit {
     if (fileInput) {
       fileInput.value = '';
     }
+
+    this.updateFormActionsState();
   }
 
   onCancel(): void {
