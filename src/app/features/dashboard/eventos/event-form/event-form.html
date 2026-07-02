@@ -29,6 +29,9 @@
       @if (form.controls.nome.hasError('required')) {
         <mat-error>O nome é obrigatório</mat-error>
       }
+      @if (form.controls.nome.hasError('duplicateName')) {
+        <mat-error>Já existe um evento cadastrado com este nome</mat-error>
+      }
     </mat-form-field>
 
     <div class="field-group">

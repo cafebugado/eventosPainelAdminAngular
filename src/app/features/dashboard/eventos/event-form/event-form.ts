@@ -2,7 +2,7 @@ import { Location } from '@angular/common';
 import { Component, OnInit, computed, inject, signal } from '@angular/core';
 import { FormBuilder, ReactiveFormsModule, ValidationErrors, Validators } from '@angular/forms';
 import { ActivatedRoute, Router } from '@angular/router';
-import { finalize, forkJoin, of, switchMap } from 'rxjs';
+import { EMPTY, finalize, forkJoin, of, switchMap } from 'rxjs';
 import { MatButtonModule } from '@angular/material/button';
 import { MatCheckboxModule } from '@angular/material/checkbox';
 import { MatDatepickerModule } from '@angular/material/datepicker';
@@ -269,6 +269,16 @@ export class EventForm implements OnInit {
     return control.value < today ? { pastDate: true } : null;
   }
 
+  private setDuplicateNameError(showNotification = true): void {
+    const control = this.form.controls.nome;
+    control.setErrors({ ...(control.errors ?? {}), duplicateName: true });
+    control.markAsTouched();
+
+    if (showNotification) {
+      this.notification.showNotification('Já existe um evento cadastrado com este nome', 'error');
+    }
+  }
+
   get isPresencial(): boolean {
     return this.form.controls.modalidade.value === 'Presencial';
   }
@@ -416,15 +426,25 @@ export class EventForm implements OnInit {
 
     this.saving.set(true);
 
-    save$
+    this.eventService
+      .eventNameExists(formData.nome, eventId)
       .pipe(
-        switchMap((saved) =>
-          forkJoin({
-            saved: of(saved),
-            tags: this.tagService.setEventTags(saved.id, tagIds),
-            image: imageFile ? this.eventService.uploadEventImage(saved.id, imageFile) : of(null),
-          }),
-        ),
+        switchMap((exists) => {
+          if (exists) {
+            this.setDuplicateNameError();
+            return EMPTY;
+          }
+
+          return save$.pipe(
+            switchMap((saved) =>
+              forkJoin({
+                saved: of(saved),
+                tags: this.tagService.setEventTags(saved.id, tagIds),
+                image: imageFile ? this.eventService.uploadEventImage(saved.id, imageFile) : of(null),
+              }),
+            ),
+          );
+        }),
         finalize(() => this.saving.set(false)),
       )
       .subscribe({
@@ -436,7 +456,12 @@ export class EventForm implements OnInit {
           );
           this.router.navigate(['/admin/dashboard/eventos']);
         },
-        error: () => {
+        error: (error) => {
+          if (error?.status === 409) {
+            this.setDuplicateNameError(false);
+            return;
+          }
+
           this.notification.showNotification('Erro ao salvar evento', 'error');
         },
       });

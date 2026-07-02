@@ -1,6 +1,6 @@
 import { HttpClient } from '@angular/common/http';
 import { Injectable, inject, signal } from '@angular/core';
-import { Observable, tap } from 'rxjs';
+import { Observable, map, of, tap } from 'rxjs';
 import { environment } from '../../../environments/environment';
 import { withRetry } from '../http/api-client';
 import {
@@ -69,6 +69,19 @@ export class EventService {
     });
   }
 
+  eventNameExists(nome: string, excludeId?: string): Observable<boolean> {
+    const normalizedName = this.normalizeName(nome);
+    const events$ = this.events().length ? of(this.events()) : this.getEvents();
+
+    return events$.pipe(
+      map((events) =>
+        events.some(
+          (event) => event.id !== excludeId && this.normalizeName(event.nome) === normalizedName,
+        ),
+      ),
+    );
+  }
+
   createEvent(data: EventoCreate): Observable<EventoRead> {
     return this.http.post<EventoRead>(`${this.baseUrl}/events`, data);
   }
@@ -113,5 +126,9 @@ export class EventService {
 
   deleteEventImage(eventId: string): Observable<EventoRead> {
     return this.http.delete<EventoRead>(`${this.baseUrl}/events/${eventId}/image`);
+  }
+
+  private normalizeName(value: string): string {
+    return value.trim().toLowerCase();
   }
 }
