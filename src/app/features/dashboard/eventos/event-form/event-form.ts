@@ -1,5 +1,5 @@
 import { Location } from '@angular/common';
-import { Component, OnInit, computed, inject, signal } from '@angular/core';
+import { Component, ElementRef, OnInit, ViewChild, computed, inject, signal } from '@angular/core';
 import { FormBuilder, ReactiveFormsModule, ValidationErrors, Validators } from '@angular/forms';
 import { ActivatedRoute, Router } from '@angular/router';
 import { EMPTY, finalize, forkJoin, of, switchMap } from 'rxjs';
@@ -59,6 +59,9 @@ export class EventForm implements OnInit {
   private readonly tagService = inject(TagService);
   private readonly dialog = inject(MatDialog);
   private readonly notification = inject(NotificationService);
+  private readonly duplicateEventNameMessage = 'Já existe um evento cadastrado com este nome';
+
+  @ViewChild('nomeInput') private nomeInput?: ElementRef<HTMLInputElement>;
 
   private readonly slugOrId = this.route.snapshot.paramMap.get('slug');
   readonly isEdit = !!this.slugOrId;
@@ -76,6 +79,7 @@ export class EventForm implements OnInit {
   readonly saving = signal(false);
   readonly hasCreateInformation = signal(false);
   readonly hasEditChanges = signal(false);
+  readonly duplicateNameBlocked = signal(false);
 
   readonly periodos = ['Matinal', 'Diurno', 'Vespertino', 'Noturno'] as const;
   readonly modalidades = ['Online', 'Presencial'] as const;
@@ -87,7 +91,10 @@ export class EventForm implements OnInit {
 
   readonly pageTitle = computed(() => (this.isEdit ? 'Editar Evento' : 'Novo Evento'));
   readonly formActionsDisabled = computed(
-    () => this.saving() || (this.isEdit ? !this.hasEditChanges() : !this.hasCreateInformation()),
+    () =>
+      this.saving() ||
+      this.duplicateNameBlocked() ||
+      (this.isEdit ? !this.hasEditChanges() : !this.hasCreateInformation()),
   );
   readonly canDeleteEvent = computed(() => {
     const event = this.event();
@@ -132,6 +139,14 @@ export class EventForm implements OnInit {
     }
 
     this.form.valueChanges.subscribe(() => this.updateFormActionsState());
+
+    this.form.controls.nome.valueChanges.subscribe(() => {
+      if (!this.duplicateNameBlocked()) return;
+
+      this.duplicateNameBlocked.set(false);
+      this.clearDuplicateNameError();
+      this.updateFormActionsState();
+    });
 
     this.form.controls.data_evento.valueChanges.subscribe((value) => {
       this.form.controls.dia_semana.setValue(getDayName(value));
@@ -273,10 +288,35 @@ export class EventForm implements OnInit {
     const control = this.form.controls.nome;
     control.setErrors({ ...(control.errors ?? {}), duplicateName: true });
     control.markAsTouched();
+    this.duplicateNameBlocked.set(true);
+    this.scrollToNameField();
 
     if (showNotification) {
-      this.notification.showNotification('Já existe um evento cadastrado com este nome', 'error');
+      this.notification.showNotification(this.duplicateEventNameMessage, 'error', {
+        horizontalPosition: 'end',
+        verticalPosition: 'bottom',
+      });
     }
+  }
+
+  private clearDuplicateNameError(): void {
+    const control = this.form.controls.nome;
+    const errors = control.errors;
+    if (!errors?.['duplicateName']) return;
+
+    const updatedErrors = { ...errors };
+    delete updatedErrors['duplicateName'];
+    control.setErrors(Object.keys(updatedErrors).length ? updatedErrors : null);
+  }
+
+  private scrollToNameField(): void {
+    requestAnimationFrame(() => {
+      const element = this.nomeInput?.nativeElement;
+      if (!element) return;
+
+      element.scrollIntoView({ behavior: 'smooth', block: 'center' });
+      element.focus({ preventScroll: true });
+    });
   }
 
   get isPresencial(): boolean {
@@ -458,7 +498,7 @@ export class EventForm implements OnInit {
         },
         error: (error) => {
           if (error?.status === 409) {
-            this.setDuplicateNameError(false);
+            this.setDuplicateNameError();
             return;
           }
 

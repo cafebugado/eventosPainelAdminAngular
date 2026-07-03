@@ -25,7 +25,7 @@
     <form [formGroup]="form" class="event-form">
     <mat-form-field appearance="outline" class="full-width">
       <mat-label>Nome</mat-label>
-      <input matInput formControlName="nome" />
+      <input matInput formControlName="nome" #nomeInput />
       @if (form.controls.nome.hasError('required')) {
         <mat-error>O nome é obrigatório</mat-error>
       }

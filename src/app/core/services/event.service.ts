@@ -1,8 +1,9 @@
-import { HttpClient } from '@angular/common/http';
+import { HttpClient, HttpContext } from '@angular/common/http';
 import { Injectable, inject, signal } from '@angular/core';
 import { Observable, map, of, tap } from 'rxjs';
 import { environment } from '../../../environments/environment';
 import { withRetry } from '../http/api-client';
+import { SKIP_ERROR_NOTIFICATION } from '../http/error-notification.context';
 import {
   EventoCreate,
   EventoPeriodo,
@@ -83,11 +84,15 @@ export class EventService {
   }
 
   createEvent(data: EventoCreate): Observable<EventoRead> {
-    return this.http.post<EventoRead>(`${this.baseUrl}/events`, data);
+    return this.http.post<EventoRead>(`${this.baseUrl}/events`, data, {
+      context: new HttpContext().set(SKIP_ERROR_NOTIFICATION, true),
+    });
   }
 
   updateEvent(eventId: string, data: EventoUpdate): Observable<EventoRead> {
-    return this.http.put<EventoRead>(`${this.baseUrl}/events/${eventId}`, data);
+    return this.http.put<EventoRead>(`${this.baseUrl}/events/${eventId}`, data, {
+      context: new HttpContext().set(SKIP_ERROR_NOTIFICATION, true),
+    });
   }
 
   deleteEvent(eventId: string): Observable<void> {
