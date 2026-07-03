@@ -1,4 +1,4 @@
-<div class="page-header">
+<div #pageTop class="page-header">
   <h1>Eventos</h1>
   @if (roleService.permissions().canCreateEvents) {
     <button mat-flat-button class="primary-action-button" (click)="goToCreate()">
@@ -11,7 +11,12 @@
 <div class="filters">
   <mat-form-field appearance="outline" class="search-field">
     <mat-label>Buscar</mat-label>
-    <input matInput [ngModel]="rawSearchQuery()" (ngModelChange)="onSearchChange($event)" placeholder="Nome, descrição ou data" />
+    <input
+      matInput
+      [ngModel]="rawSearchQuery()"
+      (ngModelChange)="onSearchChange($event)"
+      placeholder="Nome, descrição ou data"
+    />
     <mat-icon matSuffix>search</mat-icon>
   </mat-form-field>
 
@@ -61,7 +66,9 @@
         <mat-card-content>
           <div class="event-card-header">
             <h2 class="event-name">{{ row.event.nome }}</h2>
-            <span class="status-badge" [class]="'status-' + row.event.status">{{ row.event.status }}</span>
+            <span class="status-badge" [class]="'status-' + row.event.status">{{
+              row.event.status
+            }}</span>
           </div>
 
           <div class="event-meta">
@@ -75,7 +82,9 @@
             <div class="event-meta-item">
               <div>
                 <span class="event-meta-label">Criado em</span>
-                <span class="event-meta-value">{{ row.event.created_at | date: 'dd/MM/yyyy' }}</span>
+                <span class="event-meta-value">{{
+                  row.event.created_at | date: 'dd/MM/yyyy'
+                }}</span>
               </div>
             </div>
           </div>
@@ -83,7 +92,12 @@
 
         <mat-card-actions align="end" class="actions">
           @if (row.event.status !== 'publicado' && roleService.permissions().canPublishEvents) {
-            <button mat-icon-button matTooltip="Publicar" [attr.aria-label]="'Publicar evento ' + row.event.nome" (click)="publishEvent(row.event)">
+            <button
+              mat-icon-button
+              matTooltip="Publicar"
+              [attr.aria-label]="'Publicar evento ' + row.event.nome"
+              (click)="publishEvent(row.event)"
+            >
               <mat-icon>publish</mat-icon>
             </button>
           }
@@ -98,7 +112,12 @@
             </button>
           }
           @if (row.canEdit) {
-            <button mat-flat-button class="edit-action" [attr.aria-label]="'Editar evento ' + row.event.nome" (click)="goToEdit(row.event)">
+            <button
+              mat-flat-button
+              class="edit-action"
+              [attr.aria-label]="'Editar evento ' + row.event.nome"
+              (click)="goToEdit(row.event)"
+            >
               Editar
             </button>
           }
@@ -109,5 +128,9 @@
     }
   </div>
 
-  <app-pagination [totalItems]="filteredEvents().length" [page]="currentPage()" (pageChange)="onPageChange($event)" />
+  <app-pagination
+    [totalItems]="filteredEvents().length"
+    [page]="currentPage()"
+    (pageChange)="onPageChange($event)"
+  />
 }

@@ -1,6 +1,15 @@
 import { BreakpointObserver } from '@angular/cdk/layout';
 import { DatePipe } from '@angular/common';
-import { ChangeDetectionStrategy, Component, OnInit, computed, inject, signal } from '@angular/core';
+import {
+  ChangeDetectionStrategy,
+  Component,
+  ElementRef,
+  OnInit,
+  ViewChild,
+  computed,
+  inject,
+  signal,
+} from '@angular/core';
 import { toSignal } from '@angular/core/rxjs-interop';
 import { FormsModule } from '@angular/forms';
 import { ActivatedRoute, Router } from '@angular/router';
@@ -56,6 +65,8 @@ export class Eventos implements OnInit {
   private readonly router = inject(Router);
   private readonly route = inject(ActivatedRoute);
 
+  @ViewChild('pageTop') private pageTop?: ElementRef<HTMLElement>;
+
   readonly loading = this.eventService.loading;
   readonly statusOptions = STATUS_OPTIONS;
   readonly skeletonRows = Array.from({ length: 6 }, (_, i) => i);
@@ -90,7 +101,9 @@ export class Eventos implements OnInit {
 
   readonly pageSize = computed(() => (this.isMobile() ? 10 : 20));
 
-  readonly paginatedEvents = computed(() => paginate(this.filteredEvents(), this.currentPage(), this.pageSize()));
+  readonly paginatedEvents = computed(() =>
+    paginate(this.filteredEvents(), this.currentPage(), this.pageSize()),
+  );
 
   readonly paginatedRows = computed(() => {
     const permissions = this.roleService.permissions();
@@ -125,6 +138,13 @@ export class Eventos implements OnInit {
 
   onPageChange(page: number): void {
     this.currentPage.set(page);
+    this.scrollToTop();
+  }
+
+  private scrollToTop(): void {
+    requestAnimationFrame(() => {
+      this.pageTop?.nativeElement.scrollIntoView({ behavior: 'smooth', block: 'start' });
+    });
   }
 
   private computeCanEdit(
@@ -145,7 +165,9 @@ export class Eventos implements OnInit {
   }
 
   goToEdit(event: EventoRead): void {
-    this.router.navigate(['eventos', event.slug ?? event.id, 'editar'], { relativeTo: this.route.parent });
+    this.router.navigate(['eventos', event.slug ?? event.id, 'editar'], {
+      relativeTo: this.route.parent,
+    });
   }
 
   publishEvent(event: EventoRead): void {
