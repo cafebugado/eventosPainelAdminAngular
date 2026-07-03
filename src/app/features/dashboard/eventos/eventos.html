@@ -129,7 +129,7 @@
   </div>
 
   <app-pagination
-    [totalItems]="filteredEvents().length"
+    [totalItems]="totalEvents()"
     [page]="currentPage()"
     (pageChange)="onPageChange($event)"
   />

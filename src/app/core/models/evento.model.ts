@@ -34,6 +34,20 @@ export interface EventoRead extends EventoBase {
   updated_at: string;
 }
 
+export interface EventoPage {
+  items: EventoRead[];
+  total: number;
+  page: number;
+  page_size: number;
+}
+
+export interface EventoPageFilters {
+  page: number;
+  pageSize: number;
+  status?: EventoStatus;
+  search?: string;
+}
+
 export interface EventoWithTags extends EventoRead {
   tags?: import('./tag.model').TagRead[];
 }

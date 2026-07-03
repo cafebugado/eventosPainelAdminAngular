@@ -3,14 +3,16 @@ import { DatePipe } from '@angular/common';
 import {
   ChangeDetectionStrategy,
   Component,
+  DestroyRef,
   ElementRef,
   OnInit,
   ViewChild,
   computed,
+  effect,
   inject,
   signal,
 } from '@angular/core';
-import { toSignal } from '@angular/core/rxjs-interop';
+import { takeUntilDestroyed, toSignal } from '@angular/core/rxjs-interop';
 import { FormsModule } from '@angular/forms';
 import { ActivatedRoute, Router } from '@angular/router';
 import { Subject, debounceTime, map } from 'rxjs';
@@ -28,7 +30,6 @@ import { RoleService } from '../../../core/services/role.service';
 import { TagService } from '../../../core/services/tag.service';
 import { Pagination } from '../../../shared/components/pagination/pagination';
 import { NotificationService } from '../../../shared/services/notification.service';
-import { paginate } from '../../../shared/utils/pagination.util';
 import { environment } from '../../../../environments/environment';
 
 const STATUS_OPTIONS: { value: EventoStatus | 'todos'; label: string }[] = [
@@ -64,33 +65,21 @@ export class Eventos implements OnInit {
   private readonly notification = inject(NotificationService);
   private readonly router = inject(Router);
   private readonly route = inject(ActivatedRoute);
+  private readonly destroyRef = inject(DestroyRef);
 
   @ViewChild('pageTop') private pageTop?: ElementRef<HTMLElement>;
 
   readonly loading = this.eventService.loading;
+  readonly totalEvents = this.eventService.eventsTotal;
   readonly statusOptions = STATUS_OPTIONS;
   readonly skeletonRows = Array.from({ length: 6 }, (_, i) => i);
 
   readonly rawSearchQuery = signal('');
   private readonly searchInput$ = new Subject<string>();
-  readonly searchQuery = toSignal(this.searchInput$.pipe(debounceTime(250)), { initialValue: '' });
+  readonly searchQuery = signal('');
   readonly statusFilter = signal<EventoStatus | 'todos'>('todos');
   readonly currentPage = signal(1);
-
-  readonly filteredEvents = computed(() => {
-    const query = this.searchQuery().toLowerCase().trim();
-    const status = this.statusFilter();
-
-    return this.eventService.events().filter((event) => {
-      const matchesStatus = status === 'todos' || event.status === status;
-      const matchesQuery =
-        !query ||
-        event.nome.toLowerCase().includes(query) ||
-        (event.descricao ?? '').toLowerCase().includes(query) ||
-        event.data_evento.includes(query);
-      return matchesStatus && matchesQuery;
-    });
-  });
+  private readonly reloadKey = signal(0);
 
   private readonly breakpointObserver = inject(BreakpointObserver);
 
@@ -101,25 +90,40 @@ export class Eventos implements OnInit {
 
   readonly pageSize = computed(() => (this.isMobile() ? 10 : 20));
 
-  readonly paginatedEvents = computed(() =>
-    paginate(this.filteredEvents(), this.currentPage(), this.pageSize()),
-  );
-
   readonly paginatedRows = computed(() => {
     const permissions = this.roleService.permissions();
     const role = this.roleService.role();
     const userId = this.authService.currentUser()?.id;
 
-    return this.paginatedEvents().map((event) => ({
+    return this.eventService.pagedEvents().map((event) => ({
       event,
       canEdit: this.computeCanEdit(event, permissions, role, userId),
     }));
   });
 
+  private readonly eventsLoader = effect((onCleanup) => {
+    const status = this.statusFilter();
+    const subscription = this.eventService
+      .getEventsPage({
+        page: this.currentPage(),
+        pageSize: this.pageSize(),
+        status: status === 'todos' ? undefined : status,
+        search: this.searchQuery(),
+      })
+      .subscribe();
+
+    this.reloadKey();
+    onCleanup(() => subscription.unsubscribe());
+  });
+
   ngOnInit(): void {
-    if (this.eventService.events().length === 0) {
-      this.eventService.getEvents().subscribe();
-    }
+    this.searchInput$
+      .pipe(debounceTime(250), takeUntilDestroyed(this.destroyRef))
+      .subscribe((value) => {
+        this.searchQuery.set(value);
+        this.currentPage.set(1);
+      });
+
     if (this.tagService.tags().length === 0) {
       this.tagService.getTags().subscribe();
     }
@@ -128,7 +132,6 @@ export class Eventos implements OnInit {
   onSearchChange(value: string): void {
     this.rawSearchQuery.set(value);
     this.searchInput$.next(value);
-    this.currentPage.set(1);
   }
 
   onStatusFilterChange(value: EventoStatus | 'todos'): void {
@@ -175,6 +178,7 @@ export class Eventos implements OnInit {
       next: (updated) => {
         this.notification.showNotification('Evento publicado com sucesso', 'success');
         this.eventService.upsertLocal(updated);
+        this.reloadKey.update((value) => value + 1);
       },
     });
   }
