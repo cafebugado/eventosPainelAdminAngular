@@ -1,6 +1,7 @@
 export type EventoPeriodo = 'Matinal' | 'Diurno' | 'Vespertino' | 'Noturno';
 export type EventoStatus = 'rascunho' | 'publicado' | 'arquivado';
 export type EventoModalidade = 'Online' | 'Presencial';
+export type EventoDateFilter = 'upcoming' | 'past';
 
 export interface EventoBase {
   nome: string;
@@ -45,6 +46,7 @@ export interface EventoPageFilters {
   page: number;
   pageSize: number;
   status?: EventoStatus;
+  dateFilter?: EventoDateFilter;
   search?: string;
 }
 

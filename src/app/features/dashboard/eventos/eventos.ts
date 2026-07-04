@@ -23,7 +23,12 @@ import { MatIconModule } from '@angular/material/icon';
 import { MatInputModule } from '@angular/material/input';
 import { MatSelectModule } from '@angular/material/select';
 import { MatTooltipModule } from '@angular/material/tooltip';
-import { EventoRead, EventoStatus, EventoWithTags } from '../../../core/models/evento.model';
+import {
+  EventoDateFilter,
+  EventoRead,
+  EventoStatus,
+  EventoWithTags,
+} from '../../../core/models/evento.model';
 import { AuthService } from '../../../core/services/auth.service';
 import { EventService } from '../../../core/services/event.service';
 import { RoleService } from '../../../core/services/role.service';
@@ -31,12 +36,28 @@ import { Pagination } from '../../../shared/components/pagination/pagination';
 import { NotificationService } from '../../../shared/services/notification.service';
 import { environment } from '../../../../environments/environment';
 
-const STATUS_OPTIONS: { value: EventoStatus | 'todos'; label: string }[] = [
+type EventoListFilter = EventoStatus | 'ativos' | 'inativos' | 'todos';
+
+const STATUS_OPTIONS: { value: EventoListFilter; label: string }[] = [
+  { value: 'ativos', label: 'Ativos' },
   { value: 'todos', label: 'Todos' },
+  { value: 'inativos', label: 'Inativos' },
   { value: 'publicado', label: 'Publicado' },
   { value: 'rascunho', label: 'Rascunho' },
   { value: 'arquivado', label: 'Arquivado' },
 ];
+
+const EVENT_FILTERS: Record<
+  EventoListFilter,
+  { status?: EventoStatus; dateFilter?: EventoDateFilter }
+> = {
+  ativos: { dateFilter: 'upcoming' },
+  todos: {},
+  inativos: { dateFilter: 'past' },
+  publicado: { status: 'publicado' },
+  rascunho: { status: 'rascunho' },
+  arquivado: { status: 'arquivado' },
+};
 
 @Component({
   selector: 'app-eventos',
@@ -75,7 +96,7 @@ export class Eventos implements OnInit {
   readonly rawSearchQuery = signal('');
   private readonly searchInput$ = new Subject<string>();
   readonly searchQuery = signal('');
-  readonly statusFilter = signal<EventoStatus | 'todos'>('todos');
+  readonly statusFilter = signal<EventoListFilter>('ativos');
   readonly currentPage = signal(1);
   private readonly reloadKey = signal(0);
 
@@ -100,12 +121,13 @@ export class Eventos implements OnInit {
   });
 
   private readonly eventsLoader = effect((onCleanup) => {
-    const status = this.statusFilter();
+    const filters = EVENT_FILTERS[this.statusFilter()];
     const subscription = this.eventService
       .getEventsPage({
         page: this.currentPage(),
         pageSize: this.pageSize(),
-        status: status === 'todos' ? undefined : status,
+        status: filters.status,
+        dateFilter: filters.dateFilter,
         search: this.searchQuery(),
       })
       .subscribe();
@@ -128,7 +150,7 @@ export class Eventos implements OnInit {
     this.searchInput$.next(value);
   }
 
-  onStatusFilterChange(value: EventoStatus | 'todos'): void {
+  onStatusFilterChange(value: EventoListFilter): void {
     this.statusFilter.set(value);
     this.currentPage.set(1);
   }

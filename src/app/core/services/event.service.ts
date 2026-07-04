@@ -61,6 +61,10 @@ export class EventService {
       params = params.set('status', filters.status);
     }
 
+    if (filters.dateFilter) {
+      params = params.set('date_filter', filters.dateFilter);
+    }
+
     if (search) {
       params = params.set('search', search);
     }
@@ -203,6 +207,7 @@ export class EventService {
       page: filters.page,
       pageSize: filters.pageSize,
       status: filters.status ?? 'todos',
+      dateFilter: filters.dateFilter ?? 'all',
       search: filters.search?.trim().toLowerCase() ?? '',
     });
   }
