@@ -52,7 +52,7 @@
 } @else {
   <div class="events-grid">
     @for (row of paginatedRows(); track row.event.id) {
-      <mat-card class="event-card">
+      <mat-card class="event-card" [class.event-card--inactive]="row.isInactive">
         <div class="event-card-media">
           @if (row.event.imagem) {
             <img [src]="row.event.imagem" [alt]="row.event.nome" loading="lazy" />
@@ -66,9 +66,15 @@
         <mat-card-content>
           <div class="event-card-header">
             <h2 class="event-name">{{ row.event.nome }}</h2>
-            <span class="status-badge" [class]="'status-' + row.event.status">{{
-              row.event.status
-            }}</span>
+            <span
+              class="status-badge"
+              [class.status-publicado]="!row.isInactive && row.event.status === 'publicado'"
+              [class.status-rascunho]="!row.isInactive && row.event.status === 'rascunho'"
+              [class.status-arquivado]="!row.isInactive && row.event.status === 'arquivado'"
+              [class.status-inativo]="row.isInactive"
+            >
+              {{ row.statusLabel }}
+            </span>
           </div>
 
           <div class="event-meta">

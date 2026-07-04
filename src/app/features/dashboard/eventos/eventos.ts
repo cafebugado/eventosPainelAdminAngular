@@ -34,6 +34,7 @@ import { EventService } from '../../../core/services/event.service';
 import { RoleService } from '../../../core/services/role.service';
 import { Pagination } from '../../../shared/components/pagination/pagination';
 import { NotificationService } from '../../../shared/services/notification.service';
+import { parseEventDate } from '../../../shared/utils/event-date.util';
 import { environment } from '../../../../environments/environment';
 
 type EventoListFilter = EventoStatus | 'ativos' | 'inativos' | 'todos';
@@ -114,10 +115,16 @@ export class Eventos implements OnInit {
     const role = this.roleService.role();
     const userId = this.authService.currentUser()?.id;
 
-    return this.eventService.pagedEvents().map((event) => ({
-      event,
-      canEdit: this.computeCanEdit(event, permissions, role, userId),
-    }));
+    return this.eventService.pagedEvents().map((event) => {
+      const isInactive = this.isInactiveEvent(event);
+
+      return {
+        event,
+        canEdit: this.computeCanEdit(event, permissions, role, userId),
+        isInactive,
+        statusLabel: isInactive ? 'Inativo' : event.status,
+      };
+    });
   });
 
   private readonly eventsLoader = effect((onCleanup) => {
@@ -177,6 +184,17 @@ export class Eventos implements OnInit {
       return event.created_by === userId;
     }
     return true;
+  }
+
+  private isInactiveEvent(event: EventoRead): boolean {
+    const eventDate = parseEventDate(event.data_evento);
+    if (!eventDate) return false;
+
+    const today = new Date();
+    today.setHours(0, 0, 0, 0);
+    eventDate.setHours(0, 0, 0, 0);
+
+    return eventDate < today;
   }
 
   goToCreate(): void {
