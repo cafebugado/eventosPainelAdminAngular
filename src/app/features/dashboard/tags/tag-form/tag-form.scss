@@ -1,0 +1,122 @@
+@use '../../../../shared/styles/page' as page;
+
+.tag-form-page {
+  display: flex;
+  flex-direction: column;
+  max-width: 520px;
+  margin: 0 auto;
+}
+
+.page-header {
+  @include page.page-header;
+
+  h1 {
+    margin: 0;
+    font: var(--mat-sys-headline-small);
+  }
+}
+
+.back-action-button {
+  position: fixed;
+  top: 24px;
+  right: 32px;
+  flex-shrink: 0;
+  z-index: 10;
+}
+
+.loading-container {
+  @include page.loading-container;
+}
+
+.tag-form {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+}
+
+.full-width {
+  width: 100%;
+}
+
+.color-field {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) 40px;
+  align-items: center;
+  gap: 12px;
+}
+
+.tag-swatch {
+  width: 32px;
+  height: 32px;
+  border: 2px solid var(--mat-sys-outline-variant);
+  border-radius: 50%;
+}
+
+.form-actions {
+  display: flex;
+  align-items: center;
+  justify-content: flex-end;
+  gap: 8px;
+  margin-top: 8px;
+
+  .cancel-action-button[disabled],
+  .secondary-action-button[disabled] {
+    background: var(--mat-sys-surface-container-highest) !important;
+    box-shadow: none !important;
+    color: var(--mat-sys-on-surface-variant) !important;
+    cursor: not-allowed;
+    opacity: 0.58;
+    transform: none;
+  }
+}
+
+.saving-feedback {
+  margin: 0 auto 0 0;
+  color: var(--mat-sys-primary);
+  font: var(--mat-sys-body-medium);
+  font-weight: 500;
+}
+
+.save-spinner {
+  --mdc-circular-progress-active-indicator-color: #ffffff;
+}
+
+@media (max-width: 1200px) {
+  .back-action-button {
+    position: static;
+    align-self: flex-end;
+    margin-bottom: 12px;
+  }
+}
+
+@media (max-width: 640px) {
+  .back-action-button {
+    align-self: stretch;
+    width: 100%;
+  }
+
+  .page-header {
+    align-items: stretch;
+
+    h1 {
+      width: 100%;
+    }
+  }
+
+  .color-field {
+    grid-template-columns: minmax(0, 1fr);
+  }
+
+  .tag-swatch {
+    justify-self: flex-start;
+  }
+
+  .form-actions {
+    align-items: stretch;
+    flex-direction: column;
+  }
+
+  .saving-feedback {
+    margin: 0;
+  }
+}

@@ -1,0 +1,71 @@
+<div class="tag-form-page">
+  <button
+    mat-flat-button
+    class="primary-action-button back-action-button"
+    type="button"
+    (click)="goBack()"
+  >
+    <mat-icon>arrow_back</mat-icon>
+    Voltar
+  </button>
+
+  <div class="page-header">
+    <h1>{{ pageTitle() }}</h1>
+  </div>
+
+  @if (loading()) {
+    <div class="loading-container">
+      <mat-spinner diameter="40" />
+    </div>
+  } @else {
+    <form [formGroup]="form" class="tag-form">
+      <mat-form-field appearance="outline" class="full-width">
+        <mat-label>Nome</mat-label>
+        <input matInput formControlName="nome" />
+        @if (form.controls.nome.hasError('required')) {
+          <mat-error>O nome é obrigatório</mat-error>
+        }
+      </mat-form-field>
+
+      <div class="color-field">
+        <mat-form-field appearance="outline" class="full-width">
+          <mat-label>Cor</mat-label>
+          <input matInput type="color" formControlName="cor" />
+          @if (form.controls.cor.hasError('required')) {
+            <mat-error>A cor é obrigatória</mat-error>
+          }
+        </mat-form-field>
+        <span class="tag-swatch" [style.background]="form.controls.cor.value"></span>
+      </div>
+
+      <div class="form-actions">
+        @if (saving()) {
+          <p class="saving-feedback" role="status" aria-live="polite">Salvando tag...</p>
+        }
+        <button
+          mat-flat-button
+          class="cancel-action-button"
+          type="button"
+          [disabled]="saving()"
+          (click)="onCancel()"
+        >
+          Cancelar
+        </button>
+        <button
+          mat-flat-button
+          class="secondary-action-button"
+          type="button"
+          [disabled]="saving()"
+          (click)="onSubmit()"
+        >
+          @if (saving()) {
+            <mat-spinner diameter="20" class="save-spinner" />
+            <span>Salvando tag...</span>
+          } @else {
+            {{ isEdit ? 'Salvar' : 'Cadastrar tag' }}
+          }
+        </button>
+      </div>
+    </form>
+  }
+</div>

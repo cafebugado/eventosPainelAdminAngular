@@ -1,6 +1,6 @@
 <div class="page-header">
   <h1>Tags</h1>
-  <button mat-flat-button class="primary-action-button" (click)="openCreateDialog()">
+  <button mat-flat-button class="primary-action-button" (click)="goToCreate()">
     <mat-icon>add</mat-icon>
     Nova Tag
   </button>
@@ -19,7 +19,7 @@
           <span class="tag-name">{{ tag.nome }}</span>
         </mat-card-content>
         <mat-card-actions align="end">
-          <button mat-icon-button (click)="openEditDialog(tag)" aria-label="Editar">
+          <button mat-icon-button (click)="goToEdit(tag)" aria-label="Editar">
             <mat-icon>edit</mat-icon>
           </button>
           <button mat-icon-button (click)="deleteTag(tag)" aria-label="Excluir">

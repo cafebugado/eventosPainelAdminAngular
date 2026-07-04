@@ -14,11 +14,13 @@ export const routes: Routes = [
   },
   {
     path: 'admin/recuperar-senha',
-    loadComponent: () => import('./features/forgot-password/forgot-password').then((m) => m.ForgotPassword),
+    loadComponent: () =>
+      import('./features/forgot-password/forgot-password').then((m) => m.ForgotPassword),
   },
   {
     path: 'admin/auth/callback',
-    loadComponent: () => import('./features/auth-callback/auth-callback').then((m) => m.AuthCallback),
+    loadComponent: () =>
+      import('./features/auth-callback/auth-callback').then((m) => m.AuthCallback),
   },
   {
     path: 'admin/dashboard',
@@ -32,15 +34,31 @@ export const routes: Routes = [
       },
       {
         path: 'eventos/novo',
-        loadComponent: () => import('./features/dashboard/eventos/event-form/event-form').then((m) => m.EventForm),
+        loadComponent: () =>
+          import('./features/dashboard/eventos/event-form/event-form').then((m) => m.EventForm),
       },
       {
         path: 'eventos/:slug/editar',
-        loadComponent: () => import('./features/dashboard/eventos/event-form/event-form').then((m) => m.EventForm),
+        loadComponent: () =>
+          import('./features/dashboard/eventos/event-form/event-form').then((m) => m.EventForm),
       },
       {
         path: 'tags',
         loadComponent: () => import('./features/dashboard/tags/tags').then((m) => m.Tags),
+        canActivate: [permissionGuard],
+        data: { permission: 'canManageTags' },
+      },
+      {
+        path: 'tags/nova',
+        loadComponent: () =>
+          import('./features/dashboard/tags/tag-form/tag-form').then((m) => m.TagForm),
+        canActivate: [permissionGuard],
+        data: { permission: 'canManageTags' },
+      },
+      {
+        path: 'tags/:id/editar',
+        loadComponent: () =>
+          import('./features/dashboard/tags/tag-form/tag-form').then((m) => m.TagForm),
         canActivate: [permissionGuard],
         data: { permission: 'canManageTags' },
       },
@@ -81,7 +99,8 @@ export const routes: Routes = [
       },
       {
         path: 'configuracoes',
-        loadComponent: () => import('./features/dashboard/settings/settings').then((m) => m.Settings),
+        loadComponent: () =>
+          import('./features/dashboard/settings/settings').then((m) => m.Settings),
       },
     ],
   },
