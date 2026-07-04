@@ -50,7 +50,7 @@ const STATUS_OPTIONS: { value: EventoListFilter; label: string }[] = [
 
 const PARTICIPANT_STATUS_OPTIONS: { value: EventoListFilter; label: string }[] = [
   { value: 'meus_eventos', label: 'Meus eventos' },
-  ...STATUS_OPTIONS,
+  ...STATUS_OPTIONS.filter((option) => option.value !== 'todos'),
 ];
 
 const EVENT_FILTERS: Record<
@@ -138,13 +138,14 @@ export class Eventos implements OnInit {
 
   private readonly eventsLoader = effect((onCleanup) => {
     const filters = EVENT_FILTERS[this.statusFilter()];
+    const isParticipant = this.isParticipant();
     const subscription = this.eventService
       .getEventsPage({
         page: this.currentPage(),
         pageSize: this.pageSize(),
         status: filters.status,
         dateFilter: filters.dateFilter,
-        mine: filters.mine,
+        mine: isParticipant || filters.mine,
         search: this.searchQuery(),
       })
       .subscribe();
