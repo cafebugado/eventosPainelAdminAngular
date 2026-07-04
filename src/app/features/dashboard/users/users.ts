@@ -33,7 +33,7 @@ export class Users implements OnInit {
   private readonly dialog = inject(MatDialog);
   private readonly notification = inject(NotificationService);
 
-  readonly roles: Role[] = ['super_admin', 'admin', 'moderador'];
+  readonly roles: Role[] = ['super_admin', 'admin', 'moderador', 'participante'];
   readonly users = signal<UserRoleRead[]>([]);
   readonly loading = signal(false);
   readonly columns = ['nome', 'email', 'role', 'acoes'];
