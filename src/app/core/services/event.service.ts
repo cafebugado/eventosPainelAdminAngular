@@ -69,6 +69,10 @@ export class EventService {
       params = params.set('search', search);
     }
 
+    if (filters.mine) {
+      params = params.set('mine', 'true');
+    }
+
     this.loading.set(true);
 
     return withRetry(this.http.get<EventoPage>(`${this.baseUrl}/events`, { params }), {
@@ -209,6 +213,7 @@ export class EventService {
       status: filters.status ?? 'todos',
       dateFilter: filters.dateFilter ?? 'all',
       search: filters.search?.trim().toLowerCase() ?? '',
+      mine: filters.mine ?? false,
     });
   }
 

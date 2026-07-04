@@ -48,6 +48,7 @@ export interface EventoPageFilters {
   status?: EventoStatus;
   dateFilter?: EventoDateFilter;
   search?: string;
+  mine?: boolean;
 }
 
 export interface EventoWithTags extends EventoRead {

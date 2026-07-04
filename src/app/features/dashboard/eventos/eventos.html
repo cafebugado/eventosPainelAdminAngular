@@ -23,7 +23,7 @@
   <mat-form-field appearance="outline" class="status-field">
     <mat-label>Status</mat-label>
     <mat-select [ngModel]="statusFilter()" (ngModelChange)="onStatusFilterChange($event)">
-      @for (option of statusOptions; track option.value) {
+      @for (option of statusOptions(); track option.value) {
         <mat-option [value]="option.value">{{ option.label }}</mat-option>
       }
     </mat-select>

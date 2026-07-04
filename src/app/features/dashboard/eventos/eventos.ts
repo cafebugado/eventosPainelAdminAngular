@@ -37,7 +37,7 @@ import { NotificationService } from '../../../shared/services/notification.servi
 import { parseEventDate } from '../../../shared/utils/event-date.util';
 import { environment } from '../../../../environments/environment';
 
-type EventoListFilter = EventoStatus | 'ativos' | 'inativos' | 'todos';
+type EventoListFilter = EventoStatus | 'ativos' | 'inativos' | 'todos' | 'meus_eventos';
 
 const STATUS_OPTIONS: { value: EventoListFilter; label: string }[] = [
   { value: 'ativos', label: 'Ativos' },
@@ -48,10 +48,16 @@ const STATUS_OPTIONS: { value: EventoListFilter; label: string }[] = [
   { value: 'arquivado', label: 'Arquivado' },
 ];
 
+const PARTICIPANT_STATUS_OPTIONS: { value: EventoListFilter; label: string }[] = [
+  { value: 'meus_eventos', label: 'Meus eventos' },
+  ...STATUS_OPTIONS,
+];
+
 const EVENT_FILTERS: Record<
   EventoListFilter,
-  { status?: EventoStatus; dateFilter?: EventoDateFilter }
+  { status?: EventoStatus; dateFilter?: EventoDateFilter; mine?: boolean }
 > = {
+  meus_eventos: { mine: true },
   ativos: { dateFilter: 'upcoming' },
   todos: {},
   inativos: { dateFilter: 'past' },
@@ -91,13 +97,15 @@ export class Eventos implements OnInit {
 
   readonly loading = this.eventService.loading;
   readonly totalEvents = this.eventService.eventsTotal;
-  readonly statusOptions = STATUS_OPTIONS;
+  readonly statusOptions = computed(() =>
+    this.isParticipant() ? PARTICIPANT_STATUS_OPTIONS : STATUS_OPTIONS,
+  );
   readonly skeletonRows = Array.from({ length: 6 }, (_, i) => i);
 
   readonly rawSearchQuery = signal('');
   private readonly searchInput$ = new Subject<string>();
   readonly searchQuery = signal('');
-  readonly statusFilter = signal<EventoListFilter>('ativos');
+  readonly statusFilter = signal<EventoListFilter>(this.getDefaultStatusFilter());
   readonly currentPage = signal(1);
   private readonly reloadKey = signal(0);
 
@@ -109,6 +117,7 @@ export class Eventos implements OnInit {
   );
 
   readonly pageSize = computed(() => (this.isMobile() ? 10 : 20));
+  readonly isParticipant = computed(() => this.roleService.role() === 'participante');
 
   readonly paginatedRows = computed(() => {
     const permissions = this.roleService.permissions();
@@ -135,6 +144,7 @@ export class Eventos implements OnInit {
         pageSize: this.pageSize(),
         status: filters.status,
         dateFilter: filters.dateFilter,
+        mine: filters.mine,
         search: this.searchQuery(),
       })
       .subscribe();
@@ -184,6 +194,10 @@ export class Eventos implements OnInit {
       return event.created_by === userId;
     }
     return true;
+  }
+
+  private getDefaultStatusFilter(): EventoListFilter {
+    return this.roleService.role() === 'participante' ? 'meus_eventos' : 'ativos';
   }
 
   private isInactiveEvent(event: EventoRead): boolean {
