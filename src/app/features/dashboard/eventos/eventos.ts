@@ -27,7 +27,6 @@ import { EventoRead, EventoStatus, EventoWithTags } from '../../../core/models/e
 import { AuthService } from '../../../core/services/auth.service';
 import { EventService } from '../../../core/services/event.service';
 import { RoleService } from '../../../core/services/role.service';
-import { TagService } from '../../../core/services/tag.service';
 import { Pagination } from '../../../shared/components/pagination/pagination';
 import { NotificationService } from '../../../shared/services/notification.service';
 import { environment } from '../../../../environments/environment';
@@ -59,7 +58,6 @@ const STATUS_OPTIONS: { value: EventoStatus | 'todos'; label: string }[] = [
 })
 export class Eventos implements OnInit {
   private readonly eventService = inject(EventService);
-  private readonly tagService = inject(TagService);
   private readonly authService = inject(AuthService);
   readonly roleService = inject(RoleService);
   private readonly notification = inject(NotificationService);
@@ -123,10 +121,6 @@ export class Eventos implements OnInit {
         this.searchQuery.set(value);
         this.currentPage.set(1);
       });
-
-    if (this.tagService.tags().length === 0) {
-      this.tagService.getTags().subscribe();
-    }
   }
 
   onSearchChange(value: string): void {
