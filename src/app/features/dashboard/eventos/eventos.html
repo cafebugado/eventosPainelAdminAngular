@@ -1,6 +1,6 @@
 <div #pageTop class="page-header">
   <h1>Eventos</h1>
-  @if (roleService.permissions().canCreateEvents) {
+  @if (roleService.permissions().canCreateEvents && !showParticipantFirstEventEmptyState()) {
     <button mat-flat-button class="primary-action-button" (click)="goToCreate()">
       <mat-icon>add</mat-icon>
       Novo Evento
@@ -8,27 +8,29 @@
   }
 </div>
 
-<div class="filters">
-  <mat-form-field appearance="outline" class="search-field">
-    <mat-label>Buscar</mat-label>
-    <input
-      matInput
-      [ngModel]="rawSearchQuery()"
-      (ngModelChange)="onSearchChange($event)"
-      placeholder="Nome, descrição ou data"
-    />
-    <mat-icon matSuffix>search</mat-icon>
-  </mat-form-field>
+@if (!showParticipantFirstEventEmptyState()) {
+  <div class="filters">
+    <mat-form-field appearance="outline" class="search-field">
+      <mat-label>Buscar</mat-label>
+      <input
+        matInput
+        [ngModel]="rawSearchQuery()"
+        (ngModelChange)="onSearchChange($event)"
+        placeholder="Nome, descrição ou data"
+      />
+      <mat-icon matSuffix>search</mat-icon>
+    </mat-form-field>
 
-  <mat-form-field appearance="outline" class="status-field">
-    <mat-label>Status</mat-label>
-    <mat-select [ngModel]="statusFilter()" (ngModelChange)="onStatusFilterChange($event)">
-      @for (option of statusOptions(); track option.value) {
-        <mat-option [value]="option.value">{{ option.label }}</mat-option>
-      }
-    </mat-select>
-  </mat-form-field>
-</div>
+    <mat-form-field appearance="outline" class="status-field">
+      <mat-label>Status</mat-label>
+      <mat-select [ngModel]="statusFilter()" (ngModelChange)="onStatusFilterChange($event)">
+        @for (option of statusOptions(); track option.value) {
+          <mat-option [value]="option.value">{{ option.label }}</mat-option>
+        }
+      </mat-select>
+    </mat-form-field>
+  </div>
+}
 
 @if (loading()) {
   <div class="events-grid">
@@ -49,6 +51,18 @@
       </mat-card>
     }
   </div>
+} @else if (showParticipantFirstEventEmptyState()) {
+  <section class="first-event-empty-state">
+    <button mat-flat-button class="primary-action-button" (click)="goToCreate()">
+      <mat-icon>add</mat-icon>
+      Cadastrar primeiro evento
+    </button>
+    <p>
+      Boas-vindas, {{ participantDisplayName() }}! Você ainda não cadastrou nenhum evento nesta
+      conta. Use o botão acima para criar o primeiro cadastro; depois ele aparecerá aqui para
+      acompanhar, editar e compartilhar.
+    </p>
+  </section>
 } @else {
   <div class="events-grid">
     @for (row of paginatedRows(); track row.event.id) {

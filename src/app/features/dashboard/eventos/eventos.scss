@@ -334,6 +334,29 @@
   @include page.empty-message;
 }
 
+.first-event-empty-state {
+  display: flex;
+  min-height: calc(100dvh - 138px);
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 16px;
+  padding: 32px 16px;
+  text-align: center;
+
+  .primary-action-button {
+    min-width: 236px;
+  }
+
+  p {
+    max-width: 520px;
+    margin: 0;
+    color: var(--mat-sys-on-surface-variant);
+    font: var(--mat-sys-body-medium);
+    line-height: 1.6;
+  }
+}
+
 @media (max-width: 640px) {
   .page-header {
     align-items: stretch;
@@ -362,5 +385,14 @@
   .event-meta,
   .skeleton-meta {
     grid-template-columns: 1fr;
+  }
+
+  .first-event-empty-state {
+    min-height: calc(100dvh - 112px);
+
+    .primary-action-button {
+      width: 100%;
+      max-width: 320px;
+    }
   }
 }

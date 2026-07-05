@@ -31,6 +31,7 @@ import {
 } from '../../../core/models/evento.model';
 import { AuthService } from '../../../core/services/auth.service';
 import { EventService } from '../../../core/services/event.service';
+import { ProfileService } from '../../../core/services/profile.service';
 import { RoleService } from '../../../core/services/role.service';
 import { Pagination } from '../../../shared/components/pagination/pagination';
 import { NotificationService } from '../../../shared/services/notification.service';
@@ -87,6 +88,7 @@ const EVENT_FILTERS: Record<
 export class Eventos implements OnInit {
   private readonly eventService = inject(EventService);
   private readonly authService = inject(AuthService);
+  private readonly profileService = inject(ProfileService);
   readonly roleService = inject(RoleService);
   private readonly notification = inject(NotificationService);
   private readonly router = inject(Router);
@@ -108,6 +110,7 @@ export class Eventos implements OnInit {
   readonly statusFilter = signal<EventoListFilter>(this.getDefaultStatusFilter());
   readonly currentPage = signal(1);
   private readonly reloadKey = signal(0);
+  private readonly hasLoadedEventsPage = signal(false);
 
   private readonly breakpointObserver = inject(BreakpointObserver);
 
@@ -118,6 +121,23 @@ export class Eventos implements OnInit {
 
   readonly pageSize = computed(() => (this.isMobile() ? 10 : 20));
   readonly isParticipant = computed(() => this.roleService.role() === 'participante');
+  readonly participantDisplayName = computed(() => {
+    const profile = this.profileService.profile();
+    const fullName = [profile?.nome, profile?.sobrenome].filter(Boolean).join(' ').trim();
+    if (fullName) return fullName;
+
+    const email = this.authService.currentUser()?.email;
+    return email ? email.split('@')[0] : 'participante';
+  });
+  readonly showParticipantFirstEventEmptyState = computed(
+    () =>
+      this.isParticipant() &&
+      this.hasLoadedEventsPage() &&
+      !this.loading() &&
+      this.statusFilter() === 'meus_eventos' &&
+      this.searchQuery().trim().length === 0 &&
+      this.totalEvents() === 0,
+  );
 
   readonly paginatedRows = computed(() => {
     const permissions = this.roleService.permissions();
@@ -139,6 +159,7 @@ export class Eventos implements OnInit {
   private readonly eventsLoader = effect((onCleanup) => {
     const filters = EVENT_FILTERS[this.statusFilter()];
     const isParticipant = this.isParticipant();
+    this.hasLoadedEventsPage.set(false);
     const subscription = this.eventService
       .getEventsPage({
         page: this.currentPage(),
@@ -148,7 +169,9 @@ export class Eventos implements OnInit {
         mine: isParticipant || filters.mine,
         search: this.searchQuery(),
       })
-      .subscribe();
+      .subscribe({
+        next: () => this.hasLoadedEventsPage.set(true),
+      });
 
     this.reloadKey();
     onCleanup(() => subscription.unsubscribe());
