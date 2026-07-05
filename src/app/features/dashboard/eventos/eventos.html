@@ -83,6 +83,8 @@
             <span
               class="status-badge"
               [class.status-publicado]="!row.isInactive && row.event.status === 'publicado'"
+              [class.status-em-analise]="!row.isInactive && row.event.status === 'em_analise'"
+              [class.status-recusado]="!row.isInactive && row.event.status === 'recusado'"
               [class.status-rascunho]="!row.isInactive && row.event.status === 'rascunho'"
               [class.status-arquivado]="!row.isInactive && row.event.status === 'arquivado'"
               [class.status-inativo]="row.isInactive"
@@ -111,7 +113,17 @@
         </mat-card-content>
 
         <mat-card-actions align="end" class="actions">
-          @if (row.event.status !== 'publicado' && roleService.permissions().canPublishEvents) {
+          @if (row.canReview) {
+            <button
+              mat-flat-button
+              class="review-action"
+              [attr.aria-label]="'Revisar evento ' + row.event.nome"
+              (click)="goToReview(row.event)"
+            >
+              Revisar
+            </button>
+          }
+          @if (row.canPublish) {
             <button
               mat-icon-button
               matTooltip="Publicar"

@@ -23,7 +23,12 @@ import { ConfirmDialog } from '../../../../shared/components/confirm-dialog/conf
 import { LocationSelector } from '../../../../shared/components/location-selector/location-selector';
 import { RichTextEditor } from '../../../../shared/components/rich-text-editor/rich-text-editor';
 import { NotificationService } from '../../../../shared/services/notification.service';
-import { formatDateToDisplay, formatDateToInput, getDayName, getPeriodoFromHorario } from '../../../../shared/utils/event-date.util';
+import {
+  formatDateToDisplay,
+  formatDateToInput,
+  getDayName,
+  getPeriodoFromHorario,
+} from '../../../../shared/utils/event-date.util';
 import { validateImageFile } from '../../../../shared/utils/image-validators.util';
 import { resizeImageFile } from '../../../../shared/utils/image-resize.util';
 import { generateSlug } from '../../../../shared/utils/slug.util';
@@ -83,13 +88,23 @@ export class EventForm implements OnInit {
 
   readonly periodos = ['Matinal', 'Diurno', 'Vespertino', 'Noturno'] as const;
   readonly modalidades = ['Online', 'Presencial'] as const;
-  readonly statuses = [
+  private readonly defaultStatuses = [
     { value: 'rascunho', label: 'Rascunho' },
     { value: 'publicado', label: 'Publicado' },
     { value: 'arquivado', label: 'Arquivado' },
-  ];
+  ] as const;
+  private readonly reviewStatuses = [
+    ...this.defaultStatuses,
+    { value: 'em_analise', label: 'Em análise' },
+    { value: 'recusado', label: 'Recusado' },
+  ] as const;
+  readonly statuses = computed(() =>
+    this.roleService.permissions().canReviewEvents ? this.reviewStatuses : this.defaultStatuses,
+  );
 
   readonly pageTitle = computed(() => (this.isEdit ? 'Editar Evento' : 'Novo Evento'));
+  readonly isParticipant = computed(() => this.roleService.role() === 'participante');
+  readonly canChooseStatus = computed(() => !this.isParticipant());
   readonly formActionsDisabled = computed(
     () =>
       this.saving() ||
@@ -231,7 +246,9 @@ export class EventForm implements OnInit {
   }
 
   private updateEditChangesState(): void {
-    this.hasEditChanges.set(!!this.initialEditState && this.getComparableFormState() !== this.initialEditState);
+    this.hasEditChanges.set(
+      !!this.initialEditState && this.getComparableFormState() !== this.initialEditState,
+    );
   }
 
   private updateFormActionsState(): void {
@@ -432,7 +449,7 @@ export class EventForm implements OnInit {
       endereco: this.isPresencial ? value.endereco || null : null,
       cidade: this.isPresencial ? value.cidade || null : null,
       estado: this.isPresencial ? value.estado || null : null,
-      status: value.status,
+      status: this.isParticipant() && !this.isEdit ? 'em_analise' : value.status,
       slug: generateSlug(value.nome),
     };
   }
@@ -458,9 +475,9 @@ export class EventForm implements OnInit {
 
     const save$ = eventId
       ? shouldDeleteImage
-        ? this.eventService.deleteEventImage(eventId).pipe(
-            switchMap(() => this.eventService.updateEvent(eventId, formData)),
-          )
+        ? this.eventService
+            .deleteEventImage(eventId)
+            .pipe(switchMap(() => this.eventService.updateEvent(eventId, formData)))
         : this.eventService.updateEvent(eventId, formData)
       : this.eventService.createEvent(formData);
 
@@ -480,7 +497,9 @@ export class EventForm implements OnInit {
               forkJoin({
                 saved: of(saved),
                 tags: this.tagService.setEventTags(saved.id, tagIds),
-                image: imageFile ? this.eventService.uploadEventImage(saved.id, imageFile) : of(null),
+                image: imageFile
+                  ? this.eventService.uploadEventImage(saved.id, imageFile)
+                  : of(null),
               }),
             ),
           );
@@ -491,7 +510,11 @@ export class EventForm implements OnInit {
         next: ({ saved, image }) => {
           this.eventService.upsertLocal(image ?? saved);
           this.notification.showNotification(
-            this.isEdit ? 'Evento atualizado com sucesso' : 'Evento criado com sucesso',
+            this.isEdit
+              ? 'Evento atualizado com sucesso'
+              : this.isParticipant()
+                ? 'Evento enviado para análise'
+                : 'Evento criado com sucesso',
             'success',
           );
           this.router.navigate(['/admin/dashboard/eventos']);

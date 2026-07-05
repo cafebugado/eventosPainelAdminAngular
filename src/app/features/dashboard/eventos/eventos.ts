@@ -40,11 +40,21 @@ import { environment } from '../../../../environments/environment';
 
 type EventoListFilter = EventoStatus | 'ativos' | 'inativos' | 'todos' | 'meus_eventos';
 
+const STATUS_LABELS: Record<EventoStatus, string> = {
+  publicado: 'Publicado',
+  rascunho: 'Rascunho',
+  arquivado: 'Arquivado',
+  em_analise: 'Em análise',
+  recusado: 'Recusado',
+};
+
 const STATUS_OPTIONS: { value: EventoListFilter; label: string }[] = [
   { value: 'ativos', label: 'Ativos' },
   { value: 'todos', label: 'Todos' },
   { value: 'inativos', label: 'Inativos' },
   { value: 'publicado', label: 'Publicado' },
+  { value: 'em_analise', label: 'Em análise' },
+  { value: 'recusado', label: 'Recusados' },
   { value: 'rascunho', label: 'Rascunho' },
   { value: 'arquivado', label: 'Arquivado' },
 ];
@@ -63,6 +73,8 @@ const EVENT_FILTERS: Record<
   todos: {},
   inativos: { dateFilter: 'past' },
   publicado: { status: 'publicado' },
+  em_analise: { status: 'em_analise' },
+  recusado: { status: 'recusado' },
   rascunho: { status: 'rascunho' },
   arquivado: { status: 'arquivado' },
 };
@@ -149,9 +161,16 @@ export class Eventos implements OnInit {
 
       return {
         event,
-        canEdit: this.computeCanEdit(event, permissions, role, userId),
+        canEdit:
+          event.status !== 'em_analise' && this.computeCanEdit(event, permissions, role, userId),
+        canPublish:
+          permissions.canPublishEvents &&
+          event.status !== 'publicado' &&
+          event.status !== 'em_analise' &&
+          event.status !== 'recusado',
+        canReview: permissions.canReviewEvents && event.status === 'em_analise',
         isInactive,
-        statusLabel: isInactive ? 'Inativo' : event.status,
+        statusLabel: isInactive ? 'Inativo' : STATUS_LABELS[event.status],
       };
     });
   });
@@ -241,6 +260,12 @@ export class Eventos implements OnInit {
 
   goToEdit(event: EventoRead): void {
     this.router.navigate(['eventos', event.slug ?? event.id, 'editar'], {
+      relativeTo: this.route.parent,
+    });
+  }
+
+  goToReview(event: EventoRead): void {
+    this.router.navigate(['eventos', event.slug ?? event.id, 'revisar'], {
       relativeTo: this.route.parent,
     });
   }

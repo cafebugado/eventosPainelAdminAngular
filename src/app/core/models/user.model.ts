@@ -81,6 +81,7 @@ export interface Permissions {
   canEditEvents: boolean;
   canDeleteEvents: boolean;
   canPublishEvents: boolean;
+  canReviewEvents: boolean;
   canManageTags: boolean;
   canDeleteTags: boolean;
   canManageContributors: boolean;
@@ -94,6 +95,7 @@ export const NO_PERMISSIONS: Permissions = {
   canEditEvents: false,
   canDeleteEvents: false,
   canPublishEvents: false,
+  canReviewEvents: false,
   canManageTags: false,
   canDeleteTags: false,
   canManageContributors: false,
@@ -107,6 +109,7 @@ const FULL_PERMISSIONS: Permissions = {
   canEditEvents: true,
   canDeleteEvents: true,
   canPublishEvents: true,
+  canReviewEvents: true,
   canManageTags: true,
   canDeleteTags: true,
   canManageContributors: true,
@@ -120,6 +123,7 @@ const MODERADOR_PERMISSIONS: Permissions = {
   canEditEvents: true,
   canDeleteEvents: true,
   canPublishEvents: true,
+  canReviewEvents: false,
   canManageTags: true,
   canDeleteTags: true,
   canManageContributors: false,
@@ -133,6 +137,7 @@ const PARTICIPANTE_PERMISSIONS: Permissions = {
   canEditEvents: false,
   canDeleteEvents: false,
   canPublishEvents: false,
+  canReviewEvents: false,
   canManageTags: false,
   canDeleteTags: false,
   canManageContributors: false,

@@ -266,6 +266,16 @@
     color: buttons.$brand-orange-light;
   }
 
+  &.status-em-analise {
+    background: rgba(buttons.$brand-blue, 0.16);
+    color: buttons.$brand-blue-light;
+  }
+
+  &.status-recusado {
+    background: var(--mat-sys-error-container);
+    color: var(--mat-sys-on-error-container);
+  }
+
   &.status-rascunho {
     background: var(--mat-sys-surface-container-high);
     color: var(--mat-sys-on-surface-variant);
@@ -297,6 +307,37 @@
   border-radius: 8px;
   font: var(--mat-sys-label-large);
   letter-spacing: 0;
+}
+
+.review-action {
+  min-width: 0;
+  height: 36px;
+  padding: 0 14px;
+  border-radius: 8px;
+  color: #ffffff;
+  font: var(--mat-sys-label-large);
+  font-weight: 600;
+  letter-spacing: 0;
+  background: linear-gradient(
+    135deg,
+    buttons.$brand-blue-light 0%,
+    buttons.$brand-blue 50%,
+    buttons.$brand-blue-dark 100%
+  );
+  box-shadow: 0 3px 12px rgba(buttons.$brand-blue, 0.28);
+  transition:
+    box-shadow 0.2s ease,
+    transform 0.2s ease;
+
+  &:not([disabled]):hover {
+    box-shadow: 0 5px 18px rgba(buttons.$brand-blue, 0.42);
+    transform: translateY(-1px);
+  }
+
+  &:not([disabled]):active {
+    box-shadow: 0 2px 8px rgba(buttons.$brand-blue, 0.24);
+    transform: translateY(0);
+  }
 }
 
 .edit-action {

@@ -186,6 +186,18 @@ export class EventService {
       .pipe(tap((event) => this.upsertLocal(event)));
   }
 
+  approveEvent(eventId: string): Observable<EventoRead> {
+    return this.http
+      .post<EventoRead>(`${this.baseUrl}/events/${eventId}/approve`, {})
+      .pipe(tap((event) => this.upsertLocal(event)));
+  }
+
+  rejectEvent(eventId: string): Observable<EventoRead> {
+    return this.http
+      .post<EventoRead>(`${this.baseUrl}/events/${eventId}/reject`, {})
+      .pipe(tap((event) => this.upsertLocal(event)));
+  }
+
   getRecommendedEvents(eventId: string): Observable<EventoRead[]> {
     return withRetry(this.http.get<EventoRead[]>(`${this.baseUrl}/events/${eventId}/recommended`), {
       context: 'getRecommendedEvents',

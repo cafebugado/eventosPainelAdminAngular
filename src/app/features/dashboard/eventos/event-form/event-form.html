@@ -1,5 +1,10 @@
 <div class="event-form-page">
-  <button mat-flat-button class="primary-action-button back-action-button" type="button" (click)="goBack()">
+  <button
+    mat-flat-button
+    class="primary-action-button back-action-button"
+    type="button"
+    (click)="goBack()"
+  >
     <mat-icon>arrow_back</mat-icon>
     Voltar
   </button>
@@ -10,7 +15,12 @@
     </div>
     @if (canDeleteEvent()) {
       <div class="page-header-actions">
-        <button mat-flat-button class="cancel-action-button delete-event-button" type="button" (click)="onDelete()">
+        <button
+          mat-flat-button
+          class="cancel-action-button delete-event-button"
+          type="button"
+          (click)="onDelete()"
+        >
           Excluir evento
         </button>
       </div>
@@ -23,168 +33,194 @@
     </div>
   } @else {
     <form [formGroup]="form" class="event-form">
-    <mat-form-field appearance="outline" class="full-width">
-      <mat-label>Nome</mat-label>
-      <input matInput formControlName="nome" #nomeInput />
-      @if (form.controls.nome.hasError('required')) {
-        <mat-error>O nome é obrigatório</mat-error>
-      }
-      @if (form.controls.nome.hasError('duplicateName')) {
-        <mat-error>Já existe um evento cadastrado com este nome</mat-error>
-      }
-    </mat-form-field>
-
-    <div class="field-group">
-      <mat-label>Descrição</mat-label>
-      <app-rich-text-editor formControlName="descricao" />
-    </div>
-
-    <div class="form-row">
       <mat-form-field appearance="outline" class="full-width">
-        <mat-label>Data do evento</mat-label>
+        <mat-label>Nome</mat-label>
+        <input matInput formControlName="nome" #nomeInput />
+        @if (form.controls.nome.hasError('required')) {
+          <mat-error>O nome é obrigatório</mat-error>
+        }
+        @if (form.controls.nome.hasError('duplicateName')) {
+          <mat-error>Já existe um evento cadastrado com este nome</mat-error>
+        }
+      </mat-form-field>
+
+      <div class="field-group">
+        <mat-label>Descrição</mat-label>
+        <app-rich-text-editor formControlName="descricao" />
+      </div>
+
+      <div class="form-row">
+        <mat-form-field appearance="outline" class="full-width">
+          <mat-label>Data do evento</mat-label>
+          <input
+            matInput
+            readonly
+            [matDatepicker]="picker"
+            [min]="minDate"
+            formControlName="data_evento"
+            (click)="picker.open()"
+          />
+          <mat-datepicker-toggle matIconSuffix [for]="picker" />
+          <mat-datepicker #picker />
+          @if (form.controls.data_evento.hasError('required')) {
+            <mat-error>A data é obrigatória</mat-error>
+          }
+          @if (
+            form.controls.data_evento.hasError('matDatepickerMin') ||
+            form.controls.data_evento.hasError('pastDate')
+          ) {
+            <mat-error>A data não pode estar no passado</mat-error>
+          }
+        </mat-form-field>
+
+        <mat-form-field appearance="outline" class="full-width">
+          <mat-label>Horário</mat-label>
+          <input matInput type="time" formControlName="horario" />
+          @if (form.controls.horario.hasError('required')) {
+            <mat-error>O horário é obrigatório</mat-error>
+          }
+        </mat-form-field>
+      </div>
+
+      <div class="form-row">
+        <mat-form-field appearance="outline" class="full-width">
+          <mat-label>Dia da semana</mat-label>
+          <input matInput formControlName="dia_semana" readonly />
+        </mat-form-field>
+
+        <mat-form-field appearance="outline" class="full-width">
+          <mat-label>Período</mat-label>
+          <mat-select formControlName="periodo">
+            @for (periodo of periodos; track periodo) {
+              <mat-option [value]="periodo">{{ periodo }}</mat-option>
+            }
+          </mat-select>
+        </mat-form-field>
+      </div>
+
+      <mat-form-field appearance="outline" class="full-width">
+        <mat-label>Link do evento</mat-label>
+        <input matInput formControlName="link" placeholder="https://..." />
+        @if (form.controls.link.hasError('required')) {
+          <mat-error>O link é obrigatório</mat-error>
+        }
+        @if (form.controls.link.hasError('url')) {
+          <mat-error>Informe uma URL válida</mat-error>
+        }
+      </mat-form-field>
+
+      <div class="field-group">
+        <mat-label>Imagem</mat-label>
         <input
-          matInput
-          readonly
-          [matDatepicker]="picker"
-          [min]="minDate"
-          formControlName="data_evento"
-          (click)="picker.open()"
+          type="file"
+          accept="image/*"
+          (change)="onImageFileSelected($event)"
+          #fileInput
+          hidden
         />
-        <mat-datepicker-toggle matIconSuffix [for]="picker" />
-        <mat-datepicker #picker />
-        @if (form.controls.data_evento.hasError('required')) {
-          <mat-error>A data é obrigatória</mat-error>
+        @if (imagePreview()) {
+          <div class="image-preview-wrapper">
+            <img [src]="imagePreview()" alt="Pré-visualização" class="image-preview" />
+            <button
+              mat-icon-button
+              class="remove-image-button"
+              type="button"
+              matTooltip="Remover imagem"
+              aria-label="Remover imagem"
+              (click)="onRemoveImage(fileInput)"
+            >
+              <mat-icon>delete</mat-icon>
+            </button>
+          </div>
         }
-        @if (form.controls.data_evento.hasError('matDatepickerMin') || form.controls.data_evento.hasError('pastDate')) {
-          <mat-error>A data não pode estar no passado</mat-error>
+        <div class="image-actions">
+          <button
+            mat-flat-button
+            class="primary-action-button"
+            type="button"
+            (click)="fileInput.click()"
+          >
+            Selecionar arquivo
+          </button>
+        </div>
+        <mat-form-field appearance="outline" class="full-width">
+          <mat-label>Ou URL da imagem</mat-label>
+          <input matInput formControlName="imagemUrl" placeholder="https://..." />
+        </mat-form-field>
+        @if (imageError()) {
+          <p class="error-text">{{ imageError() }}</p>
         }
-      </mat-form-field>
+      </div>
 
       <mat-form-field appearance="outline" class="full-width">
-        <mat-label>Horário</mat-label>
-        <input matInput type="time" formControlName="horario" />
-        @if (form.controls.horario.hasError('required')) {
-          <mat-error>O horário é obrigatório</mat-error>
-        }
-      </mat-form-field>
-    </div>
-
-    <div class="form-row">
-      <mat-form-field appearance="outline" class="full-width">
-        <mat-label>Dia da semana</mat-label>
-        <input matInput formControlName="dia_semana" readonly />
-      </mat-form-field>
-
-      <mat-form-field appearance="outline" class="full-width">
-        <mat-label>Período</mat-label>
-        <mat-select formControlName="periodo">
-          @for (periodo of periodos; track periodo) {
-            <mat-option [value]="periodo">{{ periodo }}</mat-option>
+        <mat-label>Modalidade</mat-label>
+        <mat-select formControlName="modalidade">
+          @for (modalidade of modalidades; track modalidade) {
+            <mat-option [value]="modalidade">{{ modalidade }}</mat-option>
           }
         </mat-select>
       </mat-form-field>
-    </div>
 
-    <mat-form-field appearance="outline" class="full-width">
-      <mat-label>Link do evento</mat-label>
-      <input matInput formControlName="link" placeholder="https://..." />
-      @if (form.controls.link.hasError('required')) {
-        <mat-error>O link é obrigatório</mat-error>
+      @if (isPresencial) {
+        <app-location-selector />
       }
-      @if (form.controls.link.hasError('url')) {
-        <mat-error>Informe uma URL válida</mat-error>
-      }
-    </mat-form-field>
 
-    <div class="field-group">
-      <mat-label>Imagem</mat-label>
-      <input type="file" accept="image/*" (change)="onImageFileSelected($event)" #fileInput hidden />
-      @if (imagePreview()) {
-        <div class="image-preview-wrapper">
-          <img [src]="imagePreview()" alt="Pré-visualização" class="image-preview" />
-          <button
-            mat-icon-button
-            class="remove-image-button"
-            type="button"
-            matTooltip="Remover imagem"
-            aria-label="Remover imagem"
-            (click)="onRemoveImage(fileInput)"
-          >
-            <mat-icon>delete</mat-icon>
-          </button>
-        </div>
+      @if (canChooseStatus()) {
+        <mat-form-field appearance="outline" class="full-width">
+          <mat-label>Status</mat-label>
+          <mat-select formControlName="status">
+            @for (statusOption of statuses(); track statusOption.value) {
+              <mat-option [value]="statusOption.value">{{ statusOption.label }}</mat-option>
+            }
+          </mat-select>
+        </mat-form-field>
       }
-      <div class="image-actions">
-        <button mat-flat-button class="primary-action-button" type="button" (click)="fileInput.click()">
-          Selecionar arquivo
+
+      <mat-form-field appearance="outline" class="full-width">
+        <mat-label>Tags</mat-label>
+        <mat-select
+          multiple
+          [value]="selectedTagIds()"
+          (selectionChange)="onTagsSelectionChange($event.value)"
+        >
+          @for (tag of availableTags(); track tag.id) {
+            <mat-option [value]="tag.id" [disabled]="isTagOptionDisabled(tag.id)">
+              {{ tag.nome }}
+            </mat-option>
+          }
+        </mat-select>
+        <mat-hint>Selecione de 1 a 3 tags</mat-hint>
+      </mat-form-field>
+
+      <div class="form-actions">
+        @if (saving()) {
+          <p class="saving-feedback" role="status" aria-live="polite">Salvando evento...</p>
+        }
+        <button
+          mat-flat-button
+          class="cancel-action-button"
+          type="button"
+          [disabled]="formActionsDisabled()"
+          (click)="onCancel()"
+        >
+          Cancelar
+        </button>
+        <button
+          mat-flat-button
+          [class.secondary-action-button]="isEdit"
+          [class.success-action-button]="!isEdit"
+          type="button"
+          [disabled]="formActionsDisabled()"
+          (click)="onSubmit()"
+        >
+          @if (saving()) {
+            <mat-spinner diameter="20" class="save-spinner" />
+            <span>Salvando evento...</span>
+          } @else {
+            {{ isEdit ? 'Salvar' : 'Cadastrar evento' }}
+          }
         </button>
       </div>
-      <mat-form-field appearance="outline" class="full-width">
-        <mat-label>Ou URL da imagem</mat-label>
-        <input matInput formControlName="imagemUrl" placeholder="https://..." />
-      </mat-form-field>
-      @if (imageError()) {
-        <p class="error-text">{{ imageError() }}</p>
-      }
-    </div>
-
-    <mat-form-field appearance="outline" class="full-width">
-      <mat-label>Modalidade</mat-label>
-      <mat-select formControlName="modalidade">
-        @for (modalidade of modalidades; track modalidade) {
-          <mat-option [value]="modalidade">{{ modalidade }}</mat-option>
-        }
-      </mat-select>
-    </mat-form-field>
-
-    @if (isPresencial) {
-      <app-location-selector />
-    }
-
-    <mat-form-field appearance="outline" class="full-width">
-      <mat-label>Status</mat-label>
-      <mat-select formControlName="status">
-        @for (statusOption of statuses; track statusOption.value) {
-          <mat-option [value]="statusOption.value">{{ statusOption.label }}</mat-option>
-        }
-      </mat-select>
-    </mat-form-field>
-
-    <mat-form-field appearance="outline" class="full-width">
-      <mat-label>Tags</mat-label>
-      <mat-select multiple [value]="selectedTagIds()" (selectionChange)="onTagsSelectionChange($event.value)">
-        @for (tag of availableTags(); track tag.id) {
-          <mat-option [value]="tag.id" [disabled]="isTagOptionDisabled(tag.id)">
-            {{ tag.nome }}
-          </mat-option>
-        }
-      </mat-select>
-      <mat-hint>Selecione de 1 a 3 tags</mat-hint>
-    </mat-form-field>
-
-    <div class="form-actions">
-      @if (saving()) {
-        <p class="saving-feedback" role="status" aria-live="polite">Salvando evento...</p>
-      }
-      <button mat-flat-button class="cancel-action-button" type="button" [disabled]="formActionsDisabled()" (click)="onCancel()">
-        Cancelar
-      </button>
-      <button
-        mat-flat-button
-        [class.secondary-action-button]="isEdit"
-        [class.success-action-button]="!isEdit"
-        type="button"
-        [disabled]="formActionsDisabled()"
-        (click)="onSubmit()"
-      >
-        @if (saving()) {
-          <mat-spinner diameter="20" class="save-spinner" />
-          <span>Salvando evento...</span>
-        } @else {
-          {{ isEdit ? 'Salvar' : 'Cadastrar evento' }}
-        }
-      </button>
-    </div>
-  </form>
+    </form>
   }
 </div>

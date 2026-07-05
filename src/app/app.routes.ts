@@ -43,6 +43,15 @@ export const routes: Routes = [
           import('./features/dashboard/eventos/event-form/event-form').then((m) => m.EventForm),
       },
       {
+        path: 'eventos/:slug/revisar',
+        loadComponent: () =>
+          import('./features/dashboard/eventos/event-review/event-review').then(
+            (m) => m.EventReview,
+          ),
+        canActivate: [permissionGuard],
+        data: { permission: 'canReviewEvents' },
+      },
+      {
         path: 'tags',
         loadComponent: () => import('./features/dashboard/tags/tags').then((m) => m.Tags),
         canActivate: [permissionGuard],

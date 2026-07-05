@@ -1,0 +1,158 @@
+<div class="event-review-page">
+  <button
+    mat-flat-button
+    class="primary-action-button back-action-button"
+    type="button"
+    (click)="goBack()"
+  >
+    <mat-icon>arrow_back</mat-icon>
+    Voltar
+  </button>
+
+  <div class="page-header">
+    <div>
+      <h1>Revisar Evento</h1>
+      @if (event()) {
+        <span
+          class="status-badge"
+          [class.status-publicado]="event()?.status === 'publicado'"
+          [class.status-em-analise]="event()?.status === 'em_analise'"
+          [class.status-recusado]="event()?.status === 'recusado'"
+          [class.status-rascunho]="event()?.status === 'rascunho'"
+          [class.status-arquivado]="event()?.status === 'arquivado'"
+        >
+          {{ statusLabel() }}
+        </span>
+      }
+    </div>
+  </div>
+
+  @if (loading()) {
+    <div class="loading-container">
+      <mat-spinner diameter="40" />
+    </div>
+  } @else if (event(); as selectedEvent) {
+    <section class="review-layout">
+      <mat-card class="event-media-card">
+        @if (selectedEvent.imagem) {
+          <img [src]="selectedEvent.imagem" [alt]="selectedEvent.nome" />
+        } @else {
+          <div class="event-image-placeholder">
+            <mat-icon>image</mat-icon>
+          </div>
+        }
+      </mat-card>
+
+      <mat-card class="event-detail-card">
+        <mat-card-content>
+          <h2>{{ selectedEvent.nome }}</h2>
+
+          <div class="detail-grid">
+            <div class="detail-item">
+              <span class="detail-label">Data do evento</span>
+              <strong>{{ selectedEvent.data_evento }}</strong>
+            </div>
+            <div class="detail-item">
+              <span class="detail-label">Horário</span>
+              <strong>{{ selectedEvent.horario }}</strong>
+            </div>
+            <div class="detail-item">
+              <span class="detail-label">Dia da semana</span>
+              <strong>{{ selectedEvent.dia_semana }}</strong>
+            </div>
+            <div class="detail-item">
+              <span class="detail-label">Período</span>
+              <strong>{{ selectedEvent.periodo ?? 'Não informado' }}</strong>
+            </div>
+            <div class="detail-item">
+              <span class="detail-label">Modalidade</span>
+              <strong>{{ selectedEvent.modalidade ?? 'Não informada' }}</strong>
+            </div>
+            <div class="detail-item">
+              <span class="detail-label">Criado em</span>
+              <strong>{{ selectedEvent.created_at | date: 'dd/MM/yyyy' }}</strong>
+            </div>
+          </div>
+
+          <section class="detail-section">
+            <h3>Descrição</h3>
+            <div
+              class="description"
+              [innerHTML]="selectedEvent.descricao || 'Sem descrição cadastrada.'"
+            ></div>
+          </section>
+
+          <section class="detail-section">
+            <h3>Local e acesso</h3>
+            <div class="detail-grid">
+              <div class="detail-item detail-item--wide">
+                <span class="detail-label">Link</span>
+                <a [href]="selectedEvent.link" target="_blank" rel="noopener noreferrer">
+                  {{ selectedEvent.link }}
+                </a>
+              </div>
+              @if (selectedEvent.modalidade === 'Presencial') {
+                <div class="detail-item">
+                  <span class="detail-label">Endereço</span>
+                  <strong>{{ selectedEvent.endereco ?? 'Não informado' }}</strong>
+                </div>
+                <div class="detail-item">
+                  <span class="detail-label">Cidade/UF</span>
+                  <strong
+                    >{{ selectedEvent.cidade ?? 'Não informada' }} -
+                    {{ selectedEvent.estado ?? '--' }}</strong
+                  >
+                </div>
+              }
+            </div>
+          </section>
+
+          <section class="detail-section">
+            <h3>Tags</h3>
+            <div class="tags-list">
+              @for (tag of tags(); track tag.id) {
+                <span class="tag-chip" [style.--tag-color]="tag.cor">{{ tag.nome }}</span>
+              } @empty {
+                <span class="muted-text">Nenhuma tag vinculada.</span>
+              }
+            </div>
+          </section>
+        </mat-card-content>
+      </mat-card>
+    </section>
+
+    <div class="review-actions">
+      @if (!canReview()) {
+        <p class="review-closed">Este evento já foi revisado.</p>
+      }
+      <button
+        mat-flat-button
+        class="cancel-action-button"
+        type="button"
+        [disabled]="!!reviewing() || !canReview()"
+        (click)="rejectEvent()"
+      >
+        @if (reviewing() === 'reject') {
+          <mat-spinner diameter="20" class="action-spinner" />
+          <span>Recusando...</span>
+        } @else {
+          Recusar evento
+        }
+      </button>
+      <button
+        mat-flat-button
+        class="success-action-button"
+        type="button"
+        [disabled]="!!reviewing() || !canReview()"
+        (click)="approveEvent()"
+      >
+        @if (reviewing() === 'approve') {
+          <mat-spinner diameter="20" class="action-spinner" />
+          <span>Aprovando...</span>
+        } @else {
+          Aprovar evento
+        }
+      </button>
+    </div>
+  }
+</div>

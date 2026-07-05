@@ -1,5 +1,5 @@
 export type EventoPeriodo = 'Matinal' | 'Diurno' | 'Vespertino' | 'Noturno';
-export type EventoStatus = 'rascunho' | 'publicado' | 'arquivado';
+export type EventoStatus = 'rascunho' | 'publicado' | 'arquivado' | 'em_analise' | 'recusado';
 export type EventoModalidade = 'Online' | 'Presencial';
 export type EventoDateFilter = 'upcoming' | 'past';
 
