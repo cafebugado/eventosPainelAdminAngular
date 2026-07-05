@@ -511,7 +511,9 @@ export class EventForm implements OnInit {
           this.eventService.upsertLocal(image ?? saved);
           this.notification.showNotification(
             this.isEdit
-              ? 'Evento atualizado com sucesso'
+              ? this.isParticipant() && saved.status === 'em_analise'
+                ? 'Evento atualizado e enviado para nova análise'
+                : 'Evento atualizado com sucesso'
               : this.isParticipant()
                 ? 'Evento enviado para análise'
                 : 'Evento criado com sucesso',

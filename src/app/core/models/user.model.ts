@@ -134,7 +134,7 @@ const MODERADOR_PERMISSIONS: Permissions = {
 
 const PARTICIPANTE_PERMISSIONS: Permissions = {
   canCreateEvents: true,
-  canEditEvents: false,
+  canEditEvents: true,
   canDeleteEvents: false,
   canPublishEvents: false,
   canReviewEvents: false,

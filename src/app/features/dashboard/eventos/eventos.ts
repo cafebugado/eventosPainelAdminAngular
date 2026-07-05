@@ -233,7 +233,7 @@ export class Eventos implements OnInit {
     userId: string | undefined,
   ): boolean {
     if (!permissions.canEditEvents) return false;
-    if (role === 'moderador') {
+    if (role === 'moderador' || role === 'participante') {
       return event.created_by === userId;
     }
     return true;
