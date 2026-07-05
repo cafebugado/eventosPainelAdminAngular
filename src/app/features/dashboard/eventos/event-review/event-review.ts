@@ -1,15 +1,17 @@
 import { DatePipe, Location } from '@angular/common';
 import { Component, OnInit, computed, inject, signal } from '@angular/core';
 import { ActivatedRoute, Router } from '@angular/router';
-import { finalize, forkJoin, of, switchMap } from 'rxjs';
+import { filter, finalize, forkJoin, of, switchMap } from 'rxjs';
 import { MatButtonModule } from '@angular/material/button';
 import { MatCardModule } from '@angular/material/card';
+import { MatDialog } from '@angular/material/dialog';
 import { MatIconModule } from '@angular/material/icon';
 import { MatProgressSpinnerModule } from '@angular/material/progress-spinner';
 import { EventoStatus, EventoWithTags } from '../../../../core/models/evento.model';
 import { EventService } from '../../../../core/services/event.service';
 import { TagService } from '../../../../core/services/tag.service';
 import { NotificationService } from '../../../../shared/services/notification.service';
+import { RejectEventDialog } from './reject-event-dialog/reject-event-dialog';
 
 type ReviewAction = 'approve' | 'reject';
 
@@ -34,6 +36,7 @@ export class EventReview implements OnInit {
   private readonly eventService = inject(EventService);
   private readonly tagService = inject(TagService);
   private readonly notification = inject(NotificationService);
+  private readonly dialog = inject(MatDialog);
 
   readonly loading = signal(true);
   readonly reviewing = signal<ReviewAction | null>(null);
@@ -69,7 +72,11 @@ export class EventReview implements OnInit {
   }
 
   rejectEvent(): void {
-    this.review('reject');
+    this.dialog
+      .open(RejectEventDialog)
+      .afterClosed()
+      .pipe(filter((motivo): motivo is string => !!motivo))
+      .subscribe((motivo) => this.review('reject', motivo));
   }
 
   private loadEvent(slugOrId: string): void {
@@ -94,7 +101,7 @@ export class EventReview implements OnInit {
       });
   }
 
-  private review(action: ReviewAction): void {
+  private review(action: ReviewAction, motivo?: string): void {
     const event = this.event();
     if (!event || this.reviewing() || !this.canReview()) return;
 
@@ -102,7 +109,7 @@ export class EventReview implements OnInit {
     const request$ =
       action === 'approve'
         ? this.eventService.approveEvent(event.id)
-        : this.eventService.rejectEvent(event.id);
+        : this.eventService.rejectEvent(event.id, motivo ?? '');
 
     request$.pipe(finalize(() => this.reviewing.set(null))).subscribe({
       next: () => {

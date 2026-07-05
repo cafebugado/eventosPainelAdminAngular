@@ -17,6 +17,7 @@ export interface EventoBase {
   cidade?: string | null;
   estado?: string | null;
   status: EventoStatus;
+  motivo_recusa?: string | null;
 }
 
 export interface EventoCreate extends EventoBase {

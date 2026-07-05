@@ -28,6 +28,27 @@
   flex: 1 1 auto;
 }
 
+.rejection-notice {
+  display: flex;
+  align-items: flex-start;
+  gap: 12px;
+  margin-bottom: 16px;
+  padding: 12px 16px;
+  border-radius: 8px;
+  background: color-mix(in srgb, var(--mat-sys-error, #f44336) 12%, transparent);
+  border: 1px solid var(--mat-sys-error, #f44336);
+  color: var(--mat-sys-on-surface);
+
+  mat-icon {
+    color: var(--mat-sys-error, #f44336);
+    flex-shrink: 0;
+  }
+
+  p {
+    margin: 4px 0 0;
+  }
+}
+
 .back-action-button {
   position: fixed;
   top: 24px;

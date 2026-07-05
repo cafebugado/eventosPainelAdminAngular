@@ -192,9 +192,9 @@ export class EventService {
       .pipe(tap((event) => this.upsertLocal(event)));
   }
 
-  rejectEvent(eventId: string): Observable<EventoRead> {
+  rejectEvent(eventId: string, motivo: string): Observable<EventoRead> {
     return this.http
-      .post<EventoRead>(`${this.baseUrl}/events/${eventId}/reject`, {})
+      .post<EventoRead>(`${this.baseUrl}/events/${eventId}/reject`, { motivo })
       .pipe(tap((event) => this.upsertLocal(event)));
   }
 

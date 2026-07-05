@@ -80,17 +80,29 @@
         <mat-card-content>
           <div class="event-card-header">
             <h2 class="event-name">{{ row.event.nome }}</h2>
-            <span
-              class="status-badge"
-              [class.status-publicado]="!row.isInactive && row.event.status === 'publicado'"
-              [class.status-em-analise]="!row.isInactive && row.event.status === 'em_analise'"
-              [class.status-recusado]="!row.isInactive && row.event.status === 'recusado'"
-              [class.status-rascunho]="!row.isInactive && row.event.status === 'rascunho'"
-              [class.status-arquivado]="!row.isInactive && row.event.status === 'arquivado'"
-              [class.status-inativo]="row.isInactive"
-            >
-              {{ row.statusLabel }}
-            </span>
+            <div class="status-row">
+              <span
+                class="status-badge"
+                [class.status-publicado]="!row.isInactive && row.event.status === 'publicado'"
+                [class.status-em-analise]="!row.isInactive && row.event.status === 'em_analise'"
+                [class.status-recusado]="!row.isInactive && row.event.status === 'recusado'"
+                [class.status-rascunho]="!row.isInactive && row.event.status === 'rascunho'"
+                [class.status-arquivado]="!row.isInactive && row.event.status === 'arquivado'"
+                [class.status-inativo]="row.isInactive"
+              >
+                {{ row.statusLabel }}
+              </span>
+              @if (row.event.status === 'recusado' && row.event.motivo_recusa) {
+                <mat-icon
+                  class="reject-reason-icon"
+                  [matTooltip]="row.event.motivo_recusa"
+                  matTooltipPosition="above"
+                  aria-label="Motivo da recusa"
+                >
+                  info
+                </mat-icon>
+              }
+            </div>
           </div>
 
           <div class="event-meta">

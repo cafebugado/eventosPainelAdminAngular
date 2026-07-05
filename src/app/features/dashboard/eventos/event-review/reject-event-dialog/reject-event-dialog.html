@@ -1,0 +1,28 @@
+<h2 mat-dialog-title>Recusar evento</h2>
+
+<mat-dialog-content>
+  <p>Descreva o motivo da recusa para que quem cadastrou o evento possa corrigir e reenviar.</p>
+  <mat-form-field appearance="outline" class="full-width">
+    <mat-label>Motivo da recusa</mat-label>
+    <textarea
+      matInput
+      [formControl]="motivo"
+      maxlength="500"
+      rows="4"
+      cdkFocusInitial
+    ></textarea>
+    @if (motivo.hasError('required') && motivo.touched) {
+      <mat-error>Informe o motivo da recusa</mat-error>
+    } @else if (motivo.hasError('minlength') && motivo.touched) {
+      <mat-error>O motivo deve ter ao menos 10 caracteres</mat-error>
+    }
+    <mat-hint align="end">{{ motivo.value.length }}/500</mat-hint>
+  </mat-form-field>
+</mat-dialog-content>
+
+<mat-dialog-actions align="end">
+  <button mat-flat-button class="cancel-action-button" (click)="cancel()">Cancelar</button>
+  <button mat-flat-button color="warn" [disabled]="motivo.invalid" (click)="confirm()">
+    Confirmar recusa
+  </button>
+</mat-dialog-actions>

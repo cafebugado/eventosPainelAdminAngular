@@ -32,6 +32,15 @@
       <mat-spinner diameter="40" />
     </div>
   } @else {
+    @if (event()?.status === 'recusado' && event()?.motivo_recusa) {
+      <div class="rejection-notice">
+        <mat-icon>info</mat-icon>
+        <div>
+          <strong>Este evento foi recusado.</strong>
+          <p>{{ event()?.motivo_recusa }}</p>
+        </div>
+      </div>
+    }
     <form [formGroup]="form" class="event-form">
       <mat-form-field appearance="outline" class="full-width">
         <mat-label>Nome</mat-label>
