@@ -449,7 +449,7 @@ export class EventForm implements OnInit {
       endereco: this.isPresencial ? value.endereco || null : null,
       cidade: this.isPresencial ? value.cidade || null : null,
       estado: this.isPresencial ? value.estado || null : null,
-      status: this.isParticipant() && !this.isEdit ? 'em_analise' : value.status,
+      status: this.isParticipant() ? 'em_analise' : value.status,
       slug: generateSlug(value.nome),
     };
   }
@@ -473,12 +473,17 @@ export class EventForm implements OnInit {
     const shouldDeleteImage = this.imageRemoved() && !!this.eventId && !imageFile;
     const eventId = this.eventId;
 
+    // Participante nao decide o status do evento: o backend define a transicao
+    // (ex.: reenvio apos recusa) a partir do status atual, entao o campo nem e enviado.
+    const { status: _status, ...updatePayload } = formData;
+    const updateData = this.isParticipant() ? updatePayload : formData;
+
     const save$ = eventId
       ? shouldDeleteImage
         ? this.eventService
             .deleteEventImage(eventId)
-            .pipe(switchMap(() => this.eventService.updateEvent(eventId, formData)))
-        : this.eventService.updateEvent(eventId, formData)
+            .pipe(switchMap(() => this.eventService.updateEvent(eventId, updateData)))
+        : this.eventService.updateEvent(eventId, updateData)
       : this.eventService.createEvent(formData);
 
     this.saving.set(true);
