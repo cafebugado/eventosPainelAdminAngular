@@ -20,4 +20,4 @@ export const MENU_ITEMS: MenuItem[] = [
   { label: 'Configurações', icon: 'settings', route: 'configuracoes' },
 ];
 
-export const SITE_URL = '/';
+export const SITE_URL = 'https://eventos.cafebugado.com.br/eventos';
