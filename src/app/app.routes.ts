@@ -95,10 +95,14 @@ export const routes: Routes = [
         path: 'comunidades',
         loadComponent: () =>
           import('./features/dashboard/communities/communities').then((m) => m.Communities),
+        canActivate: [permissionGuard],
+        data: { permission: 'canManageComunidades' },
       },
       {
         path: 'galeria',
         loadComponent: () => import('./features/dashboard/gallery/gallery').then((m) => m.Gallery),
+        canActivate: [permissionGuard],
+        data: { permission: 'canManageGaleria' },
       },
       {
         path: 'auditoria',

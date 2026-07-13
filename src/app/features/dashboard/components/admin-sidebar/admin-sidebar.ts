@@ -30,14 +30,9 @@ export class AdminSidebar {
   readonly profileService = inject(ProfileService);
 
   readonly siteUrl = SITE_URL;
-  readonly menuItems = computed(() => {
-    const role = this.roleService.role();
-    return MENU_ITEMS.filter(
-      (item) =>
-        (!item.permission || this.roleService.permissions()[item.permission]) &&
-        !(role && item.hiddenForRoles?.includes(role)),
-    );
-  });
+  readonly menuItems = computed(() =>
+    MENU_ITEMS.filter((item) => !item.permission || this.roleService.permissions()[item.permission]),
+  );
 
   readonly displayName = computed(() => {
     const profile = this.profileService.profile();

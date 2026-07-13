@@ -88,6 +88,8 @@ export interface Permissions {
   canManageUsers: boolean;
   canUploadImages: boolean;
   canSaveSettings: boolean;
+  canManageComunidades: boolean;
+  canManageGaleria: boolean;
 }
 
 export const NO_PERMISSIONS: Permissions = {
@@ -102,6 +104,8 @@ export const NO_PERMISSIONS: Permissions = {
   canManageUsers: false,
   canUploadImages: false,
   canSaveSettings: false,
+  canManageComunidades: false,
+  canManageGaleria: false,
 };
 
 const FULL_PERMISSIONS: Permissions = {
@@ -116,6 +120,8 @@ const FULL_PERMISSIONS: Permissions = {
   canManageUsers: true,
   canUploadImages: true,
   canSaveSettings: true,
+  canManageComunidades: true,
+  canManageGaleria: true,
 };
 
 const MODERADOR_PERMISSIONS: Permissions = {
@@ -130,6 +136,8 @@ const MODERADOR_PERMISSIONS: Permissions = {
   canManageUsers: false,
   canUploadImages: true,
   canSaveSettings: true,
+  canManageComunidades: true,
+  canManageGaleria: true,
 };
 
 const PARTICIPANTE_PERMISSIONS: Permissions = {
@@ -144,6 +152,8 @@ const PARTICIPANTE_PERMISSIONS: Permissions = {
   canManageUsers: false,
   canUploadImages: true,
   canSaveSettings: false,
+  canManageComunidades: false,
+  canManageGaleria: false,
 };
 
 export const PERMISSIONS: Record<Role | 'none', Permissions> = {
