@@ -1,4 +1,4 @@
-import { Permissions } from '../../core/models/user.model';
+import { Permissions, Role } from '../../core/models/user.model';
 
 export interface MenuItem {
   label: string;
@@ -6,6 +6,7 @@ export interface MenuItem {
   route: string;
   permission?: keyof Permissions;
   external?: boolean;
+  hiddenForRoles?: Role[];
 }
 
 export const MENU_ITEMS: MenuItem[] = [
@@ -14,8 +15,8 @@ export const MENU_ITEMS: MenuItem[] = [
   { label: 'Contribuintes', icon: 'group', route: 'contribuintes', permission: 'canManageContributors' },
   { label: 'Repositório', icon: 'account_tree', route: 'repositorio', permission: 'canManageContributors' },
   { label: 'Usuários', icon: 'manage_accounts', route: 'usuarios', permission: 'canManageUsers' },
-  { label: 'Comunidades', icon: 'groups', route: 'comunidades' },
-  { label: 'Galeria', icon: 'photo_library', route: 'galeria' },
+  { label: 'Comunidades', icon: 'groups', route: 'comunidades', hiddenForRoles: ['participante'] },
+  { label: 'Galeria', icon: 'photo_library', route: 'galeria', hiddenForRoles: ['participante'] },
   { label: 'Auditoria', icon: 'fact_check', route: 'auditoria', permission: 'canManageUsers' },
   { label: 'Configurações', icon: 'settings', route: 'configuracoes' },
 ];
