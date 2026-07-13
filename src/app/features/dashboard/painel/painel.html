@@ -1,0 +1,270 @@
+<div class="page-header">
+  <div>
+    <h1>Painel</h1>
+    <p class="greeting">{{ greeting() }}</p>
+  </div>
+</div>
+
+<div class="stats-grid">
+  <mat-card class="stat-card" (click)="goToEventos()">
+    <mat-card-content>
+      <mat-icon>calendar_month</mat-icon>
+      @if (eventStatsLoading()) {
+        <mat-spinner diameter="24" />
+      } @else {
+        <span class="stat-value">{{ eventStats()?.total ?? 0 }}</span>
+      }
+      <span class="stat-label">Eventos</span>
+    </mat-card-content>
+  </mat-card>
+
+  @if (roleService.permissions().canManageComunidades) {
+    <mat-card class="stat-card" (click)="goToComunidades()">
+      <mat-card-content>
+        <mat-icon>groups</mat-icon>
+        @if (communitiesLoading()) {
+          <mat-spinner diameter="24" />
+        } @else {
+          <span class="stat-value">{{ communitiesCount() ?? 0 }}</span>
+        }
+        <span class="stat-label">Comunidades</span>
+      </mat-card-content>
+    </mat-card>
+  }
+
+  @if (roleService.permissions().canManageContributors) {
+    <mat-card class="stat-card" (click)="goToContribuintes()">
+      <mat-card-content>
+        <mat-icon>group</mat-icon>
+        @if (contributorsLoading()) {
+          <mat-spinner diameter="24" />
+        } @else {
+          <span class="stat-value">{{ contributorsCount() ?? 0 }}</span>
+        }
+        <span class="stat-label">Contribuintes</span>
+      </mat-card-content>
+    </mat-card>
+  }
+
+  @if (roleService.permissions().canManageGaleria) {
+    <mat-card class="stat-card" (click)="goToGaleria()">
+      <mat-card-content>
+        <mat-icon>photo_library</mat-icon>
+        @if (photosLoading()) {
+          <mat-spinner diameter="24" />
+        } @else {
+          <span class="stat-value">{{ photosCount() ?? 0 }}</span>
+        }
+        <span class="stat-label">Fotos</span>
+      </mat-card-content>
+    </mat-card>
+  }
+
+  @if (roleService.permissions().canManageUsers) {
+    <mat-card class="stat-card" (click)="goToUsuarios()">
+      <mat-card-content>
+        <mat-icon>manage_accounts</mat-icon>
+        @if (usersLoading()) {
+          <mat-spinner diameter="24" />
+        } @else {
+          <span class="stat-value">{{ usersCount() ?? 0 }}</span>
+        }
+        <span class="stat-label">Usuários</span>
+      </mat-card-content>
+    </mat-card>
+  }
+</div>
+
+<div class="stats-grid">
+  <mat-card class="stat-card" (click)="goToEventos()">
+    <mat-card-content>
+      <mat-icon>person</mat-icon>
+      @if (allEventsLoading()) {
+        <mat-spinner diameter="24" />
+      } @else {
+        <span class="stat-value">{{ myEventsCount() }}</span>
+      }
+      <span class="stat-label">Cadastrados por mim</span>
+    </mat-card-content>
+  </mat-card>
+
+  <mat-card class="stat-card" (click)="goToEventos()">
+    <mat-card-content>
+      <mat-icon>today</mat-icon>
+      @if (allEventsLoading()) {
+        <mat-spinner diameter="24" />
+      } @else {
+        <span class="stat-value">{{ todayEventsCount() }}</span>
+      }
+      <span class="stat-label">Hoje</span>
+    </mat-card-content>
+  </mat-card>
+
+  <mat-card class="stat-card" (click)="goToEventos()">
+    <mat-card-content>
+      <mat-icon>date_range</mat-icon>
+      @if (allEventsLoading()) {
+        <mat-spinner diameter="24" />
+      } @else {
+        <span class="stat-value">{{ weekEventsCount() }}</span>
+      }
+      <span class="stat-label">Esta semana</span>
+    </mat-card-content>
+  </mat-card>
+
+  <mat-card class="stat-card" (click)="goToEventos()">
+    <mat-card-content>
+      <mat-icon>calendar_view_month</mat-icon>
+      @if (allEventsLoading()) {
+        <mat-spinner diameter="24" />
+      } @else {
+        <span class="stat-value">{{ monthEventsCount() }}</span>
+      }
+      <span class="stat-label">Este mês</span>
+    </mat-card-content>
+  </mat-card>
+
+  <mat-card class="stat-card" (click)="goToEventos()">
+    <mat-card-content>
+      <mat-icon>event_note</mat-icon>
+      @if (allEventsLoading()) {
+        <mat-spinner diameter="24" />
+      } @else {
+        <span class="stat-value">{{ yearEventsCount() }}</span>
+      }
+      <span class="stat-label">Este ano</span>
+    </mat-card-content>
+  </mat-card>
+</div>
+
+@if (eventStats(); as stats) {
+  <mat-card class="breakdown-card">
+    <mat-card-header>
+      <mat-card-title>Eventos por período</mat-card-title>
+    </mat-card-header>
+    <mat-card-content>
+      <div class="breakdown-row">
+        <span class="breakdown-label">Diurno</span>
+        <div class="breakdown-bar">
+          <div
+            class="breakdown-bar-fill breakdown-bar-fill--diurno"
+            [style.width.%]="stats.total ? (stats.diurno / stats.total) * 100 : 0"
+          ></div>
+        </div>
+        <span class="breakdown-value">{{ stats.diurno }}</span>
+      </div>
+      <div class="breakdown-row">
+        <span class="breakdown-label">Noturno</span>
+        <div class="breakdown-bar">
+          <div
+            class="breakdown-bar-fill breakdown-bar-fill--noturno"
+            [style.width.%]="stats.total ? (stats.noturno / stats.total) * 100 : 0"
+          ></div>
+        </div>
+        <span class="breakdown-value">{{ stats.noturno }}</span>
+      </div>
+    </mat-card-content>
+  </mat-card>
+}
+
+<div class="columns">
+  <mat-card class="list-card">
+    <mat-card-header>
+      <mat-card-title>Próximos eventos</mat-card-title>
+      @if (upcomingEvents().length > 0) {
+        <button
+          mat-icon-button
+          type="button"
+          class="copy-button"
+          aria-label="Copiar eventos da semana"
+          matTooltip="Copiar eventos da semana"
+          (click)="copyUpcomingEvents()"
+        >
+          <mat-icon>content_copy</mat-icon>
+        </button>
+      }
+    </mat-card-header>
+    <mat-card-content>
+      @if (upcomingLoading()) {
+        <div class="loading-container">
+          <mat-spinner diameter="32" />
+        </div>
+      } @else {
+        @for (event of upcomingEvents(); track event.id) {
+          <div class="list-item">
+            <div class="item-main">
+              <span class="item-title">{{ event.nome }}</span>
+              <span class="item-meta">{{ event.dia_semana }}, {{ event.data_evento }} · {{ event.horario }}</span>
+            </div>
+            <button
+              mat-icon-button
+              type="button"
+              class="copy-button"
+              [attr.aria-label]="'Copiar detalhes do evento ' + event.nome"
+              matTooltip="Copiar detalhes do evento"
+              (click)="copyEventDetails(event)"
+            >
+              <mat-icon>content_copy</mat-icon>
+            </button>
+          </div>
+        } @empty {
+          <p class="empty-message">Nenhum evento próximo.</p>
+        }
+      }
+    </mat-card-content>
+  </mat-card>
+
+  @if (roleService.permissions().canReviewEvents) {
+    <mat-card class="list-card">
+      <mat-card-header>
+        <mat-card-title>Pendentes de revisão</mat-card-title>
+      </mat-card-header>
+      <mat-card-content>
+        @if (pendingReviewLoading()) {
+          <div class="loading-container">
+            <mat-spinner diameter="32" />
+          </div>
+        } @else {
+          @for (event of pendingReviewEvents(); track event.id) {
+            <button type="button" class="list-item list-item--button" (click)="goToRevisar(event)">
+              <div class="item-main">
+                <span class="item-title">{{ event.nome }}</span>
+                <span class="item-meta">{{ event.dia_semana }}, {{ event.data_evento }}</span>
+              </div>
+              <mat-icon>chevron_right</mat-icon>
+            </button>
+          } @empty {
+            <p class="empty-message">Nenhum evento pendente de revisão.</p>
+          }
+        }
+      </mat-card-content>
+    </mat-card>
+  }
+
+  @if (roleService.permissions().canManageUsers) {
+    <mat-card class="list-card">
+      <mat-card-header>
+        <mat-card-title>Atividade recente</mat-card-title>
+        <button mat-button class="see-all-button" (click)="goToAuditoria()">Ver tudo</button>
+      </mat-card-header>
+      <mat-card-content>
+        @if (recentActivityLoading()) {
+          <div class="loading-container">
+            <mat-spinner diameter="32" />
+          </div>
+        } @else {
+          @for (log of recentActivity(); track log.id) {
+            <div class="list-item">
+              <div class="item-main">
+                <span class="item-title">{{ activityLabel()(log) }}</span>
+                <span class="item-meta">{{ log.created_at | date: 'dd/MM/yyyy HH:mm' }}</span>
+              </div>
+            </div>
+          } @empty {
+            <p class="empty-message">Nenhuma atividade recente.</p>
+          }
+        }
+      </mat-card-content>
+    </mat-card>
+  }
+</div>

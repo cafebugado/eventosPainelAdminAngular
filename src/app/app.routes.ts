@@ -29,6 +29,10 @@ export const routes: Routes = [
     children: [
       { path: '', redirectTo: 'eventos', pathMatch: 'full' },
       {
+        path: 'painel',
+        loadComponent: () => import('./features/dashboard/painel/painel').then((m) => m.Painel),
+      },
+      {
         path: 'eventos',
         loadComponent: () => import('./features/dashboard/eventos/eventos').then((m) => m.Eventos),
       },
