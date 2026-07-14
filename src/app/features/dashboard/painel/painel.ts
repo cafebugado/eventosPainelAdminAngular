@@ -17,7 +17,7 @@ import { GalleryService } from '../../../core/services/gallery.service';
 import { ProfileService } from '../../../core/services/profile.service';
 import { RoleService } from '../../../core/services/role.service';
 import { NotificationService } from '../../../shared/services/notification.service';
-import { parseEventDate } from '../../../shared/utils/event-date.util';
+import { formatDateToIso, parseEventDate } from '../../../shared/utils/event-date.util';
 
 const PUBLIC_EVENTS_BASE_URL = 'https://eventos.cafebugado.com.br/eventos/';
 
@@ -168,6 +168,20 @@ export class Painel implements OnInit {
 
   goToEventos(): void {
     this.router.navigate(['/admin/dashboard/eventos']);
+  }
+
+  goToTodayEvents(): void {
+    const today = formatDateToIso(new Date());
+    this.router.navigate(['/admin/dashboard/eventos'], { queryParams: { search: today } });
+  }
+
+  goToWeekEvents(): void {
+    const now = new Date();
+    const end = new Date(now);
+    end.setDate(end.getDate() + 6);
+    this.router.navigate(['/admin/dashboard/eventos'], {
+      queryParams: { dateFrom: formatDateToIso(now), dateTo: formatDateToIso(end) },
+    });
   }
 
   goToComunidades(): void {

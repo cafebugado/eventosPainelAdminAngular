@@ -65,6 +65,14 @@ export class EventService {
       params = params.set('date_filter', filters.dateFilter);
     }
 
+    if (filters.dateFrom) {
+      params = params.set('date_from', filters.dateFrom);
+    }
+
+    if (filters.dateTo) {
+      params = params.set('date_to', filters.dateTo);
+    }
+
     if (search) {
       params = params.set('search', search);
     }
@@ -224,6 +232,8 @@ export class EventService {
       pageSize: filters.pageSize,
       status: filters.status ?? 'todos',
       dateFilter: filters.dateFilter ?? 'all',
+      dateFrom: filters.dateFrom ?? '',
+      dateTo: filters.dateTo ?? '',
       search: filters.search?.trim().toLowerCase() ?? '',
       mine: filters.mine ?? false,
     });

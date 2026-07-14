@@ -48,6 +48,8 @@ export interface EventoPageFilters {
   pageSize: number;
   status?: EventoStatus;
   dateFilter?: EventoDateFilter;
+  dateFrom?: string;
+  dateTo?: string;
   search?: string;
   mine?: boolean;
 }

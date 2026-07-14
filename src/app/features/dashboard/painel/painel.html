@@ -88,7 +88,7 @@
     </mat-card-content>
   </mat-card>
 
-  <mat-card class="stat-card" (click)="goToEventos()">
+  <mat-card class="stat-card" (click)="goToTodayEvents()">
     <mat-card-content>
       <mat-icon>today</mat-icon>
       @if (allEventsLoading()) {
@@ -100,7 +100,7 @@
     </mat-card-content>
   </mat-card>
 
-  <mat-card class="stat-card" (click)="goToEventos()">
+  <mat-card class="stat-card" (click)="goToWeekEvents()">
     <mat-card-content>
       <mat-icon>date_range</mat-icon>
       @if (allEventsLoading()) {

@@ -35,7 +35,7 @@ import { ProfileService } from '../../../core/services/profile.service';
 import { RoleService } from '../../../core/services/role.service';
 import { Pagination } from '../../../shared/components/pagination/pagination';
 import { NotificationService } from '../../../shared/services/notification.service';
-import { parseEventDate } from '../../../shared/utils/event-date.util';
+import { isoDateToDisplay, parseEventDate } from '../../../shared/utils/event-date.util';
 import { environment } from '../../../../environments/environment';
 
 type EventoListFilter = EventoStatus | 'ativos' | 'inativos' | 'todos' | 'meus_eventos';
@@ -116,10 +116,17 @@ export class Eventos implements OnInit {
   );
   readonly skeletonRows = Array.from({ length: 6 }, (_, i) => i);
 
-  readonly rawSearchQuery = signal('');
+  private readonly initialSearchQuery = isoDateToDisplay(
+    this.route.snapshot.queryParamMap.get('search') ?? '',
+  );
+  private readonly dateFrom = this.route.snapshot.queryParamMap.get('dateFrom') ?? undefined;
+  private readonly dateTo = this.route.snapshot.queryParamMap.get('dateTo') ?? undefined;
+  readonly rawSearchQuery = signal(this.initialSearchQuery);
   private readonly searchInput$ = new Subject<string>();
-  readonly searchQuery = signal('');
-  readonly statusFilter = signal<EventoListFilter>(this.getDefaultStatusFilter());
+  readonly searchQuery = signal(this.initialSearchQuery);
+  readonly statusFilter = signal<EventoListFilter>(
+    this.initialSearchQuery || this.dateFrom || this.dateTo ? 'todos' : this.getDefaultStatusFilter(),
+  );
   readonly currentPage = signal(1);
   private readonly reloadKey = signal(0);
   private readonly hasLoadedEventsPage = signal(false);
@@ -185,6 +192,8 @@ export class Eventos implements OnInit {
         pageSize: this.pageSize(),
         status: filters.status,
         dateFilter: filters.dateFilter,
+        dateFrom: this.dateFrom,
+        dateTo: this.dateTo,
         mine: isParticipant || filters.mine,
         search: this.searchQuery(),
       })
