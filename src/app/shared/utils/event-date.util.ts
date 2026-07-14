@@ -39,6 +39,21 @@ export function isoDateToDisplay(value: string): string {
   return `${day}/${month}/${year}`;
 }
 
+/** Retorna a segunda-feira e o domingo da semana (calendário) que contém a data informada. */
+export function getWeekRange(value: Date): { start: Date; end: Date } {
+  const start = new Date(value);
+  start.setHours(0, 0, 0, 0);
+  const dayOfWeek = start.getDay();
+  const diffToMonday = dayOfWeek === 0 ? -6 : 1 - dayOfWeek;
+  start.setDate(start.getDate() + diffToMonday);
+
+  const end = new Date(start);
+  end.setDate(end.getDate() + 6);
+  end.setHours(23, 59, 59, 999);
+
+  return { start, end };
+}
+
 /** Retorna o nome do dia da semana em português a partir de um Date. */
 export function getDayName(value: Date | null | undefined): string {
   if (!value) return '';
