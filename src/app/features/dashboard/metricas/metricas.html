@@ -1,0 +1,92 @@
+<div class="page-header">
+  <h1>Métricas</h1>
+</div>
+
+@if (metricsLoading()) {
+  <div class="loading-container">
+    <mat-spinner diameter="32" />
+  </div>
+} @else if (metrics(); as data) {
+  <div class="stats-grid">
+    <mat-card class="stat-card">
+      <mat-card-content>
+        <mat-icon>calendar_month</mat-icon>
+        <span class="stat-value">{{ data.total_eventos }}</span>
+        <span class="stat-label">Total de eventos</span>
+      </mat-card-content>
+    </mat-card>
+
+    <mat-card class="stat-card">
+      <mat-card-content>
+        <mat-icon>trending_up</mat-icon>
+        <span class="stat-value">{{ data.media_eventos_por_semana }}</span>
+        <span class="stat-label">Média de eventos/semana</span>
+      </mat-card-content>
+    </mat-card>
+  </div>
+
+  <div class="charts-grid">
+    <mat-card class="chart-card">
+      <mat-card-header>
+        <mat-card-title>Eventos por dia da semana</mat-card-title>
+      </mat-card-header>
+      <mat-card-content>
+        <canvas baseChart [data]="diaSemanaChart()" [options]="barOptions" type="bar"></canvas>
+      </mat-card-content>
+    </mat-card>
+
+    <mat-card class="chart-card">
+      <mat-card-header>
+        <mat-card-title>Distribuição por período</mat-card-title>
+      </mat-card-header>
+      <mat-card-content>
+        <canvas baseChart [data]="periodoChart()" [options]="pieOptions" type="doughnut"></canvas>
+      </mat-card-content>
+    </mat-card>
+
+    <mat-card class="chart-card">
+      <mat-card-header>
+        <mat-card-title>Modalidade</mat-card-title>
+      </mat-card-header>
+      <mat-card-content>
+        <canvas baseChart [data]="modalidadeChart()" [options]="pieOptions" type="pie"></canvas>
+      </mat-card-content>
+    </mat-card>
+
+    <mat-card class="chart-card">
+      <mat-card-header>
+        <mat-card-title>Status dos eventos</mat-card-title>
+      </mat-card-header>
+      <mat-card-content>
+        <canvas baseChart [data]="statusChart()" [options]="pieOptions" type="doughnut"></canvas>
+      </mat-card-content>
+    </mat-card>
+
+    <mat-card class="chart-card">
+      <mat-card-header>
+        <mat-card-title>Top tags</mat-card-title>
+      </mat-card-header>
+      <mat-card-content>
+        <canvas baseChart [data]="tagsChart()" [options]="horizontalBarOptions" type="bar"></canvas>
+      </mat-card-content>
+    </mat-card>
+
+    <mat-card class="chart-card">
+      <mat-card-header>
+        <mat-card-title>Top cidades</mat-card-title>
+      </mat-card-header>
+      <mat-card-content>
+        <canvas baseChart [data]="cidadeChart()" [options]="horizontalBarOptions" type="bar"></canvas>
+      </mat-card-content>
+    </mat-card>
+
+    <mat-card class="chart-card chart-card--wide">
+      <mat-card-header>
+        <mat-card-title>Evolução mensal</mat-card-title>
+      </mat-card-header>
+      <mat-card-content>
+        <canvas baseChart [data]="evolucaoMensalChart()" [options]="lineOptions" type="line"></canvas>
+      </mat-card-content>
+    </mat-card>
+  </div>
+}

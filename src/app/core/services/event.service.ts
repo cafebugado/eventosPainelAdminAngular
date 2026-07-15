@@ -6,6 +6,7 @@ import { withRetry } from '../http/api-client';
 import { SKIP_ERROR_NOTIFICATION } from '../http/error-notification.context';
 import {
   EventoCreate,
+  EventoMetrics,
   EventoPage,
   EventoPageFilters,
   EventoPeriodo,
@@ -111,6 +112,20 @@ export class EventService {
     return withRetry(this.http.get<EventoStats>(`${this.baseUrl}/events/stats`), {
       context: 'getEventStats',
     });
+  }
+
+  getEventMetrics(params?: { dateFrom?: string; dateTo?: string }): Observable<EventoMetrics> {
+    let httpParams = new HttpParams();
+    if (params?.dateFrom) {
+      httpParams = httpParams.set('date_from', params.dateFrom);
+    }
+    if (params?.dateTo) {
+      httpParams = httpParams.set('date_to', params.dateTo);
+    }
+    return withRetry(
+      this.http.get<EventoMetrics>(`${this.baseUrl}/events/metrics`, { params: httpParams }),
+      { context: 'getEventMetrics' },
+    );
   }
 
   getEventsByPeriod(periodo: EventoPeriodo): Observable<EventoRead[]> {

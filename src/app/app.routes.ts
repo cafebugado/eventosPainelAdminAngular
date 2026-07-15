@@ -33,6 +33,11 @@ export const routes: Routes = [
         loadComponent: () => import('./features/dashboard/painel/painel').then((m) => m.Painel),
       },
       {
+        path: 'metricas',
+        loadComponent: () =>
+          import('./features/dashboard/metricas/metricas').then((m) => m.Metricas),
+      },
+      {
         path: 'eventos',
         loadComponent: () => import('./features/dashboard/eventos/eventos').then((m) => m.Eventos),
       },

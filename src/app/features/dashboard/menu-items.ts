@@ -10,6 +10,7 @@ export interface MenuItem {
 
 export const MENU_ITEMS: MenuItem[] = [
   { label: 'Painel', icon: 'dashboard', route: 'painel' },
+  { label: 'Métricas', icon: 'insights', route: 'metricas' },
   { label: 'Eventos', icon: 'calendar_month', route: 'eventos' },
   { label: 'Tags', icon: 'sell', route: 'tags', permission: 'canManageTags' },
   { label: 'Contribuintes', icon: 'group', route: 'contribuintes', permission: 'canManageContributors' },
