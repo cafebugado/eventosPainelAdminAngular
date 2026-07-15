@@ -1,5 +1,47 @@
 @use '../../../shared/styles/page' as page;
 
+:host {
+  --chart-series-1: #2a78d6;
+  --chart-series-2: #008300;
+  --chart-series-3: #e87ba4;
+  --chart-series-4: #eda100;
+  --chart-series-5: #1baf7a;
+  --chart-series-6: #eb6834;
+  --chart-series-7: #4a3aa7;
+  --chart-series-8: #e34948;
+  --chart-grid: #e1e0d9;
+  --chart-axis: #898781;
+  --chart-surface: var(--mat-sys-surface, #fcfcfb);
+}
+
+@media (prefers-color-scheme: dark) {
+  :host:where(:not([data-theme='light'])) {
+    --chart-series-1: #3987e5;
+    --chart-series-2: #008300;
+    --chart-series-3: #d55181;
+    --chart-series-4: #c98500;
+    --chart-series-5: #199e70;
+    --chart-series-6: #d95926;
+    --chart-series-7: #9085e9;
+    --chart-series-8: #e66767;
+    --chart-grid: #2c2c2a;
+    --chart-axis: #898781;
+  }
+}
+
+:host-context([data-theme='dark']) {
+  --chart-series-1: #3987e5;
+  --chart-series-2: #008300;
+  --chart-series-3: #d55181;
+  --chart-series-4: #c98500;
+  --chart-series-5: #199e70;
+  --chart-series-6: #d95926;
+  --chart-series-7: #9085e9;
+  --chart-series-8: #e66767;
+  --chart-grid: #2c2c2a;
+  --chart-axis: #898781;
+}
+
 .page-header {
   @include page.page-header;
 

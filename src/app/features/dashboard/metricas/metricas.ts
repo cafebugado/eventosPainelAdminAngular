@@ -1,4 +1,12 @@
-import { ChangeDetectionStrategy, Component, OnInit, computed, inject, signal } from '@angular/core';
+import {
+  ChangeDetectionStrategy,
+  Component,
+  ElementRef,
+  OnInit,
+  computed,
+  inject,
+  signal,
+} from '@angular/core';
 import { MatCardModule } from '@angular/material/card';
 import { MatIconModule } from '@angular/material/icon';
 import { MatProgressSpinnerModule } from '@angular/material/progress-spinner';
@@ -11,12 +19,6 @@ Chart.register(...registerables);
 
 const DIA_SEMANA_ORDER = ['Domingo', 'Segunda', 'Terça', 'Quarta', 'Quinta', 'Sexta', 'Sábado'];
 
-function readColor(variable: string, fallback: string): string {
-  if (typeof window === 'undefined') return fallback;
-  const value = getComputedStyle(document.documentElement).getPropertyValue(variable).trim();
-  return value || fallback;
-}
-
 @Component({
   selector: 'app-metricas',
   imports: [MatCardModule, MatIconModule, MatProgressSpinnerModule, BaseChartDirective],
@@ -26,20 +28,35 @@ function readColor(variable: string, fallback: string): string {
 })
 export class Metricas implements OnInit {
   private readonly eventService = inject(EventService);
+  private readonly elementRef = inject(ElementRef<HTMLElement>);
 
   readonly metrics = signal<EventoMetrics | null>(null);
   readonly metricsLoading = signal(false);
 
-  private readonly palette = [
-    readColor('--mat-sys-primary', '#2563eb'),
-    readColor('--mat-sys-tertiary', '#16a34a'),
-    readColor('--mat-sys-secondary', '#7c3aed'),
-    readColor('--mat-sys-error', '#dc2626'),
-    '#f59e0b',
-    '#0891b2',
-    '#db2777',
-    '#65a30d',
-  ];
+  private readVar(name: string, fallback: string): string {
+    const value = getComputedStyle(this.elementRef.nativeElement).getPropertyValue(name).trim();
+    return value || fallback;
+  }
+
+  private palette(index: number): string {
+    return this.readVar(`--chart-series-${index}`, '#2a78d6');
+  }
+
+  private get seriesPalette(): string[] {
+    return [1, 2, 3, 4, 5, 6, 7, 8].map((index) => this.palette(index));
+  }
+
+  private get chartSurface(): string {
+    return this.readVar('--chart-surface', '#fcfcfb');
+  }
+
+  private get gridColor(): string {
+    return this.readVar('--chart-grid', '#e1e0d9');
+  }
+
+  private get axisColor(): string {
+    return this.readVar('--chart-axis', '#898781');
+  }
 
   readonly diaSemanaChart = computed<ChartData<'bar'>>(() => {
     const data = this.metrics()?.por_dia_semana ?? [];
@@ -48,7 +65,15 @@ export class Metricas implements OnInit {
     );
     return {
       labels: sorted.map((item) => item.dia_semana),
-      datasets: [{ data: sorted.map((item) => item.total), backgroundColor: this.palette[0] }],
+      datasets: [
+        {
+          label: 'Eventos',
+          data: sorted.map((item) => item.total),
+          backgroundColor: this.palette(1),
+          borderRadius: 4,
+          maxBarThickness: 24,
+        },
+      ],
     };
   });
 
@@ -56,7 +81,14 @@ export class Metricas implements OnInit {
     const data = this.metrics()?.por_periodo ?? [];
     return {
       labels: data.map((item) => item.periodo),
-      datasets: [{ data: data.map((item) => item.total), backgroundColor: this.palette }],
+      datasets: [
+        {
+          data: data.map((item) => item.total),
+          backgroundColor: this.seriesPalette,
+          borderColor: this.chartSurface,
+          borderWidth: 2,
+        },
+      ],
     };
   });
 
@@ -64,7 +96,14 @@ export class Metricas implements OnInit {
     const data = this.metrics()?.por_modalidade ?? [];
     return {
       labels: data.map((item) => item.modalidade),
-      datasets: [{ data: data.map((item) => item.total), backgroundColor: this.palette }],
+      datasets: [
+        {
+          data: data.map((item) => item.total),
+          backgroundColor: this.seriesPalette,
+          borderColor: this.chartSurface,
+          borderWidth: 2,
+        },
+      ],
     };
   });
 
@@ -72,7 +111,14 @@ export class Metricas implements OnInit {
     const data = this.metrics()?.por_status ?? [];
     return {
       labels: data.map((item) => item.status),
-      datasets: [{ data: data.map((item) => item.total), backgroundColor: this.palette }],
+      datasets: [
+        {
+          data: data.map((item) => item.total),
+          backgroundColor: this.seriesPalette,
+          borderColor: this.chartSurface,
+          borderWidth: 2,
+        },
+      ],
     };
   });
 
@@ -80,7 +126,15 @@ export class Metricas implements OnInit {
     const data = this.metrics()?.por_cidade ?? [];
     return {
       labels: data.map((item) => (item.estado ? `${item.cidade}/${item.estado}` : item.cidade)),
-      datasets: [{ data: data.map((item) => item.total), backgroundColor: this.palette[1] }],
+      datasets: [
+        {
+          label: 'Eventos',
+          data: data.map((item) => item.total),
+          backgroundColor: this.palette(2),
+          borderRadius: 4,
+          maxBarThickness: 24,
+        },
+      ],
     };
   });
 
@@ -88,19 +142,34 @@ export class Metricas implements OnInit {
     const data = this.metrics()?.top_tags ?? [];
     return {
       labels: data.map((item) => item.nome),
-      datasets: [{ data: data.map((item) => item.total), backgroundColor: data.map((item) => item.cor) }],
+      datasets: [
+        {
+          label: 'Eventos',
+          data: data.map((item) => item.total),
+          backgroundColor: data.map((item) => item.cor),
+          borderRadius: 4,
+          maxBarThickness: 24,
+        },
+      ],
     };
   });
 
   readonly evolucaoMensalChart = computed<ChartData<'line'>>(() => {
     const data = this.metrics()?.evolucao_mensal ?? [];
+    const color = this.palette(1);
     return {
       labels: data.map((item) => item.ano_mes),
       datasets: [
         {
+          label: 'Eventos',
           data: data.map((item) => item.total),
-          borderColor: this.palette[0],
-          backgroundColor: this.palette[0],
+          borderColor: color,
+          backgroundColor: color,
+          pointBackgroundColor: color,
+          pointBorderColor: this.chartSurface,
+          pointBorderWidth: 2,
+          pointRadius: 4,
+          borderWidth: 2,
           tension: 0.3,
           fill: false,
         },
@@ -108,30 +177,50 @@ export class Metricas implements OnInit {
     };
   });
 
-  readonly horizontalBarOptions: ChartConfiguration['options'] = {
-    indexAxis: 'y',
-    responsive: true,
-    maintainAspectRatio: false,
-    plugins: { legend: { display: false } },
-  };
+  get horizontalBarOptions(): ChartConfiguration['options'] {
+    return {
+      indexAxis: 'y',
+      responsive: true,
+      maintainAspectRatio: false,
+      plugins: { legend: { display: false } },
+      scales: {
+        x: { grid: { color: this.gridColor }, ticks: { color: this.axisColor } },
+        y: { grid: { display: false }, ticks: { color: this.axisColor } },
+      },
+    };
+  }
 
-  readonly barOptions: ChartConfiguration['options'] = {
-    responsive: true,
-    maintainAspectRatio: false,
-    plugins: { legend: { display: false } },
-  };
+  get barOptions(): ChartConfiguration['options'] {
+    return {
+      responsive: true,
+      maintainAspectRatio: false,
+      plugins: { legend: { display: false } },
+      scales: {
+        x: { grid: { display: false }, ticks: { color: this.axisColor } },
+        y: { grid: { color: this.gridColor }, ticks: { color: this.axisColor } },
+      },
+    };
+  }
 
-  readonly pieOptions: ChartConfiguration['options'] = {
-    responsive: true,
-    maintainAspectRatio: false,
-    plugins: { legend: { position: 'bottom' } },
-  };
+  get pieOptions(): ChartConfiguration['options'] {
+    return {
+      responsive: true,
+      maintainAspectRatio: false,
+      plugins: { legend: { position: 'bottom', labels: { color: this.axisColor } } },
+    };
+  }
 
-  readonly lineOptions: ChartConfiguration['options'] = {
-    responsive: true,
-    maintainAspectRatio: false,
-    plugins: { legend: { display: false } },
-  };
+  get lineOptions(): ChartConfiguration['options'] {
+    return {
+      responsive: true,
+      maintainAspectRatio: false,
+      plugins: { legend: { display: false } },
+      scales: {
+        x: { grid: { display: false }, ticks: { color: this.axisColor } },
+        y: { grid: { color: this.gridColor }, ticks: { color: this.axisColor } },
+      },
+    };
+  }
 
   ngOnInit(): void {
     this.loadMetrics();
