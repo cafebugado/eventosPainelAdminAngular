@@ -17,7 +17,7 @@ import { GalleryService } from '../../../core/services/gallery.service';
 import { ProfileService } from '../../../core/services/profile.service';
 import { RoleService } from '../../../core/services/role.service';
 import { NotificationService } from '../../../shared/services/notification.service';
-import { formatDateToIso, getWeekRange, parseEventDate } from '../../../shared/utils/event-date.util';
+import { formatDateToIso, getMonthRange, getWeekRange, parseEventDate } from '../../../shared/utils/event-date.util';
 
 const PUBLIC_EVENTS_BASE_URL = 'https://eventos.cafebugado.com.br/eventos/';
 
@@ -84,10 +84,10 @@ export class Painel implements OnInit {
     }).length;
   });
   readonly monthEventsCount = computed(() => {
-    const now = new Date();
+    const { start, end } = getMonthRange(new Date());
     return this.allEvents().filter((event) => {
       const date = parseEventDate(event.data_evento);
-      return date && date.getFullYear() === now.getFullYear() && date.getMonth() === now.getMonth();
+      return date && date >= start && date <= end;
     }).length;
   });
   readonly yearEventsCount = computed(() => {
@@ -183,6 +183,13 @@ export class Painel implements OnInit {
 
   goToWeekEvents(): void {
     const { start, end } = getWeekRange(new Date());
+    this.router.navigate(['/admin/dashboard/eventos'], {
+      queryParams: { dateFrom: formatDateToIso(start), dateTo: formatDateToIso(end) },
+    });
+  }
+
+  goToMonthEvents(): void {
+    const { start, end } = getMonthRange(new Date());
     this.router.navigate(['/admin/dashboard/eventos'], {
       queryParams: { dateFrom: formatDateToIso(start), dateTo: formatDateToIso(end) },
     });

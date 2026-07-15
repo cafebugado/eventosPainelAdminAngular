@@ -54,6 +54,17 @@ export function getWeekRange(value: Date): { start: Date; end: Date } {
   return { start, end };
 }
 
+/** Retorna o primeiro e o último dia do mês que contém a data informada. */
+export function getMonthRange(value: Date): { start: Date; end: Date } {
+  const start = new Date(value.getFullYear(), value.getMonth(), 1);
+  start.setHours(0, 0, 0, 0);
+
+  const end = new Date(value.getFullYear(), value.getMonth() + 1, 0);
+  end.setHours(23, 59, 59, 999);
+
+  return { start, end };
+}
+
 /** Retorna o nome do dia da semana em português a partir de um Date. */
 export function getDayName(value: Date | null | undefined): string {
   if (!value) return '';
