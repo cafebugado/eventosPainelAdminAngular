@@ -17,8 +17,6 @@ import { EventService } from '../../../core/services/event.service';
 
 Chart.register(...registerables);
 
-const DIA_SEMANA_ORDER = ['Domingo', 'Segunda', 'Terça', 'Quarta', 'Quinta', 'Sexta', 'Sábado'];
-
 @Component({
   selector: 'app-metricas',
   imports: [MatCardModule, MatIconModule, MatProgressSpinnerModule, BaseChartDirective],
@@ -60,21 +58,23 @@ export class Metricas implements OnInit {
 
   readonly diaSemanaChart = computed<ChartData<'bar'>>(() => {
     const data = this.metrics()?.por_dia_semana ?? [];
-    const sorted = [...data].sort(
-      (a, b) => DIA_SEMANA_ORDER.indexOf(a.dia_semana) - DIA_SEMANA_ORDER.indexOf(b.dia_semana),
-    );
     return {
-      labels: sorted.map((item) => item.dia_semana),
+      labels: data.map((item) => item.dia_semana),
       datasets: [
         {
           label: 'Eventos',
-          data: sorted.map((item) => item.total),
+          data: data.map((item) => item.total),
           backgroundColor: this.palette(1),
           borderRadius: 4,
           maxBarThickness: 24,
         },
       ],
     };
+  });
+
+  private readonly diaSemanaPercentuais = computed<number[]>(() => {
+    const data = this.metrics()?.por_dia_semana ?? [];
+    return data.map((item) => item.percentual);
   });
 
   readonly periodoChart = computed<ChartData<'doughnut'>>(() => {
@@ -195,6 +195,29 @@ export class Metricas implements OnInit {
       responsive: true,
       maintainAspectRatio: false,
       plugins: { legend: { display: false } },
+      scales: {
+        x: { grid: { display: false }, ticks: { color: this.axisColor } },
+        y: { grid: { color: this.gridColor }, ticks: { color: this.axisColor } },
+      },
+    };
+  }
+
+  get diaSemanaOptions(): ChartConfiguration['options'] {
+    const percentuais = this.diaSemanaPercentuais();
+    return {
+      responsive: true,
+      maintainAspectRatio: false,
+      plugins: {
+        legend: { display: false },
+        tooltip: {
+          callbacks: {
+            label: (context) => {
+              const percentual = percentuais[context.dataIndex] ?? 0;
+              return `${context.formattedValue} eventos (${percentual}%)`;
+            },
+          },
+        },
+      },
       scales: {
         x: { grid: { display: false }, ticks: { color: this.axisColor } },
         y: { grid: { color: this.gridColor }, ticks: { color: this.axisColor } },

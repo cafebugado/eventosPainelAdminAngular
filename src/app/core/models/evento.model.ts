@@ -67,6 +67,7 @@ export interface EventoStats {
 export interface DiaSemanaCount {
   dia_semana: string;
   total: number;
+  percentual: number;
 }
 
 export interface PeriodoCount {
