@@ -9,10 +9,10 @@
   <mat-card class="stat-card" (click)="goToEventos()">
     <mat-card-content>
       <mat-icon>calendar_month</mat-icon>
-      @if (eventStatsLoading()) {
+      @if (summaryLoading()) {
         <mat-spinner diameter="24" />
       } @else {
-        <span class="stat-value">{{ eventStats()?.total ?? 0 }}</span>
+        <span class="stat-value">{{ eventCounts()?.total ?? 0 }}</span>
       }
       <span class="stat-label">Eventos</span>
     </mat-card-content>
@@ -22,7 +22,7 @@
     <mat-card class="stat-card" (click)="goToComunidades()">
       <mat-card-content>
         <mat-icon>groups</mat-icon>
-        @if (communitiesLoading()) {
+        @if (summaryLoading()) {
           <mat-spinner diameter="24" />
         } @else {
           <span class="stat-value">{{ communitiesCount() ?? 0 }}</span>
@@ -36,7 +36,7 @@
     <mat-card class="stat-card" (click)="goToContribuintes()">
       <mat-card-content>
         <mat-icon>group</mat-icon>
-        @if (contributorsLoading()) {
+        @if (summaryLoading()) {
           <mat-spinner diameter="24" />
         } @else {
           <span class="stat-value">{{ contributorsCount() ?? 0 }}</span>
@@ -50,7 +50,7 @@
     <mat-card class="stat-card" (click)="goToGaleria()">
       <mat-card-content>
         <mat-icon>photo_library</mat-icon>
-        @if (photosLoading()) {
+        @if (summaryLoading()) {
           <mat-spinner diameter="24" />
         } @else {
           <span class="stat-value">{{ photosCount() ?? 0 }}</span>
@@ -64,7 +64,7 @@
     <mat-card class="stat-card" (click)="goToUsuarios()">
       <mat-card-content>
         <mat-icon>manage_accounts</mat-icon>
-        @if (usersLoading()) {
+        @if (summaryLoading()) {
           <mat-spinner diameter="24" />
         } @else {
           <span class="stat-value">{{ usersCount() ?? 0 }}</span>
@@ -79,10 +79,10 @@
   <mat-card class="stat-card" (click)="goToEventos()">
     <mat-card-content>
       <mat-icon>person</mat-icon>
-      @if (allEventsLoading()) {
+      @if (summaryLoading()) {
         <mat-spinner diameter="24" />
       } @else {
-        <span class="stat-value">{{ myEventsCount() }}</span>
+        <span class="stat-value">{{ eventCounts()?.meus_eventos ?? 0 }}</span>
       }
       <span class="stat-label">Cadastrados por mim</span>
     </mat-card-content>
@@ -91,10 +91,10 @@
   <mat-card class="stat-card" (click)="goToTodayEvents()">
     <mat-card-content>
       <mat-icon>today</mat-icon>
-      @if (allEventsLoading()) {
+      @if (summaryLoading()) {
         <mat-spinner diameter="24" />
       } @else {
-        <span class="stat-value">{{ todayEventsCount() }}</span>
+        <span class="stat-value">{{ eventCounts()?.hoje ?? 0 }}</span>
       }
       <span class="stat-label">Hoje</span>
     </mat-card-content>
@@ -103,10 +103,10 @@
   <mat-card class="stat-card" (click)="goToWeekEvents()">
     <mat-card-content>
       <mat-icon>date_range</mat-icon>
-      @if (allEventsLoading()) {
+      @if (summaryLoading()) {
         <mat-spinner diameter="24" />
       } @else {
-        <span class="stat-value">{{ weekEventsCount() }}</span>
+        <span class="stat-value">{{ eventCounts()?.semana ?? 0 }}</span>
       }
       <span class="stat-label">Esta semana</span>
     </mat-card-content>
@@ -115,10 +115,10 @@
   <mat-card class="stat-card" (click)="goToMonthEvents()">
     <mat-card-content>
       <mat-icon>calendar_view_month</mat-icon>
-      @if (allEventsLoading()) {
+      @if (summaryLoading()) {
         <mat-spinner diameter="24" />
       } @else {
-        <span class="stat-value">{{ monthEventsCount() }}</span>
+        <span class="stat-value">{{ eventCounts()?.mes ?? 0 }}</span>
       }
       <span class="stat-label">Este mês</span>
     </mat-card-content>
@@ -127,17 +127,17 @@
   <mat-card class="stat-card" (click)="goToEventos()">
     <mat-card-content>
       <mat-icon>event_note</mat-icon>
-      @if (allEventsLoading()) {
+      @if (summaryLoading()) {
         <mat-spinner diameter="24" />
       } @else {
-        <span class="stat-value">{{ yearEventsCount() }}</span>
+        <span class="stat-value">{{ eventCounts()?.ano ?? 0 }}</span>
       }
       <span class="stat-label">Este ano</span>
     </mat-card-content>
   </mat-card>
 </div>
 
-@if (eventStats(); as stats) {
+@if (eventCounts(); as counts) {
   <mat-card class="breakdown-card">
     <mat-card-header>
       <mat-card-title>Eventos por período</mat-card-title>
@@ -148,20 +148,20 @@
         <div class="breakdown-bar">
           <div
             class="breakdown-bar-fill breakdown-bar-fill--diurno"
-            [style.width.%]="stats.total ? (stats.diurno / stats.total) * 100 : 0"
+            [style.width.%]="counts.total ? (counts.diurno / counts.total) * 100 : 0"
           ></div>
         </div>
-        <span class="breakdown-value">{{ stats.diurno }}</span>
+        <span class="breakdown-value">{{ counts.diurno }}</span>
       </div>
       <div class="breakdown-row">
         <span class="breakdown-label">Noturno</span>
         <div class="breakdown-bar">
           <div
             class="breakdown-bar-fill breakdown-bar-fill--noturno"
-            [style.width.%]="stats.total ? (stats.noturno / stats.total) * 100 : 0"
+            [style.width.%]="counts.total ? (counts.noturno / counts.total) * 100 : 0"
           ></div>
         </div>
-        <span class="breakdown-value">{{ stats.noturno }}</span>
+        <span class="breakdown-value">{{ counts.noturno }}</span>
       </div>
     </mat-card-content>
   </mat-card>
@@ -185,7 +185,7 @@
       }
     </mat-card-header>
     <mat-card-content>
-      @if (upcomingLoading()) {
+      @if (summaryLoading()) {
         <div class="loading-container">
           <mat-spinner diameter="32" />
         </div>
@@ -220,7 +220,7 @@
         <mat-card-title>Pendentes de revisão</mat-card-title>
       </mat-card-header>
       <mat-card-content>
-        @if (pendingReviewLoading()) {
+        @if (summaryLoading()) {
           <div class="loading-container">
             <mat-spinner diameter="32" />
           </div>
@@ -248,7 +248,7 @@
         <button mat-button class="see-all-button" (click)="goToAuditoria()">Ver tudo</button>
       </mat-card-header>
       <mat-card-content>
-        @if (recentActivityLoading()) {
+        @if (summaryLoading()) {
           <div class="loading-container">
             <mat-spinner diameter="32" />
           </div>
