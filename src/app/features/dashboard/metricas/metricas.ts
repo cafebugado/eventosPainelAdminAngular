@@ -12,10 +12,18 @@ import { MatIconModule } from '@angular/material/icon';
 import { MatProgressSpinnerModule } from '@angular/material/progress-spinner';
 import { ChartConfiguration, ChartData, Chart, registerables } from 'chart.js';
 import { BaseChartDirective } from 'ng2-charts';
-import { EventoMetrics } from '../../../core/models/evento.model';
+import { EventoMetrics, EventoStatus } from '../../../core/models/evento.model';
 import { EventService } from '../../../core/services/event.service';
 
 Chart.register(...registerables);
+
+const STATUS_LABELS: Record<EventoStatus, string> = {
+  publicado: 'Publicado',
+  rascunho: 'Rascunho',
+  arquivado: 'Arquivado',
+  em_analise: 'Em análise',
+  recusado: 'Recusado',
+};
 
 @Component({
   selector: 'app-metricas',
@@ -77,10 +85,52 @@ export class Metricas implements OnInit {
     return data.map((item) => item.percentual);
   });
 
+  private readonly periodoLabels: Record<string, string> = {
+    Noturno: 'Noite',
+    Diurno: 'Dia todo',
+    Matinal: 'Manhã',
+    Vespertino: 'Tarde',
+  };
+
+  private percentuaisOf(totals: number[]): number[] {
+    const total = totals.reduce((sum, value) => sum + value, 0);
+    return totals.map((value) => (total > 0 ? Math.round((value / total) * 1000) / 10 : 0));
+  }
+
+  private legendOf(
+    labels: string[],
+    totals: number[],
+  ): { label: string; color: string; percentual: number }[] {
+    const percentuais = this.percentuaisOf(totals);
+    return labels.map((label, index) => ({
+      label,
+      color: this.palette(index + 1),
+      percentual: percentuais[index] ?? 0,
+    }));
+  }
+
+  private percentTooltipOptions(percentuais: number[]): ChartConfiguration['options'] {
+    return {
+      responsive: true,
+      maintainAspectRatio: false,
+      plugins: {
+        legend: { display: false },
+        tooltip: {
+          callbacks: {
+            label: (context) => {
+              const percentual = percentuais[context.dataIndex] ?? 0;
+              return `${context.label}: ${context.formattedValue} eventos (${percentual}%)`;
+            },
+          },
+        },
+      },
+    };
+  }
+
   readonly periodoChart = computed<ChartData<'doughnut'>>(() => {
     const data = this.metrics()?.por_periodo ?? [];
     return {
-      labels: data.map((item) => item.periodo),
+      labels: data.map((item) => this.periodoLabels[item.periodo] ?? item.periodo),
       datasets: [
         {
           data: data.map((item) => item.total),
@@ -90,6 +140,18 @@ export class Metricas implements OnInit {
         },
       ],
     };
+  });
+
+  private readonly periodoPercentuais = computed<number[]>(() =>
+    this.percentuaisOf((this.metrics()?.por_periodo ?? []).map((item) => item.total)),
+  );
+
+  readonly periodoLegend = computed(() => {
+    const data = this.metrics()?.por_periodo ?? [];
+    return this.legendOf(
+      data.map((item) => this.periodoLabels[item.periodo] ?? item.periodo),
+      data.map((item) => item.total),
+    );
   });
 
   readonly modalidadeChart = computed<ChartData<'pie'>>(() => {
@@ -107,10 +169,22 @@ export class Metricas implements OnInit {
     };
   });
 
+  private readonly modalidadePercentuais = computed<number[]>(() =>
+    this.percentuaisOf((this.metrics()?.por_modalidade ?? []).map((item) => item.total)),
+  );
+
+  readonly modalidadeLegend = computed(() => {
+    const data = this.metrics()?.por_modalidade ?? [];
+    return this.legendOf(
+      data.map((item) => item.modalidade),
+      data.map((item) => item.total),
+    );
+  });
+
   readonly statusChart = computed<ChartData<'doughnut'>>(() => {
     const data = this.metrics()?.por_status ?? [];
     return {
-      labels: data.map((item) => item.status),
+      labels: data.map((item) => STATUS_LABELS[item.status] ?? item.status),
       datasets: [
         {
           data: data.map((item) => item.total),
@@ -120,6 +194,18 @@ export class Metricas implements OnInit {
         },
       ],
     };
+  });
+
+  private readonly statusPercentuais = computed<number[]>(() =>
+    this.percentuaisOf((this.metrics()?.por_status ?? []).map((item) => item.total)),
+  );
+
+  readonly statusLegend = computed(() => {
+    const data = this.metrics()?.por_status ?? [];
+    return this.legendOf(
+      data.map((item) => STATUS_LABELS[item.status] ?? item.status),
+      data.map((item) => item.total),
+    );
   });
 
   readonly cidadeChart = computed<ChartData<'bar'>>(() => {
@@ -154,6 +240,14 @@ export class Metricas implements OnInit {
     };
   });
 
+  private readonly tagsPercentuais = computed<number[]>(() =>
+    this.percentuaisOf((this.metrics()?.top_tags ?? []).map((item) => item.total)),
+  );
+
+  private readonly cidadePercentuais = computed<number[]>(() =>
+    this.percentuaisOf((this.metrics()?.por_cidade ?? []).map((item) => item.total)),
+  );
+
   readonly evolucaoMensalChart = computed<ChartData<'line'>>(() => {
     const data = this.metrics()?.evolucao_mensal ?? [];
     const color = this.palette(1);
@@ -177,17 +271,39 @@ export class Metricas implements OnInit {
     };
   });
 
-  get horizontalBarOptions(): ChartConfiguration['options'] {
+  private readonly evolucaoMensalPercentuais = computed<number[]>(() =>
+    this.percentuaisOf((this.metrics()?.evolucao_mensal ?? []).map((item) => item.total)),
+  );
+
+  private horizontalBarOptionsWithPercent(percentuais: number[]): ChartConfiguration['options'] {
     return {
       indexAxis: 'y',
       responsive: true,
       maintainAspectRatio: false,
-      plugins: { legend: { display: false } },
+      plugins: {
+        legend: { display: false },
+        tooltip: {
+          callbacks: {
+            label: (context) => {
+              const percentual = percentuais[context.dataIndex] ?? 0;
+              return `${context.formattedValue} eventos (${percentual}%)`;
+            },
+          },
+        },
+      },
       scales: {
         x: { grid: { color: this.gridColor }, ticks: { color: this.axisColor } },
         y: { grid: { display: false }, ticks: { color: this.axisColor } },
       },
     };
+  }
+
+  get tagsOptions(): ChartConfiguration['options'] {
+    return this.horizontalBarOptionsWithPercent(this.tagsPercentuais());
+  }
+
+  get cidadeOptions(): ChartConfiguration['options'] {
+    return this.horizontalBarOptionsWithPercent(this.cidadePercentuais());
   }
 
   get barOptions(): ChartConfiguration['options'] {
@@ -225,19 +341,34 @@ export class Metricas implements OnInit {
     };
   }
 
-  get pieOptions(): ChartConfiguration['options'] {
-    return {
-      responsive: true,
-      maintainAspectRatio: false,
-      plugins: { legend: { position: 'bottom', labels: { color: this.axisColor } } },
-    };
+  get periodoOptions(): ChartConfiguration['options'] {
+    return this.percentTooltipOptions(this.periodoPercentuais());
+  }
+
+  get modalidadeOptions(): ChartConfiguration['options'] {
+    return this.percentTooltipOptions(this.modalidadePercentuais());
+  }
+
+  get statusOptions(): ChartConfiguration['options'] {
+    return this.percentTooltipOptions(this.statusPercentuais());
   }
 
   get lineOptions(): ChartConfiguration['options'] {
+    const percentuais = this.evolucaoMensalPercentuais();
     return {
       responsive: true,
       maintainAspectRatio: false,
-      plugins: { legend: { display: false } },
+      plugins: {
+        legend: { display: false },
+        tooltip: {
+          callbacks: {
+            label: (context) => {
+              const percentual = percentuais[context.dataIndex] ?? 0;
+              return `${context.formattedValue} eventos (${percentual}%)`;
+            },
+          },
+        },
+      },
       scales: {
         x: { grid: { display: false }, ticks: { color: this.axisColor } },
         y: { grid: { color: this.gridColor }, ticks: { color: this.axisColor } },

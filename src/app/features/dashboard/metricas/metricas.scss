@@ -97,4 +97,54 @@
   &--wide {
     grid-column: 1 / -1;
   }
+
+  &__content--with-legend {
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+  }
+
+  &__canvas-wrap {
+    position: relative;
+    flex: 1;
+    min-height: 0;
+  }
+}
+
+.chart-legend {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 4px 16px;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+
+  &__item {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    min-width: 0;
+    font: var(--mat-sys-body-small);
+    color: var(--mat-sys-on-surface-variant);
+  }
+
+  &__swatch {
+    flex: none;
+    width: 10px;
+    height: 10px;
+    border-radius: 50%;
+  }
+
+  &__label {
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+  }
+
+  &__percent {
+    flex: none;
+    margin-left: auto;
+    font-weight: 600;
+    color: var(--mat-sys-on-surface);
+  }
 }

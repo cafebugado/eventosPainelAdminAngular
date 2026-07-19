@@ -39,8 +39,19 @@
       <mat-card-header>
         <mat-card-title>Distribuição por período</mat-card-title>
       </mat-card-header>
-      <mat-card-content>
-        <canvas baseChart [data]="periodoChart()" [options]="pieOptions" type="doughnut"></canvas>
+      <mat-card-content class="chart-card__content--with-legend">
+        <div class="chart-card__canvas-wrap">
+          <canvas baseChart [data]="periodoChart()" [options]="periodoOptions" type="doughnut"></canvas>
+        </div>
+        <ul class="chart-legend">
+          @for (item of periodoLegend(); track item.label) {
+            <li class="chart-legend__item">
+              <span class="chart-legend__swatch" [style.background]="item.color"></span>
+              <span class="chart-legend__label">{{ item.label }}</span>
+              <span class="chart-legend__percent">{{ item.percentual }}%</span>
+            </li>
+          }
+        </ul>
       </mat-card-content>
     </mat-card>
 
@@ -48,8 +59,19 @@
       <mat-card-header>
         <mat-card-title>Modalidade</mat-card-title>
       </mat-card-header>
-      <mat-card-content>
-        <canvas baseChart [data]="modalidadeChart()" [options]="pieOptions" type="pie"></canvas>
+      <mat-card-content class="chart-card__content--with-legend">
+        <div class="chart-card__canvas-wrap">
+          <canvas baseChart [data]="modalidadeChart()" [options]="modalidadeOptions" type="pie"></canvas>
+        </div>
+        <ul class="chart-legend">
+          @for (item of modalidadeLegend(); track item.label) {
+            <li class="chart-legend__item">
+              <span class="chart-legend__swatch" [style.background]="item.color"></span>
+              <span class="chart-legend__label">{{ item.label }}</span>
+              <span class="chart-legend__percent">{{ item.percentual }}%</span>
+            </li>
+          }
+        </ul>
       </mat-card-content>
     </mat-card>
 
@@ -57,8 +79,19 @@
       <mat-card-header>
         <mat-card-title>Status dos eventos</mat-card-title>
       </mat-card-header>
-      <mat-card-content>
-        <canvas baseChart [data]="statusChart()" [options]="pieOptions" type="doughnut"></canvas>
+      <mat-card-content class="chart-card__content--with-legend">
+        <div class="chart-card__canvas-wrap">
+          <canvas baseChart [data]="statusChart()" [options]="statusOptions" type="doughnut"></canvas>
+        </div>
+        <ul class="chart-legend">
+          @for (item of statusLegend(); track item.label) {
+            <li class="chart-legend__item">
+              <span class="chart-legend__swatch" [style.background]="item.color"></span>
+              <span class="chart-legend__label">{{ item.label }}</span>
+              <span class="chart-legend__percent">{{ item.percentual }}%</span>
+            </li>
+          }
+        </ul>
       </mat-card-content>
     </mat-card>
 
@@ -67,7 +100,7 @@
         <mat-card-title>Top tags</mat-card-title>
       </mat-card-header>
       <mat-card-content>
-        <canvas baseChart [data]="tagsChart()" [options]="horizontalBarOptions" type="bar"></canvas>
+        <canvas baseChart [data]="tagsChart()" [options]="tagsOptions" type="bar"></canvas>
       </mat-card-content>
     </mat-card>
 
@@ -76,7 +109,7 @@
         <mat-card-title>Top cidades</mat-card-title>
       </mat-card-header>
       <mat-card-content>
-        <canvas baseChart [data]="cidadeChart()" [options]="horizontalBarOptions" type="bar"></canvas>
+        <canvas baseChart [data]="cidadeChart()" [options]="cidadeOptions" type="bar"></canvas>
       </mat-card-content>
     </mat-card>
 
