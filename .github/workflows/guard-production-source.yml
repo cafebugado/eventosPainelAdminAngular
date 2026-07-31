@@ -1,0 +1,19 @@
+name: Guard Production Source
+
+on:
+  pull_request:
+    types: [opened, edited, synchronize, reopened]
+    branches: [production]
+
+jobs:
+  check-source-branch:
+    name: check-source-branch
+    runs-on: ubuntu-latest
+    steps:
+      - name: Ensure PR into production comes from development
+        run: |
+          if [ "${{ github.event.pull_request.head.ref }}" != "development" ]; then
+            echo "PRs para 'production' só podem vir da branch 'development'. Origem encontrada: ${{ github.event.pull_request.head.ref }}"
+            exit 1
+          fi
+          echo "Origem válida: development"

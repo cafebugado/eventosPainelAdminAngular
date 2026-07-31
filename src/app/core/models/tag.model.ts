@@ -20,6 +20,4 @@ export interface SetEventTagsRequest {
   tag_ids: string[];
 }
 
-export interface EventTagsMap {
-  [eventoId: string]: string[];
-}
+export type EventTagsMap = Record<string, string[]>;
