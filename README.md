@@ -65,6 +65,23 @@ Veja o passo a passo completo (como configurar, onde fica o código, como verifi
 que cada ferramenta está funcionando) em
 [docs/OBSERVABILIDADE.md](docs/OBSERVABILIDADE.md).
 
+## Fluxo de branches / CI-CD
+
+O repositório tem duas branches de longa duração:
+
+- **`production`** — branch padrão do repositório (para quem clona/visita o repo), reflete o que está em produção. Só recebe merge vindo de `development`.
+- **`development`** — onde o trabalho do dia a dia acontece.
+
+**Importante:** como `production` é a branch padrão, `git clone` e o botão "New branch" do GitHub partem dela por padrão. Toda branch nova deve ser criada a partir de `development`, não de `production`:
+
+```bash
+git checkout development
+git pull
+git checkout -b minha-branch
+```
+
+PRs para `production` que não vierem de `development` são bloqueados automaticamente (workflow `guard-production-source`). Tanto PRs para `development` quanto para `production` exigem checks de CI (build/test/lint) verdes e pelo menos 1 aprovação.
+
 ## Additional Resources
 
 For more information on using the Angular CLI, including detailed command references, visit the [Angular CLI Overview and Command Reference](https://angular.dev/tools/cli) page.
