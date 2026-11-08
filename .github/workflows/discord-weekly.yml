@@ -1,0 +1,33 @@
+name: Discord · Resumo semanal
+
+# Toda segunda às 09:00 (Brasília) posta o resumo da semana no #api-geral.
+
+on:
+  schedule:
+    - cron: '0 12 * * 1'
+  workflow_dispatch:
+
+permissions:
+  contents: read
+  issues: read
+  pull-requests: read
+  deployments: read
+
+jobs:
+  weekly:
+    runs-on: ubuntu-latest
+    timeout-minutes: 3
+    steps:
+      - uses: actions/checkout@v7
+        with:
+          sparse-checkout: .github/discord
+          persist-credentials: false
+
+      - name: Postar resumo
+        if: hashFiles('.github/discord/notify.mjs') != ''
+        run: node .github/discord/notify.mjs weekly
+        env:
+          DISCORD_CONFIG: ${{ vars.DISCORD_CONFIG }}
+          DISCORD_WEBHOOKS: ${{ secrets.DISCORD_WEBHOOKS }}
+          DISCORD_BOT_TOKEN: ${{ secrets.DISCORD_BOT_TOKEN }}
+          GITHUB_TOKEN: ${{ github.token }}
