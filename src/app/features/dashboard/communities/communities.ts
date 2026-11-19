@@ -1,4 +1,4 @@
-import { Component, OnInit, inject } from '@angular/core';
+import { Component, OnInit, inject, ChangeDetectionStrategy } from '@angular/core';
 import { MatButtonModule } from '@angular/material/button';
 import { MatCardModule } from '@angular/material/card';
 import { MatDialog } from '@angular/material/dialog';
@@ -8,12 +8,16 @@ import { CommunityRead } from '../../../core/models/community.model';
 import { CommunityService } from '../../../core/services/community.service';
 import { ConfirmDialog } from '../../../shared/components/confirm-dialog/confirm-dialog';
 import { NotificationService } from '../../../shared/services/notification.service';
-import { CommunityFormDialog, CommunityFormDialogData } from './community-form-dialog/community-form-dialog';
+import {
+  CommunityFormDialog,
+  CommunityFormDialogData,
+} from './community-form-dialog/community-form-dialog';
 
 @Component({
   selector: 'app-communities',
   imports: [MatButtonModule, MatCardModule, MatIconModule, MatProgressSpinnerModule],
   templateUrl: './communities.html',
+  changeDetection: ChangeDetectionStrategy.Eager,
   styleUrl: './communities.scss',
 })
 export class Communities implements OnInit {

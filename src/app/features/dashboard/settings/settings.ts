@@ -1,4 +1,11 @@
-import { Component, OnInit, computed, inject, signal } from '@angular/core';
+import {
+  Component,
+  OnInit,
+  computed,
+  inject,
+  signal,
+  ChangeDetectionStrategy,
+} from '@angular/core';
 import { FormBuilder, ReactiveFormsModule, Validators } from '@angular/forms';
 import { MatButtonModule } from '@angular/material/button';
 import { MatCardModule } from '@angular/material/card';
@@ -10,7 +17,12 @@ import { MatProgressSpinnerModule } from '@angular/material/progress-spinner';
 import { MatSelectModule } from '@angular/material/select';
 import { AuthService } from '../../../core/services/auth.service';
 import { ProfileService } from '../../../core/services/profile.service';
-import { GENERO_OPCOES, NIVEL_EXPERIENCIA_OPCOES, UserProfileRead, UserProfileUpsert } from '../../../core/models/user.model';
+import {
+  GENERO_OPCOES,
+  NIVEL_EXPERIENCIA_OPCOES,
+  UserProfileRead,
+  UserProfileUpsert,
+} from '../../../core/models/user.model';
 import { NotificationService } from '../../../shared/services/notification.service';
 import { minAgeValidator } from '../../../shared/validators/min-age.validator';
 import { ChangePasswordDialog } from './change-password-dialog/change-password-dialog';
@@ -28,6 +40,7 @@ import { ChangePasswordDialog } from './change-password-dialog/change-password-d
     MatSelectModule,
   ],
   templateUrl: './settings.html',
+  changeDetection: ChangeDetectionStrategy.Eager,
   styleUrl: './settings.scss',
 })
 export class Settings implements OnInit {
@@ -136,7 +149,8 @@ export class Settings implements OnInit {
         cargo_atual: value.cargo_atual || null,
         empresa: value.empresa || null,
         area_atuacao: value.area_atuacao || null,
-        nivel_experiencia: (value.nivel_experiencia || null) as UserProfileUpsert['nivel_experiencia'],
+        nivel_experiencia: (value.nivel_experiencia ||
+          null) as UserProfileUpsert['nivel_experiencia'],
         github_username: value.github_username || null,
         linkedin_url: value.linkedin_url || null,
         portfolio_url: value.portfolio_url || null,

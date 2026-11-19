@@ -1,4 +1,4 @@
-import { Component, computed, inject, output } from '@angular/core';
+import { Component, computed, inject, output, ChangeDetectionStrategy } from '@angular/core';
 import { Router, RouterLink, RouterLinkActive } from '@angular/router';
 import { MatButtonModule } from '@angular/material/button';
 import { MatIconModule } from '@angular/material/icon';
@@ -12,8 +12,16 @@ import { MENU_ITEMS, SITE_URL } from '../../menu-items';
 
 @Component({
   selector: 'app-admin-mobile-nav',
-  imports: [RouterLink, RouterLinkActive, MatButtonModule, MatIconModule, MatToolbarModule, RoleLabelPipe],
+  imports: [
+    RouterLink,
+    RouterLinkActive,
+    MatButtonModule,
+    MatIconModule,
+    MatToolbarModule,
+    RoleLabelPipe,
+  ],
   templateUrl: './admin-mobile-nav.html',
+  changeDetection: ChangeDetectionStrategy.Eager,
   styleUrl: './admin-mobile-nav.scss',
 })
 export class AdminMobileNav {
@@ -28,7 +36,9 @@ export class AdminMobileNav {
   readonly siteUrl = SITE_URL;
 
   readonly menuItems = computed(() =>
-    MENU_ITEMS.filter((item) => !item.permission || this.roleService.permissions()[item.permission]),
+    MENU_ITEMS.filter(
+      (item) => !item.permission || this.roleService.permissions()[item.permission],
+    ),
   );
 
   toggleTheme(): void {
