@@ -63,7 +63,7 @@ export class Contributors implements OnInit {
     const ref = this.dialog.open(ConfirmDialog, {
       data: {
         title: 'Excluir contribuinte',
-        message: `Tem certeza que deseja excluir "${contributor.nome ?? contributor.github_username}"?`,
+        message: `Tem certeza que deseja excluir "${contributor.nome || contributor.github_username}"?`,
       },
     });
 
