@@ -11,6 +11,7 @@ import { NotificationService } from '../../../shared/services/notification.servi
 import {
   CommunityFormDialog,
   CommunityFormDialogData,
+  CommunityFormDialogResult,
 } from './community-form-dialog/community-form-dialog';
 
 @Component({
@@ -41,24 +42,20 @@ export class Communities implements OnInit {
   }
 
   private openFormDialog(data: CommunityFormDialogData): void {
-    const ref = this.dialog.open(CommunityFormDialog, { data });
+    // O diálogo faz o salvamento e só fecha com `true` em caso de sucesso.
+    const ref = this.dialog.open<CommunityFormDialog, CommunityFormDialogData, CommunityFormDialogResult>(
+      CommunityFormDialog,
+      { data },
+    );
 
-    ref.afterClosed().subscribe((result) => {
-      if (!result) return;
+    ref.afterClosed().subscribe((saved) => {
+      if (!saved) return;
 
-      const request = data.community
-        ? this.communityService.updateCommunity(data.community.id, result)
-        : this.communityService.createCommunity(result);
-
-      request.subscribe({
-        next: () => {
-          this.notification.showNotification(
-            data.community ? 'Comunidade atualizada com sucesso' : 'Comunidade criada com sucesso',
-            'success',
-          );
-          this.communityService.getCommunities().subscribe();
-        },
-      });
+      this.notification.showNotification(
+        data.community ? 'Comunidade atualizada com sucesso' : 'Comunidade criada com sucesso',
+        'success',
+      );
+      this.communityService.getCommunities().subscribe();
     });
   }
 

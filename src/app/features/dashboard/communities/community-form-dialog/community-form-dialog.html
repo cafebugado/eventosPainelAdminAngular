@@ -16,6 +16,22 @@
 </mat-dialog-content>
 
 <mat-dialog-actions align="end">
-  <button mat-flat-button class="cancel-action-button" (click)="cancel()">Cancelar</button>
-  <button mat-flat-button class="secondary-action-button" (click)="save()">Salvar</button>
+  <button mat-flat-button class="cancel-action-button" type="button" (click)="cancel()" [disabled]="saving()">
+    Cancelar
+  </button>
+  <button
+    mat-flat-button
+    class="secondary-action-button save-button"
+    type="button"
+    (click)="save()"
+    [disabled]="saving()"
+    [attr.aria-busy]="saving()"
+  >
+    @if (saving()) {
+      <mat-spinner diameter="18" />
+      Salvando...
+    } @else {
+      Salvar
+    }
+  </button>
 </mat-dialog-actions>
