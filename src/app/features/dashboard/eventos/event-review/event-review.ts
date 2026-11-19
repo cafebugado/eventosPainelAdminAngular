@@ -1,5 +1,12 @@
 import { DatePipe, Location } from '@angular/common';
-import { Component, OnInit, computed, inject, signal } from '@angular/core';
+import {
+  Component,
+  OnInit,
+  computed,
+  inject,
+  signal,
+  ChangeDetectionStrategy,
+} from '@angular/core';
 import { ActivatedRoute, Router } from '@angular/router';
 import { filter, finalize, forkJoin, of, switchMap } from 'rxjs';
 import { MatButtonModule } from '@angular/material/button';
@@ -27,6 +34,7 @@ const STATUS_LABELS: Record<EventoStatus, string> = {
   selector: 'app-event-review',
   imports: [DatePipe, MatButtonModule, MatCardModule, MatIconModule, MatProgressSpinnerModule],
   templateUrl: './event-review.html',
+  changeDetection: ChangeDetectionStrategy.Eager,
   styleUrl: './event-review.scss',
 })
 export class EventReview implements OnInit {

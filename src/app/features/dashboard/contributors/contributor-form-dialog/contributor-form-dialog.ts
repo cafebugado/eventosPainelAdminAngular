@@ -1,5 +1,11 @@
-import { Component, inject, signal } from '@angular/core';
-import { FormBuilder, ReactiveFormsModule, ValidationErrors, ValidatorFn, Validators } from '@angular/forms';
+import { Component, inject, signal, ChangeDetectionStrategy } from '@angular/core';
+import {
+  FormBuilder,
+  ReactiveFormsModule,
+  ValidationErrors,
+  ValidatorFn,
+  Validators,
+} from '@angular/forms';
 import { MatButtonModule } from '@angular/material/button';
 import {
   MAT_DIALOG_DATA,
@@ -38,11 +44,13 @@ function githubUsernameValidator(): ValidatorFn {
 }
 
 function linkedinValidator(): ValidatorFn {
-  return (control): ValidationErrors | null => (isValidLinkedInUrl(control.value) ? null : { linkedin: true });
+  return (control): ValidationErrors | null =>
+    isValidLinkedInUrl(control.value) ? null : { linkedin: true };
 }
 
 function portfolioValidator(): ValidatorFn {
-  return (control): ValidationErrors | null => (isValidPortfolioUrl(control.value) ? null : { portfolio: true });
+  return (control): ValidationErrors | null =>
+    isValidPortfolioUrl(control.value) ? null : { portfolio: true };
 }
 
 @Component({
@@ -59,6 +67,7 @@ function portfolioValidator(): ValidatorFn {
     MatProgressSpinnerModule,
   ],
   templateUrl: './contributor-form-dialog.html',
+  changeDetection: ChangeDetectionStrategy.Eager,
   styleUrl: './contributor-form-dialog.scss',
 })
 export class ContributorFormDialog {
@@ -81,7 +90,10 @@ export class ContributorFormDialog {
     : null;
 
   readonly form = this.fb.nonNullable.group({
-    github_username: [this.data?.contributor?.github_username ?? '', [Validators.required, githubUsernameValidator()]],
+    github_username: [
+      this.data?.contributor?.github_username ?? '',
+      [Validators.required, githubUsernameValidator()],
+    ],
     nome: [this.data?.contributor?.nome ?? ''],
     avatar_url: [this.data?.contributor?.avatar_url ?? ''],
     linkedin_url: [this.data?.contributor?.linkedin_url ?? '', linkedinValidator()],

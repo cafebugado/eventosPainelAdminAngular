@@ -1,5 +1,12 @@
 import { DatePipe } from '@angular/common';
-import { Component, OnInit, computed, inject, signal } from '@angular/core';
+import {
+  Component,
+  OnInit,
+  computed,
+  inject,
+  signal,
+  ChangeDetectionStrategy,
+} from '@angular/core';
 import { FormsModule } from '@angular/forms';
 import { MatButtonModule } from '@angular/material/button';
 import { MatDialog } from '@angular/material/dialog';
@@ -31,6 +38,7 @@ const PAGE_SIZE = 20;
     Pagination,
   ],
   templateUrl: './audit-log.html',
+  changeDetection: ChangeDetectionStrategy.Eager,
   styleUrl: './audit-log.scss',
 })
 export class AuditLog implements OnInit {

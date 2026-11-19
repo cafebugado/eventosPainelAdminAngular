@@ -36,6 +36,10 @@ module.exports = defineConfig([
         { argsIgnorePattern: '^_', varsIgnorePattern: '^_', ignoreRestSiblings: true },
       ],
       '@typescript-eslint/no-empty-function': ['error', { allow: ['arrowFunctions'] }],
+      // A migração do Angular 22 marcou os componentes com ChangeDetectionStrategy.Eager
+      // para preservar o comportamento da v21. Migrar para OnPush é uma mudança de
+      // comportamento e deve ser feita em um PR próprio, componente a componente.
+      '@angular-eslint/prefer-on-push-component-change-detection': 'off',
     },
   },
   {
