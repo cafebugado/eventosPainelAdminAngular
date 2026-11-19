@@ -16,7 +16,11 @@ import { GalleryService } from '../../../core/services/gallery.service';
 import { ConfirmDialog } from '../../../shared/components/confirm-dialog/confirm-dialog';
 import { NotificationService } from '../../../shared/services/notification.service';
 import { validateImageFile } from '../../../shared/utils/image-validators.util';
-import { AlbumFormDialog, AlbumFormDialogData } from './album-form-dialog/album-form-dialog';
+import {
+  AlbumFormDialog,
+  AlbumFormDialogData,
+  AlbumFormDialogResult,
+} from './album-form-dialog/album-form-dialog';
 import { PhotoCaptionEditor } from './photo-caption-editor/photo-caption-editor';
 
 @Component({
@@ -71,17 +75,17 @@ export class Gallery implements OnInit {
 
   openCreateDialog(): void {
     const data: AlbumFormDialogData = {};
-    const ref = this.dialog.open(AlbumFormDialog, { data, width: '420px' });
+    // O diálogo faz o salvamento e só fecha com `true` em caso de sucesso.
+    const ref = this.dialog.open<AlbumFormDialog, AlbumFormDialogData, AlbumFormDialogResult>(AlbumFormDialog, {
+      data,
+      width: '420px',
+    });
 
-    ref.afterClosed().subscribe((result) => {
-      if (!result) return;
+    ref.afterClosed().subscribe((saved) => {
+      if (!saved) return;
 
-      this.galleryService.createAlbum(result).subscribe({
-        next: () => {
-          this.notification.showNotification('Álbum criado com sucesso', 'success');
-          this.galleryService.getAlbuns().subscribe();
-        },
-      });
+      this.notification.showNotification('Álbum criado com sucesso', 'success');
+      this.galleryService.getAlbuns().subscribe();
     });
   }
 
