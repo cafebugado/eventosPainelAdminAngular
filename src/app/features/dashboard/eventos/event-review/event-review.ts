@@ -8,7 +8,7 @@ import {
   ChangeDetectionStrategy,
 } from '@angular/core';
 import { ActivatedRoute, Router } from '@angular/router';
-import { filter, finalize, forkJoin, of, switchMap } from 'rxjs';
+import { finalize, forkJoin, of, switchMap } from 'rxjs';
 import { MatButtonModule } from '@angular/material/button';
 import { MatCardModule } from '@angular/material/card';
 import { MatDialog } from '@angular/material/dialog';
@@ -18,7 +18,11 @@ import { EventoStatus, EventoWithTags } from '../../../../core/models/evento.mod
 import { EventService } from '../../../../core/services/event.service';
 import { TagService } from '../../../../core/services/tag.service';
 import { NotificationService } from '../../../../shared/services/notification.service';
-import { RejectEventDialog } from './reject-event-dialog/reject-event-dialog';
+import {
+  RejectEventDialog,
+  RejectEventDialogData,
+  RejectEventDialogResult,
+} from './reject-event-dialog/reject-event-dialog';
 
 type ReviewAction = 'approve' | 'reject';
 
@@ -76,15 +80,35 @@ export class EventReview implements OnInit {
   }
 
   approveEvent(): void {
-    this.review('approve');
+    const event = this.event();
+    if (!event || this.reviewing() || !this.canReview()) return;
+
+    this.reviewing.set('approve');
+    this.eventService
+      .approveEvent(event.id)
+      .pipe(finalize(() => this.reviewing.set(null)))
+      .subscribe({
+        next: () => this.finishReview('Evento aprovado com sucesso'),
+        error: () => this.notification.showNotification('Erro ao revisar evento', 'error'),
+      });
   }
 
+  /**
+   * O diálogo envia a recusa e só fecha com `true` em caso de sucesso; em erro,
+   * continua aberto com o motivo digitado.
+   */
   rejectEvent(): void {
+    const event = this.event();
+    if (!event || this.reviewing() || !this.canReview()) return;
+
     this.dialog
-      .open(RejectEventDialog)
+      .open<RejectEventDialog, RejectEventDialogData, RejectEventDialogResult>(RejectEventDialog, {
+        data: { eventId: event.id },
+      })
       .afterClosed()
-      .pipe(filter((motivo): motivo is string => !!motivo))
-      .subscribe((motivo) => this.review('reject', motivo));
+      .subscribe((rejected) => {
+        if (rejected) this.finishReview('Evento recusado');
+      });
   }
 
   private loadEvent(slugOrId: string): void {
@@ -109,27 +133,8 @@ export class EventReview implements OnInit {
       });
   }
 
-  private review(action: ReviewAction, motivo?: string): void {
-    const event = this.event();
-    if (!event || this.reviewing() || !this.canReview()) return;
-
-    this.reviewing.set(action);
-    const request$ =
-      action === 'approve'
-        ? this.eventService.approveEvent(event.id)
-        : this.eventService.rejectEvent(event.id, motivo ?? '');
-
-    request$.pipe(finalize(() => this.reviewing.set(null))).subscribe({
-      next: () => {
-        this.notification.showNotification(
-          action === 'approve' ? 'Evento aprovado com sucesso' : 'Evento recusado',
-          'success',
-        );
-        this.router.navigate(['/admin/dashboard/eventos']);
-      },
-      error: () => {
-        this.notification.showNotification('Erro ao revisar evento', 'error');
-      },
-    });
+  private finishReview(message: string): void {
+    this.notification.showNotification(message, 'success');
+    this.router.navigate(['/admin/dashboard/eventos']);
   }
 }
