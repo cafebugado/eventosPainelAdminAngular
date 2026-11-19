@@ -110,9 +110,10 @@ export class ContributorFormDialog {
     this.searchingGithub.set(true);
     this.contributorService.fetchGitHubUser(username).subscribe({
       next: (info) => {
+        // O nome do perfil no GitHub pode vir com espaços nas pontas (ex.: "Dario Reis ").
         this.form.patchValue({
-          nome: info.nome || this.form.controls.nome.value,
-          avatar_url: info.avatar_url || this.form.controls.avatar_url.value,
+          nome: info.nome?.trim() || this.form.controls.nome.value,
+          avatar_url: info.avatar_url?.trim() || this.form.controls.avatar_url.value,
         });
         // Vale só para este username: se ele mudar, o envio volta ao endereço padrão.
         if (info.github_url) this.knownGithubUrl = { username, url: info.github_url };
