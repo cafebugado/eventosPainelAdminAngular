@@ -27,6 +27,9 @@ export interface ContributorFormDialogData {
   contributor?: ContributorRead;
 }
 
+/** Valor devolvido ao fechar: `true` quando o contribuinte foi salvo. */
+export type ContributorFormDialogResult = boolean | undefined;
+
 function githubUsernameValidator(): ValidatorFn {
   return (control): ValidationErrors | null => {
     if (!control.value) return null;
@@ -60,13 +63,14 @@ function portfolioValidator(): ValidatorFn {
 })
 export class ContributorFormDialog {
   private readonly fb = inject(FormBuilder);
-  private readonly dialogRef = inject(MatDialogRef<ContributorFormDialog>);
+  private readonly dialogRef = inject<MatDialogRef<ContributorFormDialog, ContributorFormDialogResult>>(MatDialogRef);
   private readonly contributorService = inject(ContributorService);
   private readonly notification = inject(NotificationService);
   readonly data = inject<ContributorFormDialogData>(MAT_DIALOG_DATA);
 
   readonly isEdit = !!this.data?.contributor;
   readonly searchingGithub = signal(false);
+  readonly saving = signal(false);
 
   /**
    * `github_url` conhecido para um username (o já salvo, na edição). Só é usado
@@ -110,16 +114,41 @@ export class ContributorFormDialog {
   }
 
   onCancel(): void {
+    if (this.saving()) return;
     this.dialogRef.close();
   }
 
+  /**
+   * Salva pelo próprio diálogo: ele só fecha em caso de sucesso. Em erro, os
+   * dados continuam no formulário e o interceptor global mostra o motivo.
+   */
   onSubmit(): void {
+    if (this.saving()) return;
     if (this.form.invalid) {
       this.form.markAllAsTouched();
       return;
     }
 
-    this.dialogRef.close(this.buildPayload());
+    const payload = this.buildPayload();
+    const contributor = this.data?.contributor;
+    const request = contributor
+      ? this.contributorService.updateContributor(contributor.id, payload)
+      : this.contributorService.createContributor(payload);
+
+    this.setSaving(true);
+    request.subscribe({
+      next: () => {
+        this.setSaving(false);
+        this.dialogRef.close(true);
+      },
+      error: () => this.setSaving(false),
+    });
+  }
+
+  private setSaving(saving: boolean): void {
+    this.saving.set(saving);
+    // Impede fechar com Esc ou clique fora durante o envio.
+    this.dialogRef.disableClose = saving;
   }
 
   private buildPayload(): ContributorCreate {

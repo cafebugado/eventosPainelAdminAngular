@@ -1,6 +1,6 @@
-import { TestBed } from '@angular/core/testing';
+import { ComponentFixture, TestBed } from '@angular/core/testing';
 import { MAT_DIALOG_DATA, MatDialogRef } from '@angular/material/dialog';
-import { Observable, of, throwError } from 'rxjs';
+import { Observable, of, Subject, throwError } from 'rxjs';
 import { ContributorRead, GitHubUserInfo } from '../../../../core/models/contributor.model';
 import { ContributorService } from '../../../../core/services/contributor.service';
 import { NotificationService } from '../../../../shared/services/notification.service';
@@ -34,12 +34,13 @@ describe('ContributorFormDialog', () => {
   };
   let dialogRef: { close: ReturnType<typeof vi.fn>; disableClose: boolean };
   let notification: { showNotification: ReturnType<typeof vi.fn> };
+  let fixture: ComponentFixture<ContributorFormDialog>;
 
   function setup(data: ContributorFormDialogData = {}): ContributorFormDialog {
     service = {
       fetchGitHubUser: vi.fn(),
-      createContributor: vi.fn(),
-      updateContributor: vi.fn(),
+      createContributor: vi.fn(() => of(EXISTING)),
+      updateContributor: vi.fn(() => of(EXISTING)),
     };
     dialogRef = { close: vi.fn(), disableClose: false };
     notification = { showNotification: vi.fn() };
@@ -53,14 +54,16 @@ describe('ContributorFormDialog', () => {
         { provide: MAT_DIALOG_DATA, useValue: data },
       ],
     });
-    const fixture = TestBed.createComponent(ContributorFormDialog);
+    fixture = TestBed.createComponent(ContributorFormDialog);
     fixture.detectChanges();
     return fixture.componentInstance;
   }
 
-  /** Payload enviado no último salvamento. */
+  /** Payload enviado no último salvamento (criação ou edição). */
   function submittedPayload(): unknown {
-    return dialogRef.close.mock.lastCall?.[0];
+    const create = service.createContributor.mock.lastCall?.[0];
+    const update = service.updateContributor.mock.lastCall?.[1];
+    return create ?? update;
   }
 
   describe('buscar no GitHub', () => {
@@ -160,6 +163,145 @@ describe('ContributorFormDialog', () => {
 
       expect(service.fetchGitHubUser).not.toHaveBeenCalled();
       expect(notification.showNotification).toHaveBeenCalledWith('Informe um username válido do GitHub', 'error');
+    });
+  });
+
+  describe('salvar', () => {
+    it('cria pelo próprio diálogo e fecha com true em caso de sucesso', () => {
+      const component = setup();
+      component.form.controls.github_username.setValue('octocat');
+
+      component.onSubmit();
+
+      expect(service.createContributor).toHaveBeenCalledWith({
+        github_username: 'octocat',
+        nome: 'octocat',
+        avatar_url: 'https://github.com/octocat.png',
+        github_url: 'https://github.com/octocat',
+        linkedin_url: null,
+        portfolio_url: null,
+      });
+      expect(dialogRef.close).toHaveBeenCalledWith(true);
+      expect(component.saving()).toBe(false);
+    });
+
+    it('edita pelo id do contribuinte e fecha com true', () => {
+      const component = setup({ contributor: EXISTING });
+      component.form.controls.linkedin_url.setValue('');
+
+      component.onSubmit();
+
+      expect(service.createContributor).not.toHaveBeenCalled();
+      expect(service.updateContributor).toHaveBeenCalledWith('c1', expect.objectContaining({ linkedin_url: null }));
+      expect(dialogRef.close).toHaveBeenCalledWith(true);
+    });
+
+    it('mantém o diálogo aberto e bloqueado enquanto salva', () => {
+      const component = setup();
+      const pending = new Subject<ContributorRead>();
+      service.createContributor.mockReturnValue(pending);
+      component.form.controls.github_username.setValue('octocat');
+
+      component.onSubmit();
+
+      expect(component.saving()).toBe(true);
+      expect(dialogRef.disableClose).toBe(true);
+      expect(dialogRef.close).not.toHaveBeenCalled();
+
+      pending.next(EXISTING);
+      pending.complete();
+
+      expect(component.saving()).toBe(false);
+      expect(dialogRef.disableClose).toBe(false);
+      expect(dialogRef.close).toHaveBeenCalledWith(true);
+    });
+
+    it('desabilita Salvar e Cancelar e mostra carregamento durante o envio', () => {
+      const component = setup();
+      service.createContributor.mockReturnValue(new Subject<ContributorRead>());
+      component.form.controls.github_username.setValue('octocat');
+
+      component.onSubmit();
+      fixture.detectChanges();
+
+      const buttons: HTMLButtonElement[] = Array.from(fixture.nativeElement.querySelectorAll('mat-dialog-actions button'));
+      expect(buttons.map((b) => b.disabled)).toEqual([true, true]);
+      expect(buttons[1].textContent).toContain('Salvando');
+      expect(buttons[1].querySelector('mat-spinner')).not.toBeNull();
+    });
+
+    it('não envia duas vezes com clique duplo', () => {
+      const component = setup();
+      service.createContributor.mockReturnValue(new Subject<ContributorRead>());
+      component.form.controls.github_username.setValue('octocat');
+
+      component.onSubmit();
+      component.onSubmit();
+
+      expect(service.createContributor).toHaveBeenCalledTimes(1);
+    });
+
+    it.each([
+      ['409', { status: 409, error: { detail: 'Contribuinte já cadastrado' } }],
+      ['422', { status: 422, error: { detail: [] } }],
+      ['falha de rede', { status: 0, error: null }],
+    ])('em erro (%s), continua aberto com os dados preservados', (_caso, error) => {
+      const component = setup();
+      service.createContributor.mockReturnValue(throwError(() => error));
+      component.form.setValue({
+        github_username: 'octocat',
+        nome: 'Octo',
+        avatar_url: '',
+        linkedin_url: 'https://www.linkedin.com/in/octo',
+        portfolio_url: '',
+      });
+
+      component.onSubmit();
+
+      expect(dialogRef.close).not.toHaveBeenCalled();
+      expect(component.saving()).toBe(false);
+      expect(dialogRef.disableClose).toBe(false);
+      expect(component.form.getRawValue()).toEqual({
+        github_username: 'octocat',
+        nome: 'Octo',
+        avatar_url: '',
+        linkedin_url: 'https://www.linkedin.com/in/octo',
+        portfolio_url: '',
+      });
+    });
+
+    it('permite tentar de novo depois de um erro', () => {
+      const component = setup();
+      service.createContributor.mockReturnValueOnce(throwError(() => ({ status: 409 })));
+      component.form.controls.github_username.setValue('octocat');
+
+      component.onSubmit();
+      component.onSubmit();
+
+      expect(service.createContributor).toHaveBeenCalledTimes(2);
+      expect(dialogRef.close).toHaveBeenCalledWith(true);
+    });
+
+    it('não envia com formulário inválido', () => {
+      const component = setup();
+      component.form.controls.linkedin_url.setValue('https://www.linkedin.com/company/x');
+      component.form.controls.github_username.setValue('octocat');
+
+      component.onSubmit();
+
+      expect(service.createContributor).not.toHaveBeenCalled();
+      expect(component.form.controls.linkedin_url.touched).toBe(true);
+    });
+
+    it('Cancelar não fecha durante o envio', () => {
+      const component = setup();
+      service.createContributor.mockReturnValue(new Subject<ContributorRead>());
+      component.form.controls.github_username.setValue('octocat');
+
+      component.onSubmit();
+      component.onCancel();
+
+      expect(dialogRef.close).not.toHaveBeenCalled();
     });
   });
 });

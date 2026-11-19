@@ -9,7 +9,11 @@ import { ContributorRead } from '../../../core/models/contributor.model';
 import { ContributorService } from '../../../core/services/contributor.service';
 import { ConfirmDialog } from '../../../shared/components/confirm-dialog/confirm-dialog';
 import { NotificationService } from '../../../shared/services/notification.service';
-import { ContributorFormDialog, ContributorFormDialogData } from './contributor-form-dialog/contributor-form-dialog';
+import {
+  ContributorFormDialog,
+  ContributorFormDialogData,
+  ContributorFormDialogResult,
+} from './contributor-form-dialog/contributor-form-dialog';
 
 @Component({
   selector: 'app-contributors',
@@ -38,24 +42,20 @@ export class Contributors implements OnInit {
   }
 
   private openFormDialog(data: ContributorFormDialogData): void {
-    const ref = this.dialog.open(ContributorFormDialog, { data, width: '500px' });
+    // O diálogo faz o salvamento e só fecha com `true` em caso de sucesso.
+    const ref = this.dialog.open<ContributorFormDialog, ContributorFormDialogData, ContributorFormDialogResult>(
+      ContributorFormDialog,
+      { data, width: '500px' },
+    );
 
-    ref.afterClosed().subscribe((result) => {
-      if (!result) return;
+    ref.afterClosed().subscribe((saved) => {
+      if (!saved) return;
 
-      const request = data.contributor
-        ? this.contributorService.updateContributor(data.contributor.id, result)
-        : this.contributorService.createContributor(result);
-
-      request.subscribe({
-        next: () => {
-          this.notification.showNotification(
-            data.contributor ? 'Contribuinte atualizado com sucesso' : 'Contribuinte criado com sucesso',
-            'success',
-          );
-          this.contributorService.getContributors().subscribe();
-        },
-      });
+      this.notification.showNotification(
+        data.contributor ? 'Contribuinte atualizado com sucesso' : 'Contribuinte criado com sucesso',
+        'success',
+      );
+      this.contributorService.getContributors().subscribe();
     });
   }
 
