@@ -2,3 +2,9 @@
   width: 100%;
   min-width: 360px;
 }
+
+.save-button mat-spinner {
+  display: inline-block;
+  margin-right: 8px;
+  vertical-align: middle;
+}

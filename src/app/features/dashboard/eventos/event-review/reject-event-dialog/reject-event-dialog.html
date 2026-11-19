@@ -21,8 +21,23 @@
 </mat-dialog-content>
 
 <mat-dialog-actions align="end">
-  <button mat-flat-button class="cancel-action-button" (click)="cancel()">Cancelar</button>
-  <button mat-flat-button color="warn" [disabled]="motivo.invalid" (click)="confirm()">
-    Confirmar recusa
+  <button mat-flat-button class="cancel-action-button" type="button" (click)="cancel()" [disabled]="saving()">
+    Cancelar
+  </button>
+  <button
+    mat-flat-button
+    class="save-button"
+    color="warn"
+    type="button"
+    [disabled]="motivo.invalid || saving()"
+    [attr.aria-busy]="saving()"
+    (click)="confirm()"
+  >
+    @if (saving()) {
+      <mat-spinner diameter="18" />
+      Recusando...
+    } @else {
+      Confirmar recusa
+    }
   </button>
 </mat-dialog-actions>

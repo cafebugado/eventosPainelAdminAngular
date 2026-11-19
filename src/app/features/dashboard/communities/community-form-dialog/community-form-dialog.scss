@@ -8,3 +8,9 @@
 .full-width {
   width: 100%;
 }
+
+.save-button mat-spinner {
+  display: inline-block;
+  margin-right: 8px;
+  vertical-align: middle;
+}
