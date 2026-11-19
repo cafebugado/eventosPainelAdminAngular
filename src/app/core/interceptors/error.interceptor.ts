@@ -4,6 +4,7 @@ import { Router } from '@angular/router';
 import * as Sentry from '@sentry/angular';
 import { catchError, throwError } from 'rxjs';
 import { NotificationService } from '../../shared/services/notification.service';
+import { formatApiErrorDetail } from '../http/api-error-message';
 import { SKIP_ERROR_NOTIFICATION } from '../http/error-notification.context';
 import { AuthService } from '../services/auth.service';
 
@@ -25,12 +26,9 @@ export const errorInterceptor: HttpInterceptorFn = (req, next) => {
             extra: { url: req.url, method: req.method, status: error.status },
           });
         }
-        const message = error?.error?.detail ?? error?.message ?? 'Erro inesperado';
         if (!skipNotification) {
-          notification.showNotification(
-            typeof message === 'string' ? message : 'Erro inesperado',
-            'error',
-          );
+          const fallback = typeof error?.message === 'string' && error.message ? error.message : undefined;
+          notification.showNotification(formatApiErrorDetail(error?.error?.detail, fallback), 'error');
         }
       }
       return throwError(() => error);
