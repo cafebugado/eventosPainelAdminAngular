@@ -1,4 +1,4 @@
-import { Component, computed, inject } from '@angular/core';
+import { Component, computed, inject, ChangeDetectionStrategy } from '@angular/core';
 import { RouterLink, RouterLinkActive, Router } from '@angular/router';
 import { MatButtonModule } from '@angular/material/button';
 import { MatIconModule } from '@angular/material/icon';
@@ -15,8 +15,17 @@ import { MENU_ITEMS, SITE_URL } from '../../menu-items';
 
 @Component({
   selector: 'app-admin-sidebar',
-  imports: [RouterLink, RouterLinkActive, MatButtonModule, MatIconModule, MatTooltipModule, MatDividerModule, RoleLabelPipe],
+  imports: [
+    RouterLink,
+    RouterLinkActive,
+    MatButtonModule,
+    MatIconModule,
+    MatTooltipModule,
+    MatDividerModule,
+    RoleLabelPipe,
+  ],
   templateUrl: './admin-sidebar.html',
+  changeDetection: ChangeDetectionStrategy.Eager,
   styleUrl: './admin-sidebar.scss',
 })
 export class AdminSidebar {
@@ -31,7 +40,9 @@ export class AdminSidebar {
 
   readonly siteUrl = SITE_URL;
   readonly menuItems = computed(() =>
-    MENU_ITEMS.filter((item) => !item.permission || this.roleService.permissions()[item.permission]),
+    MENU_ITEMS.filter(
+      (item) => !item.permission || this.roleService.permissions()[item.permission],
+    ),
   );
 
   readonly displayName = computed(() => {

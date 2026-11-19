@@ -1,7 +1,18 @@
-import { Component, inject, signal } from '@angular/core';
-import { AbstractControl, FormBuilder, ReactiveFormsModule, ValidationErrors, Validators } from '@angular/forms';
+import { Component, inject, signal, ChangeDetectionStrategy } from '@angular/core';
+import {
+  AbstractControl,
+  FormBuilder,
+  ReactiveFormsModule,
+  ValidationErrors,
+  Validators,
+} from '@angular/forms';
 import { MatButtonModule } from '@angular/material/button';
-import { MatDialogActions, MatDialogContent, MatDialogRef, MatDialogTitle } from '@angular/material/dialog';
+import {
+  MatDialogActions,
+  MatDialogContent,
+  MatDialogRef,
+  MatDialogTitle,
+} from '@angular/material/dialog';
 import { MatFormFieldModule } from '@angular/material/form-field';
 import { MatIconModule } from '@angular/material/icon';
 import { MatInputModule } from '@angular/material/input';
@@ -29,6 +40,7 @@ function passwordMatchValidator(control: AbstractControl): ValidationErrors | nu
     MatProgressSpinnerModule,
   ],
   templateUrl: './change-password-dialog.html',
+  changeDetection: ChangeDetectionStrategy.Eager,
   styleUrl: './change-password-dialog.scss',
 })
 export class ChangePasswordDialog {
@@ -75,7 +87,10 @@ export class ChangePasswordDialog {
         if (error?.status === 401) {
           this.form.controls.currentPassword.setErrors({ invalid: true });
         } else {
-          this.notification.showNotification('Não foi possível atualizar a senha. Tente novamente.', 'error');
+          this.notification.showNotification(
+            'Não foi possível atualizar a senha. Tente novamente.',
+            'error',
+          );
         }
       },
     });

@@ -1,4 +1,11 @@
-import { AfterViewInit, Component, ElementRef, forwardRef, ViewChild } from '@angular/core';
+import {
+  AfterViewInit,
+  Component,
+  ElementRef,
+  forwardRef,
+  ViewChild,
+  ChangeDetectionStrategy,
+} from '@angular/core';
 import { ControlValueAccessor, NG_VALUE_ACCESSOR } from '@angular/forms';
 import { MatButtonModule } from '@angular/material/button';
 import { MatIconModule } from '@angular/material/icon';
@@ -9,6 +16,7 @@ import { MatTooltipModule } from '@angular/material/tooltip';
   imports: [MatButtonModule, MatIconModule, MatTooltipModule],
   templateUrl: './rich-text-editor.html',
   styleUrl: './rich-text-editor.scss',
+  changeDetection: ChangeDetectionStrategy.Eager,
   providers: [
     {
       provide: NG_VALUE_ACCESSOR,
@@ -97,7 +105,10 @@ export class RichTextEditor implements ControlValueAccessor, AfterViewInit {
 
     this.replaceSelection(`${prefix}${selectedText}${suffix}`);
 
-    textarea.setSelectionRange(selectionStart + prefix.length, selectionStart + prefix.length + selectedText.length);
+    textarea.setSelectionRange(
+      selectionStart + prefix.length,
+      selectionStart + prefix.length + selectedText.length,
+    );
   }
 
   private applyLinePrefix(nextPrefix: () => string): void {
