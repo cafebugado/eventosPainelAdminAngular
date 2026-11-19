@@ -21,6 +21,7 @@ import {
   isValidPortfolioUrl,
 } from '../../../../shared/utils/url-validators.util';
 import { buildContributorPayload } from './contributor-payload';
+import { describeGitHubLookupError } from './github-lookup-error';
 
 export interface ContributorFormDialogData {
   contributor?: ContributorRead;
@@ -84,7 +85,7 @@ export class ContributorFormDialog {
   });
 
   searchGitHub(): void {
-    const username = this.form.controls.github_username.value;
+    const username = this.form.controls.github_username.value.trim();
     if (!username || !isValidGitHubUsername(username)) {
       this.notification.showNotification('Informe um username válido do GitHub', 'error');
       return;
@@ -94,14 +95,16 @@ export class ContributorFormDialog {
     this.contributorService.fetchGitHubUser(username).subscribe({
       next: (info) => {
         this.form.patchValue({
-          nome: info.name ?? this.form.controls.nome.value,
-          avatar_url: info.avatar_url,
+          nome: info.nome || this.form.controls.nome.value,
+          avatar_url: info.avatar_url || this.form.controls.avatar_url.value,
         });
+        // Vale só para este username: se ele mudar, o envio volta ao endereço padrão.
+        if (info.github_url) this.knownGithubUrl = { username, url: info.github_url };
         this.searchingGithub.set(false);
       },
-      error: () => {
+      error: (error: unknown) => {
         this.searchingGithub.set(false);
-        this.notification.showNotification('Usuário do GitHub não encontrado', 'error');
+        this.notification.showNotification(describeGitHubLookupError(error), 'error');
       },
     });
   }

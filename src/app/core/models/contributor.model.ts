@@ -31,9 +31,10 @@ export interface ContributorRead {
   updated_at: string;
 }
 
+/** Resposta de `GET /contributors/github/{username}` (schema `GitHubUserInfo` da API). */
 export interface GitHubUserInfo {
-  login: string;
-  name?: string | null;
+  github_username: string;
+  nome: string;
   avatar_url: string;
-  html_url: string;
+  github_url: string;
 }
