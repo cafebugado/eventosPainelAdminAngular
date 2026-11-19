@@ -1,4 +1,4 @@
-import { Component, inject } from '@angular/core';
+import { Component, inject, ChangeDetectionStrategy } from '@angular/core';
 import { MatButtonModule } from '@angular/material/button';
 import {
   MAT_DIALOG_DATA,
@@ -18,6 +18,7 @@ export interface ConfirmDialogData {
 @Component({
   selector: 'app-confirm-dialog',
   imports: [MatButtonModule, MatDialogTitle, MatDialogContent, MatDialogActions],
+  changeDetection: ChangeDetectionStrategy.Eager,
   templateUrl: './confirm-dialog.html',
 })
 export class ConfirmDialog {

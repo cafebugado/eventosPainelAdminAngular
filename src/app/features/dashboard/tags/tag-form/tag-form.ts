@@ -1,5 +1,12 @@
 import { Location } from '@angular/common';
-import { Component, OnInit, computed, inject, signal } from '@angular/core';
+import {
+  Component,
+  OnInit,
+  computed,
+  inject,
+  signal,
+  ChangeDetectionStrategy,
+} from '@angular/core';
 import { FormBuilder, ReactiveFormsModule, Validators } from '@angular/forms';
 import { ActivatedRoute, Router } from '@angular/router';
 import { finalize } from 'rxjs';
@@ -24,6 +31,7 @@ const DEFAULT_COLOR = '#2563eb';
     MatProgressSpinnerModule,
   ],
   templateUrl: './tag-form.html',
+  changeDetection: ChangeDetectionStrategy.Eager,
   styleUrl: './tag-form.scss',
 })
 export class TagForm implements OnInit {

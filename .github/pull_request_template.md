@@ -12,6 +12,7 @@
 
 ## Checklist
 
+- [ ] Esta branch foi criada a partir de `development` (branch padrão do repo é `production` — cuidado ao criar branch pela UI do GitHub)
 - [ ] `npm run build` passa localmente
 - [ ] `npm test` passa localmente
 - [ ] `npm run lint` passa localmente
