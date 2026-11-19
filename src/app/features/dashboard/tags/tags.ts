@@ -1,4 +1,4 @@
-import { Component, OnInit, inject } from '@angular/core';
+import { Component, OnInit, inject, ChangeDetectionStrategy } from '@angular/core';
 import { MatButtonModule } from '@angular/material/button';
 import { MatCardModule } from '@angular/material/card';
 import { MatDialog } from '@angular/material/dialog';
@@ -14,6 +14,7 @@ import { NotificationService } from '../../../shared/services/notification.servi
   selector: 'app-tags',
   imports: [MatButtonModule, MatCardModule, MatIconModule, MatProgressSpinnerModule],
   templateUrl: './tags.html',
+  changeDetection: ChangeDetectionStrategy.Eager,
   styleUrl: './tags.scss',
 })
 export class Tags implements OnInit {

@@ -1,4 +1,4 @@
-import { Component, computed, inject, OnInit } from '@angular/core';
+import { Component, computed, inject, OnInit, ChangeDetectionStrategy } from '@angular/core';
 import { MatCardModule } from '@angular/material/card';
 import { MatIconModule } from '@angular/material/icon';
 import { AuthService } from '../../../../core/services/auth.service';
@@ -16,6 +16,7 @@ const MOTIVATIONAL_PHRASES: Record<string, string> = {
   selector: 'app-moderator-stats-panel',
   imports: [MatCardModule, MatIconModule],
   templateUrl: './moderator-stats-panel.html',
+  changeDetection: ChangeDetectionStrategy.Eager,
   styleUrl: './moderator-stats-panel.scss',
 })
 export class ModeratorStatsPanel implements OnInit {

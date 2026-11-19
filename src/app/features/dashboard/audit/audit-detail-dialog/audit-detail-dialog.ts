@@ -1,4 +1,4 @@
-import { Component, inject } from '@angular/core';
+import { Component, inject, ChangeDetectionStrategy } from '@angular/core';
 import { DatePipe } from '@angular/common';
 import { MatButtonModule } from '@angular/material/button';
 import { MAT_DIALOG_DATA, MatDialogModule, MatDialogRef } from '@angular/material/dialog';
@@ -12,6 +12,7 @@ export interface AuditDetailDialogData {
   selector: 'app-audit-detail-dialog',
   imports: [DatePipe, MatButtonModule, MatDialogModule],
   templateUrl: './audit-detail-dialog.html',
+  changeDetection: ChangeDetectionStrategy.Eager,
   styleUrl: './audit-detail-dialog.scss',
 })
 export class AuditDetailDialog {

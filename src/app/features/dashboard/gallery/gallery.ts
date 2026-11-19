@@ -1,4 +1,4 @@
-import { Component, OnInit, inject, signal } from '@angular/core';
+import { Component, OnInit, inject, signal, ChangeDetectionStrategy } from '@angular/core';
 import { FormsModule } from '@angular/forms';
 import { MatButtonModule } from '@angular/material/button';
 import { MatCardModule } from '@angular/material/card';
@@ -32,6 +32,7 @@ import { PhotoCaptionEditor } from './photo-caption-editor/photo-caption-editor'
     PhotoCaptionEditor,
   ],
   templateUrl: './gallery.html',
+  changeDetection: ChangeDetectionStrategy.Eager,
   styleUrl: './gallery.scss',
 })
 export class Gallery implements OnInit {
@@ -51,7 +52,9 @@ export class Gallery implements OnInit {
   ngOnInit(): void {
     this.galleryService.getAlbuns().subscribe();
     this.eventService.getEvents().subscribe((events) => this.events.set(events));
-    this.communityService.getCommunities().subscribe((communities) => this.communities.set(communities));
+    this.communityService
+      .getCommunities()
+      .subscribe((communities) => this.communities.set(communities));
   }
 
   albumTitle(album: GaleriaAlbumRead): string {
