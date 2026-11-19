@@ -81,6 +81,30 @@ describe('ContributorFormDialog', () => {
       expect(notification.showNotification).not.toHaveBeenCalled();
     });
 
+    it('remove espaços nas pontas do nome e do avatar vindos do GitHub', () => {
+      const component = setup();
+      service.fetchGitHubUser.mockReturnValue(
+        of({ ...OCTOCAT, nome: '  The Octocat ', avatar_url: ` ${OCTOCAT.avatar_url} ` }),
+      );
+      component.form.controls.github_username.setValue('octocat');
+
+      component.searchGitHub();
+
+      expect(component.form.controls.nome.value).toBe('The Octocat');
+      expect(component.form.controls.avatar_url.value).toBe(OCTOCAT.avatar_url);
+    });
+
+    it('mantém o nome digitado quando o GitHub devolve só espaços', () => {
+      const component = setup();
+      service.fetchGitHubUser.mockReturnValue(of({ ...OCTOCAT, nome: '   ' }));
+      component.form.controls.github_username.setValue('octocat');
+      component.form.controls.nome.setValue('Octo Manual');
+
+      component.searchGitHub();
+
+      expect(component.form.controls.nome.value).toBe('Octo Manual');
+    });
+
     it('mostra só "usuário não encontrado" quando o GitHub responde 404', () => {
       const component = setup();
       service.fetchGitHubUser.mockReturnValue(
