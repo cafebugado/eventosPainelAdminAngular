@@ -1,5 +1,5 @@
 import { BreakpointObserver } from '@angular/cdk/layout';
-import { Component, computed, inject, input, output } from '@angular/core';
+import { Component, computed, inject, input, output, ChangeDetectionStrategy } from '@angular/core';
 import { MatButtonModule } from '@angular/material/button';
 import { MatIconModule } from '@angular/material/icon';
 import { toSignal } from '@angular/core/rxjs-interop';
@@ -9,6 +9,7 @@ import { map } from 'rxjs';
   selector: 'app-pagination',
   imports: [MatButtonModule, MatIconModule],
   templateUrl: './pagination.html',
+  changeDetection: ChangeDetectionStrategy.Eager,
   styleUrl: './pagination.scss',
 })
 export class Pagination {

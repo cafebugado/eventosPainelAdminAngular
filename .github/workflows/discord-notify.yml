@@ -1,0 +1,59 @@
+name: Discord
+
+# Envia issues, PRs, reviews, CI, deploys da Vercel e commits para os canais
+# da equipe no Discord do Café Bugado. Detalhes em .github/discord/README.md.
+# Só observa eventos: não roda código de PR e nunca bloqueia merge.
+
+on:
+  issues:
+    types: [opened, edited, closed, reopened, assigned, unassigned, labeled, unlabeled]
+  issue_comment:
+    types: [created]
+  pull_request_target:
+    types: [opened, reopened, ready_for_review, converted_to_draft, review_requested, synchronize, closed, edited]
+  pull_request_review:
+    types: [submitted]
+  workflow_run:
+    workflows: [CI, CodeQL]
+    types: [completed]
+  deployment_status:
+  push:
+    branches: [development, production]
+  release:
+    types: [published]
+
+permissions:
+  contents: read
+  issues: read
+  pull-requests: read
+  actions: read
+  deployments: read
+
+# Um evento por vez para cada issue/PR, evitando posts duplicados.
+concurrency:
+  group: discord-${{ github.event.issue.number || github.event.pull_request.number || github.run_id }}
+  cancel-in-progress: false
+
+jobs:
+  notify:
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    steps:
+      # Em eventos de PR nunca usa o código do PR: pull_request_target lê a branch
+      # padrão e pull_request_review lê a branch de destino do PR.
+      - name: Checkout do script de notificação
+        uses: actions/checkout@v7
+        with:
+          ref: ${{ github.event_name == 'pull_request_target' && github.event.repository.default_branch || github.event_name == 'pull_request_review' && github.event.pull_request.base.ref || github.sha }}
+          sparse-checkout: .github/discord
+          persist-credentials: false
+
+      - name: Enviar para o Discord
+        # A branch pode ainda não ter a integração (ex.: antes do merge)
+        if: hashFiles('.github/discord/notify.mjs') != ''
+        run: node .github/discord/notify.mjs
+        env:
+          DISCORD_CONFIG: ${{ vars.DISCORD_CONFIG || secrets.DISCORD_CONFIG }}
+          DISCORD_WEBHOOKS: ${{ secrets.DISCORD_WEBHOOKS }}
+          DISCORD_BOT_TOKEN: ${{ secrets.DISCORD_BOT_TOKEN }}
+          GITHUB_TOKEN: ${{ github.token }}

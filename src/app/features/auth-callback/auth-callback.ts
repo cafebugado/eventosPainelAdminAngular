@@ -1,4 +1,4 @@
-import { Component, inject } from '@angular/core';
+import { Component, inject, ChangeDetectionStrategy } from '@angular/core';
 import { ActivatedRoute, Router } from '@angular/router';
 import { MatProgressSpinnerModule } from '@angular/material/progress-spinner';
 import { AuthService } from '../../core/services/auth.service';
@@ -7,6 +7,7 @@ import { NotificationService } from '../../shared/services/notification.service'
 @Component({
   selector: 'app-auth-callback',
   imports: [MatProgressSpinnerModule],
+  changeDetection: ChangeDetectionStrategy.Eager,
   template: `
     <div style="display:flex;align-items:center;justify-content:center;min-height:100vh;">
       <mat-spinner diameter="48"></mat-spinner>

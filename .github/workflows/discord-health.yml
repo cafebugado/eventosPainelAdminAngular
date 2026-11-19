@@ -1,0 +1,48 @@
+name: Discord · Health
+
+# Verifica se o painel de produção está no ar a cada 5 minutos e avisa
+# no Discord só quando o estado muda (caiu / voltou).
+
+on:
+  schedule:
+    - cron: '*/5 * * * *'
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: discord-health
+  cancel-in-progress: false
+
+jobs:
+  health:
+    runs-on: ubuntu-latest
+    timeout-minutes: 3
+    steps:
+      - uses: actions/checkout@v7
+        with:
+          sparse-checkout: .github/discord
+          persist-credentials: false
+
+      # Último estado conhecido (para avisar só nas mudanças)
+      - uses: actions/cache/restore@v6
+        with:
+          path: .health-state.json
+          key: discord-health-${{ github.run_id }}
+          restore-keys: discord-health-
+
+      - name: Verificar /health
+        id: check
+        if: hashFiles('.github/discord/notify.mjs') != ''
+        run: node .github/discord/notify.mjs health
+        env:
+          DISCORD_CONFIG: ${{ vars.DISCORD_CONFIG }}
+          DISCORD_WEBHOOKS: ${{ secrets.DISCORD_WEBHOOKS }}
+          DISCORD_BOT_TOKEN: ${{ secrets.DISCORD_BOT_TOKEN }}
+
+      - if: steps.check.outputs.changed == 'true'
+        uses: actions/cache/save@v6
+        with:
+          path: .health-state.json
+          key: discord-health-${{ github.run_id }}

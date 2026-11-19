@@ -1,4 +1,4 @@
-import { Component, inject, signal, HostListener } from '@angular/core';
+import { Component, inject, signal, HostListener, ChangeDetectionStrategy } from '@angular/core';
 import { FormBuilder, ReactiveFormsModule, Validators } from '@angular/forms';
 import { RouterModule } from '@angular/router';
 import { MatButtonModule } from '@angular/material/button';
@@ -24,6 +24,7 @@ const EMAIL_REGEX = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
     MatProgressSpinnerModule,
   ],
   templateUrl: './forgot-password.html',
+  changeDetection: ChangeDetectionStrategy.Eager,
   styleUrl: './forgot-password.scss',
 })
 export class ForgotPassword {

@@ -1,4 +1,4 @@
-import { Component, OnInit, inject, signal } from '@angular/core';
+import { Component, OnInit, inject, signal, ChangeDetectionStrategy } from '@angular/core';
 import { MatChipsModule } from '@angular/material/chips';
 import { MatDialog } from '@angular/material/dialog';
 import { MatFormFieldModule } from '@angular/material/form-field';
@@ -25,6 +25,7 @@ import { NotificationService } from '../../../shared/services/notification.servi
     RoleLabelPipe,
   ],
   templateUrl: './users.html',
+  changeDetection: ChangeDetectionStrategy.Eager,
   styleUrl: './users.scss',
 })
 export class Users implements OnInit {

@@ -1,4 +1,4 @@
-import { Component, OnInit, inject, signal } from '@angular/core';
+import { Component, OnInit, inject, signal, ChangeDetectionStrategy } from '@angular/core';
 import { FormBuilder, ReactiveFormsModule } from '@angular/forms';
 import { MatButtonModule } from '@angular/material/button';
 import { MAT_DIALOG_DATA, MatDialogModule, MatDialogRef } from '@angular/material/dialog';
@@ -16,8 +16,15 @@ export interface AlbumFormDialogData {
 
 @Component({
   selector: 'app-album-form-dialog',
-  imports: [ReactiveFormsModule, MatButtonModule, MatDialogModule, MatFormFieldModule, MatSelectModule],
+  imports: [
+    ReactiveFormsModule,
+    MatButtonModule,
+    MatDialogModule,
+    MatFormFieldModule,
+    MatSelectModule,
+  ],
   templateUrl: './album-form-dialog.html',
+  changeDetection: ChangeDetectionStrategy.Eager,
   styleUrl: './album-form-dialog.scss',
 })
 export class AlbumFormDialog implements OnInit {
@@ -42,7 +49,9 @@ export class AlbumFormDialog implements OnInit {
 
   ngOnInit(): void {
     this.eventService.getEvents().subscribe((events) => this.events.set(events));
-    this.communityService.getCommunities().subscribe((communities) => this.communities.set(communities));
+    this.communityService
+      .getCommunities()
+      .subscribe((communities) => this.communities.set(communities));
   }
 
   save(): void {

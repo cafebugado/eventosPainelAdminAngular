@@ -1,4 +1,4 @@
-import { Component, OnInit, signal } from '@angular/core';
+import { Component, OnInit, signal, ChangeDetectionStrategy } from '@angular/core';
 import { DatePipe } from '@angular/common';
 import { inject } from '@angular/core';
 import { MatButtonModule } from '@angular/material/button';
@@ -7,7 +7,12 @@ import { MatChipsModule } from '@angular/material/chips';
 import { MatIconModule } from '@angular/material/icon';
 import { MatProgressSpinnerModule } from '@angular/material/progress-spinner';
 import { MatTabsModule } from '@angular/material/tabs';
-import { ContributorInfo, GithubCommit, GithubPR, RepoStats } from '../../../core/models/github.model';
+import {
+  ContributorInfo,
+  GithubCommit,
+  GithubPR,
+  RepoStats,
+} from '../../../core/models/github.model';
 import { GithubService } from '../../../core/services/github.service';
 
 interface RepoPanelState {
@@ -27,15 +32,31 @@ const REPOS: { repo: string; label: string }[] = [
 
 @Component({
   selector: 'app-github-stats',
-  imports: [DatePipe, MatButtonModule, MatCardModule, MatChipsModule, MatIconModule, MatProgressSpinnerModule, MatTabsModule],
+  imports: [
+    DatePipe,
+    MatButtonModule,
+    MatCardModule,
+    MatChipsModule,
+    MatIconModule,
+    MatProgressSpinnerModule,
+    MatTabsModule,
+  ],
   templateUrl: './github-stats.html',
+  changeDetection: ChangeDetectionStrategy.Eager,
   styleUrl: './github-stats.scss',
 })
 export class GithubStats implements OnInit {
   private readonly githubService = inject(GithubService);
 
   readonly panels = signal<RepoPanelState[]>(
-    REPOS.map((r) => ({ ...r, stats: null, commits: [], prs: [], contributors: [], loading: false })),
+    REPOS.map((r) => ({
+      ...r,
+      stats: null,
+      commits: [],
+      prs: [],
+      contributors: [],
+      loading: false,
+    })),
   );
 
   ngOnInit(): void {
@@ -50,9 +71,15 @@ export class GithubStats implements OnInit {
     const panel = this.panels()[index];
     this.updatePanel(index, { loading: true });
 
-    this.githubService.getRepoStats(panel.repo).subscribe((stats) => this.updatePanel(index, { stats }));
-    this.githubService.getRecentCommits(panel.repo).subscribe((commits) => this.updatePanel(index, { commits }));
-    this.githubService.getRecentPRs(panel.repo).subscribe((prs) => this.updatePanel(index, { prs }));
+    this.githubService
+      .getRepoStats(panel.repo)
+      .subscribe((stats) => this.updatePanel(index, { stats }));
+    this.githubService
+      .getRecentCommits(panel.repo)
+      .subscribe((commits) => this.updatePanel(index, { commits }));
+    this.githubService
+      .getRecentPRs(panel.repo)
+      .subscribe((prs) => this.updatePanel(index, { prs }));
     this.githubService
       .getTopContributors(panel.repo)
       .subscribe((contributors) => this.updatePanel(index, { contributors, loading: false }));

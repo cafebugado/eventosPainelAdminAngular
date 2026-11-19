@@ -1,5 +1,14 @@
 import { Location } from '@angular/common';
-import { Component, ElementRef, OnInit, ViewChild, computed, inject, signal } from '@angular/core';
+import {
+  Component,
+  ElementRef,
+  OnInit,
+  ViewChild,
+  computed,
+  inject,
+  signal,
+  ChangeDetectionStrategy,
+} from '@angular/core';
 import { FormBuilder, ReactiveFormsModule, ValidationErrors, Validators } from '@angular/forms';
 import { ActivatedRoute, Router } from '@angular/router';
 import { EMPTY, finalize, forkJoin, of, switchMap } from 'rxjs';
@@ -51,6 +60,7 @@ import { validateURL } from '../../../../shared/utils/url-validators.util';
     RichTextEditor,
   ],
   templateUrl: './event-form.html',
+  changeDetection: ChangeDetectionStrategy.Eager,
   styleUrl: './event-form.scss',
 })
 export class EventForm implements OnInit {

@@ -1,6 +1,19 @@
-import { Component, DestroyRef, Input, OnInit, inject, signal } from '@angular/core';
+import {
+  Component,
+  DestroyRef,
+  Input,
+  OnInit,
+  inject,
+  signal,
+  ChangeDetectionStrategy,
+} from '@angular/core';
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
-import { ControlContainer, FormControl, FormGroupDirective, ReactiveFormsModule } from '@angular/forms';
+import {
+  ControlContainer,
+  FormControl,
+  FormGroupDirective,
+  ReactiveFormsModule,
+} from '@angular/forms';
 import { MatAutocompleteModule } from '@angular/material/autocomplete';
 import { MatFormFieldModule } from '@angular/material/form-field';
 import { MatInputModule } from '@angular/material/input';
@@ -11,9 +24,16 @@ import { BRAZIL_STATES } from '../../utils/brazil-states.util';
 
 @Component({
   selector: 'app-location-selector',
-  imports: [ReactiveFormsModule, MatAutocompleteModule, MatFormFieldModule, MatInputModule, MatSelectModule],
+  imports: [
+    ReactiveFormsModule,
+    MatAutocompleteModule,
+    MatFormFieldModule,
+    MatInputModule,
+    MatSelectModule,
+  ],
   templateUrl: './location-selector.html',
   styleUrl: './location-selector.scss',
+  changeDetection: ChangeDetectionStrategy.Eager,
   viewProviders: [{ provide: ControlContainer, useExisting: FormGroupDirective }],
 })
 export class LocationSelector implements OnInit {

@@ -1,4 +1,4 @@
-import { Component, OnInit, inject } from '@angular/core';
+import { Component, OnInit, inject, ChangeDetectionStrategy } from '@angular/core';
 import { MatButtonModule } from '@angular/material/button';
 import { MatCardModule } from '@angular/material/card';
 import { MatDialog } from '@angular/material/dialog';
@@ -9,12 +9,22 @@ import { ContributorRead } from '../../../core/models/contributor.model';
 import { ContributorService } from '../../../core/services/contributor.service';
 import { ConfirmDialog } from '../../../shared/components/confirm-dialog/confirm-dialog';
 import { NotificationService } from '../../../shared/services/notification.service';
-import { ContributorFormDialog, ContributorFormDialogData } from './contributor-form-dialog/contributor-form-dialog';
+import {
+  ContributorFormDialog,
+  ContributorFormDialogData,
+} from './contributor-form-dialog/contributor-form-dialog';
 
 @Component({
   selector: 'app-contributors',
-  imports: [MatButtonModule, MatCardModule, MatIconModule, MatProgressSpinnerModule, MatTooltipModule],
+  imports: [
+    MatButtonModule,
+    MatCardModule,
+    MatIconModule,
+    MatProgressSpinnerModule,
+    MatTooltipModule,
+  ],
   templateUrl: './contributors.html',
+  changeDetection: ChangeDetectionStrategy.Eager,
   styleUrl: './contributors.scss',
 })
 export class Contributors implements OnInit {
@@ -50,7 +60,9 @@ export class Contributors implements OnInit {
       request.subscribe({
         next: () => {
           this.notification.showNotification(
-            data.contributor ? 'Contribuinte atualizado com sucesso' : 'Contribuinte criado com sucesso',
+            data.contributor
+              ? 'Contribuinte atualizado com sucesso'
+              : 'Contribuinte criado com sucesso',
             'success',
           );
           this.contributorService.getContributors().subscribe();
