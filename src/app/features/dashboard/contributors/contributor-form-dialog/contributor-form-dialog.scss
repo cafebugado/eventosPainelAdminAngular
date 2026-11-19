@@ -33,3 +33,9 @@
   object-fit: cover;
   align-self: center;
 }
+
+.save-button mat-spinner {
+  display: inline-block;
+  margin-right: 8px;
+  vertical-align: middle;
+}

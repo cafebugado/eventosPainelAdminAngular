@@ -14,7 +14,7 @@
         }
       </mat-form-field>
 
-      <button mat-stroked-button type="button" (click)="searchGitHub()" [disabled]="searchingGithub()">
+      <button mat-stroked-button type="button" (click)="searchGitHub()" [disabled]="searchingGithub() || saving()">
         @if (searchingGithub()) {
           <mat-spinner diameter="18" />
         } @else {
@@ -40,9 +40,9 @@
 
     <mat-form-field appearance="outline" class="full-width">
       <mat-label>LinkedIn</mat-label>
-      <input matInput formControlName="linkedin_url" placeholder="https://linkedin.com/in/..." />
+      <input matInput formControlName="linkedin_url" placeholder="https://www.linkedin.com/in/seu-perfil" />
       @if (form.controls.linkedin_url.hasError('linkedin')) {
-        <mat-error>URL do LinkedIn inválida</mat-error>
+        <mat-error>Use o formato https://www.linkedin.com/in/seu-perfil</mat-error>
       }
     </mat-form-field>
 
@@ -57,6 +57,22 @@
 </mat-dialog-content>
 
 <mat-dialog-actions align="end">
-  <button mat-flat-button class="cancel-action-button" (click)="onCancel()">Cancelar</button>
-  <button mat-flat-button class="secondary-action-button" (click)="onSubmit()">Salvar</button>
+  <button mat-flat-button class="cancel-action-button" type="button" (click)="onCancel()" [disabled]="saving()">
+    Cancelar
+  </button>
+  <button
+    mat-flat-button
+    class="secondary-action-button save-button"
+    type="button"
+    (click)="onSubmit()"
+    [disabled]="saving()"
+    [attr.aria-busy]="saving()"
+  >
+    @if (saving()) {
+      <mat-spinner diameter="18" />
+      Salvando...
+    } @else {
+      Salvar
+    }
+  </button>
 </mat-dialog-actions>

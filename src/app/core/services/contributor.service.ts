@@ -1,8 +1,9 @@
-import { HttpClient } from '@angular/common/http';
+import { HttpClient, HttpContext } from '@angular/common/http';
 import { Injectable, inject, signal } from '@angular/core';
 import { Observable, tap } from 'rxjs';
 import { environment } from '../../../environments/environment';
 import { withRetry } from '../http/api-client';
+import { SKIP_ERROR_NOTIFICATION } from '../http/error-notification.context';
 import {
   ContributorCreate,
   ContributorRead,
@@ -51,7 +52,13 @@ export class ContributorService {
     return this.http.delete<void>(`${this.baseUrl}/contributors/${contributorId}`);
   }
 
+  /**
+   * Consulta o perfil no GitHub pela API. Não passa pela notificação global de
+   * erro: quem chama é responsável por avisar o usuário (ver `describeGitHubLookupError`).
+   */
   fetchGitHubUser(username: string): Observable<GitHubUserInfo> {
-    return this.http.get<GitHubUserInfo>(`${this.baseUrl}/contributors/github/${username}`);
+    return this.http.get<GitHubUserInfo>(`${this.baseUrl}/contributors/github/${encodeURIComponent(username)}`, {
+      context: new HttpContext().set(SKIP_ERROR_NOTIFICATION, true),
+    });
   }
 }
