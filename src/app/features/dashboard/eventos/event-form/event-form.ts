@@ -31,6 +31,7 @@ import { TagService } from '../../../../core/services/tag.service';
 import { ConfirmDialog } from '../../../../shared/components/confirm-dialog/confirm-dialog';
 import { LocationSelector } from '../../../../shared/components/location-selector/location-selector';
 import { RichTextEditor } from '../../../../shared/components/rich-text-editor/rich-text-editor';
+import { AutofocusDirective } from '../../../../shared/directives/autofocus.directive';
 import { NotificationService } from '../../../../shared/services/notification.service';
 import {
   formatDateToDisplay,
@@ -58,6 +59,7 @@ import { validateURL } from '../../../../shared/utils/url-validators.util';
     MatTooltipModule,
     LocationSelector,
     RichTextEditor,
+    AutofocusDirective,
   ],
   templateUrl: './event-form.html',
   changeDetection: ChangeDetectionStrategy.Eager,
