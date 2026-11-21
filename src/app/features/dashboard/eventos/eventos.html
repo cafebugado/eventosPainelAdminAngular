@@ -17,6 +17,7 @@
         [ngModel]="rawSearchQuery()"
         (ngModelChange)="onSearchChange($event)"
         placeholder="Nome, descrição ou data"
+        appAutofocus
       />
       <mat-icon matSuffix>search</mat-icon>
     </mat-form-field>

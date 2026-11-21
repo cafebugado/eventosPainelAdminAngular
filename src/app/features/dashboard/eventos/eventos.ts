@@ -34,6 +34,7 @@ import { EventService } from '../../../core/services/event.service';
 import { ProfileService } from '../../../core/services/profile.service';
 import { RoleService } from '../../../core/services/role.service';
 import { Pagination } from '../../../shared/components/pagination/pagination';
+import { AutofocusDirective } from '../../../shared/directives/autofocus.directive';
 import { NotificationService } from '../../../shared/services/notification.service';
 import { isoDateToDisplay, parseEventDate } from '../../../shared/utils/event-date.util';
 import { environment } from '../../../../environments/environment';
@@ -92,6 +93,7 @@ const EVENT_FILTERS: Record<
     MatSelectModule,
     MatTooltipModule,
     Pagination,
+    AutofocusDirective,
   ],
   templateUrl: './eventos.html',
   styleUrl: './eventos.scss',
